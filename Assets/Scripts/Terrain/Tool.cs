@@ -6,17 +6,20 @@ namespace Unrailed.Terrain
 {
     public abstract class Tool : Tile, IPickupable
     {
-        public int tier;
+        public Transform handOffset;
+        public int tier = 1;
 
         public void PickUp(Transform parent)
         {
             GetComponent<BoxCollider>().enabled = false;
 
+            parent.localPosition = handOffset.localPosition;
+            parent.localRotation = handOffset.localRotation;
             transform.parent = parent;
-            transform.localPosition = Vector3.up;
+            transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
         }
 
-        public abstract void InteractWith(Tile tile);
+        public abstract bool InteractWith(Tile tile, Vector3 point);
     }
 }

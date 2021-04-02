@@ -6,7 +6,7 @@ namespace Unrailed.Terrain
 {
     public class Pickaxe : Tool
     {
-        public override void InteractWith(Tile tile)
+        public override bool InteractWith(Tile tile, Vector3 point)
         {
             throw new System.NotImplementedException();
         }

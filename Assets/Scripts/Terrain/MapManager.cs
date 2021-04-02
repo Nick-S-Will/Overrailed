@@ -33,19 +33,18 @@ namespace Unrailed.Terrain
             {
                 var rowParent = new GameObject("Row " + x).transform;
                 rowParent.parent = floorParent;
-                int xPos = -mapLength / 2 + x;
 
                 for (int z = 0; z < mapWidth; z++)
                 {
                     Tile tile = Region.GetTile(groundRegions, heightMap[x, z]);
-                    var obj = Instantiate(tile, new Vector3(xPos, 0, -mapWidth / 2 + z), Quaternion.identity, rowParent);
+                    var obj = Instantiate(tile, new Vector3(x, 0, z), Quaternion.identity, rowParent);
                     obj.name = obj.name.Substring(0, obj.name.Length - 7) + " " + z;
                 }
             }
 
             var groundCollider = new GameObject("Ground Collider").transform;
             groundCollider.parent = transform;
-            groundCollider.position = new Vector3((mapLength + 1) % 2 * -0.5f, -0.5f, (mapWidth + 1) % 2 * -0.5f);
+            groundCollider.position = new Vector3(mapLength / 2f - 0.5f, -0.5f, mapWidth / 2f - 0.5f);
             groundCollider.gameObject.AddComponent<BoxCollider>().size = new Vector3(mapLength, 1, mapWidth);
             #endregion
 
@@ -55,14 +54,12 @@ namespace Unrailed.Terrain
 
             for (int x = 0; x < mapLength; x++)
             {
-                int xPos = -mapLength / 2 + x;
-
                 for (int z = 0; z < mapWidth; z++)
                 {
                     Tile tile = Region.GetTile(obstacleRegions, heightMap[x, z]);
                     if (tile == null) continue;
 
-                    var obj = Instantiate(tile, new Vector3(xPos, 1, -mapWidth / 2 + z), Quaternion.Euler(0, rng.Next(3) * 90, 0), obstacleParent);
+                    var obj = Instantiate(tile, new Vector3(x, 1, z), Quaternion.Euler(0, rng.Next(3) * 90, 0), obstacleParent);
                 }
             }
             #endregion

@@ -19,7 +19,7 @@ namespace Unrailed.Terrain
             transform.localPosition = Vector3.up;
         }
 
-        public void TryStackOn(PickupTile tile)
+        public void TryStackOn(PickupTile stack)
         {
             // TODO: Implement this
         }

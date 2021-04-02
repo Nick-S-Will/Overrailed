@@ -127,7 +127,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85474966dc5c1ec41876f50cc9a27f2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  liquid: {fileID: 0}
   lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
+  breakParticles: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
 --- !u!65 &5117350108793975478
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ namespace Unrailed.Player
     {
         public System.Action<bool> OnPickUp, OnDrop; // True for Pickups false for Tools
 
-        public float moveSpeed = 5, turnSpeed = 360, armTurnTime = 0.5f;
+        public float moveSpeed = 5, turnSpeed = 360, armTurnSpeed = 2, armSwingSpeed = 3;
         public LayerMask interactMask;
 
         [Header("Transforms")] public Transform toolHolder;
@@ -19,6 +19,7 @@ namespace Unrailed.Player
         private Rigidbody rb;
         private MapManager map;
         private Tile heldObject;
+        private bool isSwinging;
 
         void Start()
         {
@@ -36,23 +37,31 @@ namespace Unrailed.Player
                 RaycastHit hit;
                 if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, 1, interactMask, QueryTriggerInteraction.Collide))
                 {
-                    var tile = hit.collider.gameObject.GetComponent<Tile>();
+                    var obj = hit.collider.gameObject.GetComponent<Tile>();
 
                     if (heldObject == null)
                     {
-                        if (tile is IPickupable pickup)
+                        if (obj is IPickupable pickup)
                         {
                             bool isPickup = pickup is PickupTile;
 
                             pickup.PickUp(isPickup ? pickupHolder : toolHolder);
                             OnPickUp?.Invoke(isPickup);
-                            heldObject = tile;
+                            heldObject = obj;
                         }
                     }
                     else
                     {
-                        if (heldObject is Tool tool) tool.InteractWith(tile);
-                        else if (heldObject is PickupTile pickup && tile is PickupTile stack) pickup.TryStackOn(stack);
+                        if (!isSwinging && heldObject is Tool tool)
+                        {
+                            tool.InteractWith(obj, hit.point);
+                            StartCoroutine(SwingTool());
+                        }
+                        else if (heldObject is PickupTile pickup && obj is PickupTile stack)
+                        {
+                            pickup.TryStackOn(stack);
+                            OnDrop?.Invoke(true);
+                        }
                     }
                 }
                 else if (heldObject != null)
@@ -80,27 +89,38 @@ namespace Unrailed.Player
         private void RaiseArms(bool both)
         {
             StopAllCoroutines();
-            StartCoroutine(TurnArm(armR, -90, armTurnTime));
-            if (both) StartCoroutine(TurnArm(armL, -90, armTurnTime));
+            StartCoroutine(TurnArm(armR, -90, armTurnSpeed));
+            if (both) StartCoroutine(TurnArm(armL, -90, armTurnSpeed));
         }
 
         private void LowerArms(bool both)
         {
             StopAllCoroutines();
-            StartCoroutine(TurnArm(armR, 0, armTurnTime));
-            if (both) StartCoroutine(TurnArm(armL, 0, armTurnTime));
+            StartCoroutine(TurnArm(armR, 0, armTurnSpeed));
+            if (both) StartCoroutine(TurnArm(armL, 0, armTurnSpeed));
+        }
+
+        private IEnumerator SwingTool()
+        {
+            isSwinging = true;
+
+            yield return StartCoroutine(TurnArm(armR, 0, armSwingSpeed));
+            yield return new WaitForSeconds(0.1f);
+            yield return StartCoroutine(TurnArm(armR, -90, armTurnSpeed));
+
+            isSwinging = false;
         }
 
         /// <summary>
         /// Animates arm turning around it's local x
         /// </summary>
         /// <param name="arm">Selected arm</param>
-        /// <param name="rotation">Final x value on eulerAngles.x</param>
-        /// <param name="duration">Length in seconds of the animation</param>
-        private IEnumerator TurnArm(Transform arm, float rotation, float duration)
+        /// <param name="rotation">Final x value on arm.eulerAngles.x</param>
+        /// <param name="speed">Speed of the animation</param>
+        private IEnumerator TurnArm(Transform arm, float rotation, float speed)
         {
             Quaternion from = arm.localRotation, to = from * Quaternion.Euler(rotation - from.eulerAngles.x, 0, 0);
-            float percent = 0, speed = 1 / duration;
+            float percent = 0;
 
             while (percent < 1)
             {
