@@ -20,6 +20,6 @@ namespace Unrailed.Terrain
             transform.localRotation = Quaternion.identity;
         }
 
-        public abstract bool InteractWith(Tile tile, Vector3 point);
+        public abstract bool InteractWith(Tile tile, RaycastHit hit);
     }
 }

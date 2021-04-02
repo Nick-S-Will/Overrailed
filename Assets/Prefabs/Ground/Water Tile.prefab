@@ -158,6 +158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   liquid: {fileID: 8282603897148303172}
+  waveHeight: 0.25
 --- !u!65 &7833495729107115489
 BoxCollider:
   m_ObjectHideFlags: 0

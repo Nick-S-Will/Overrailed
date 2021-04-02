@@ -6,15 +6,15 @@ namespace Unrailed.Terrain
 {
     public class BreakTool : Tool
     {
-        [Tooltip("String all BreakableTile's you want this tool to break have in their name")] public string breakTileCode = "Tree";
+        [Tooltip("String all BreakableTile's you want this tool to break have in their names")] public string breakTileCode = "Tree";
 
-        public override bool InteractWith(Tile tile, Vector3 point)
+        public override bool InteractWith(Tile tile, RaycastHit hit)
         {
             if (tile is BreakableTile breakT)
             {
                 if (breakT.name.Contains(breakTileCode))
                 {
-                    breakT.TakeHit(tier, point);
+                    breakT.TakeHit(tier, hit);
                     return true;
                 }
             }

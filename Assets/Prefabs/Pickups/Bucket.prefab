@@ -244,6 +244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   liquid: {fileID: 8986870579608214646}
+  waveHeight: 0.05
   handOffset: {fileID: 5470045993996298689}
   tier: 1
 --- !u!65 &3102169558612024035

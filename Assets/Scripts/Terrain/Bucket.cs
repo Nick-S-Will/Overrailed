@@ -10,16 +10,17 @@ namespace Unrailed.Terrain
 
         protected override void Start()
         {
-            if (liquid != null && isFull) StartCoroutine(AnimateLiquid());
+            liquid.gameObject.SetActive(isFull);
+            if (liquid != null) StartCoroutine(AnimateLiquid());
         }
 
-        public override bool InteractWith(Tile tile, Vector3 point)
+        public override bool InteractWith(Tile tile, RaycastHit hit)
         {
             print(tile.name);
             if (tile.liquid != null)
             {
                 isFull = !isFull;
-                liquid.localScale = isFull ? Vector3.one : Vector3.zero;
+                liquid.gameObject.SetActive(isFull);
                 return true;
             }
 

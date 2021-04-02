@@ -7,6 +7,7 @@ namespace Unrailed.Terrain
     public class Tile : MonoBehaviour
     {
         public Transform liquid;
+        public float waveHeight = 0.2f;
 
         protected virtual void Start()
         {
@@ -15,13 +16,16 @@ namespace Unrailed.Terrain
 
         protected IEnumerator AnimateLiquid()
         {
-            float min = 0.85f;
-
-            yield return new WaitForSeconds(transform.position.x);
+            yield return new WaitForSeconds(0.2f * transform.position.x + 0.3f * transform.position.z);
+            float time = 0;
 
             while (liquid)
             {
-                liquid.localScale = new Vector3(1, Mathf.Lerp(1, min, Mathf.PingPong(Time.time, 1)), 1);
+                if (liquid.gameObject.activeSelf)
+                {
+                    liquid.localScale = new Vector3(1, Mathf.Lerp(1, 1 - waveHeight, Mathf.PingPong(time, 1)), 1);
+                    time += Time.deltaTime;
+                }
                 yield return null;
             }
 

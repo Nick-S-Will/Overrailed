@@ -9,10 +9,33 @@ namespace Unrailed.Terrain
         public Tile lowerTier;
         public ParticleSystem breakParticles;
 
-        public void TakeHit(int damage, Vector3 point)
+        private Gradient meshColors;
+
+        protected override void Start()
+        {
+            base.Start();
+
+            var mats = new List<Material>();
+            var gradientPins = new List<GradientColorKey>();
+
+            foreach (Transform t in transform)
+            {
+                var renderer = t.GetComponent<MeshRenderer>();
+                if (renderer != null) mats.Add(renderer.material);
+            }
+            for (int i = 0; i < mats.Count; i++)
+            {
+                gradientPins.Add(new GradientColorKey(mats[i].color, (i + 1f) / mats.Count));
+            }
+
+            meshColors = new Gradient();
+            meshColors.mode = GradientMode.Fixed;
+            meshColors.colorKeys = gradientPins.ToArray();
+        }
+
+        public void TakeHit(int damage, RaycastHit hit)
         {
             Tile toSpawn = this;
-            Material mat = GetComponent<Renderer>().material;
 
             for (int i = 0; i < damage; i++)
             {
@@ -20,8 +43,13 @@ namespace Unrailed.Terrain
                 {
                     toSpawn = t.lowerTier;
 
-                    var p = Instantiate(breakParticles, point, Quaternion.identity);
-                    p.GetComponent<ParticleSystemRenderer>().material = mat;
+                    var p = Instantiate(breakParticles, hit.point, breakParticles.transform.rotation);
+                    Destroy(p.gameObject, breakParticles.main.startLifetime.constant);
+
+                    var settings = p.main;
+                    var colors = new ParticleSystem.MinMaxGradient(meshColors);
+                    colors.mode = ParticleSystemGradientMode.RandomColor;
+                    settings.startColor = colors;
                 }
                 else break;
             }

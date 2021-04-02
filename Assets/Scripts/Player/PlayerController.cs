@@ -54,8 +54,7 @@ namespace Unrailed.Player
                     {
                         if (!isSwinging && heldObject is Tool tool)
                         {
-                            tool.InteractWith(obj, hit.point);
-                            StartCoroutine(SwingTool());
+                            if (tool.InteractWith(obj, hit)) StartCoroutine(SwingTool());
                         }
                         else if (heldObject is PickupTile pickup && obj is PickupTile stack)
                         {
