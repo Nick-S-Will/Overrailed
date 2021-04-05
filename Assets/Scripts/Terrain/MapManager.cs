@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Unrailed.Terrain
@@ -12,8 +13,8 @@ namespace Unrailed.Terrain
         public Vector2 noiseOffset;
         [Range(1, 1000)] public int mapLength = 5, mapWidth = 5;
 
-        [Header("Region")] public Region[] groundRegions;
-        public Region[] obstacleRegions;
+        [Header("Regions")] public Biome groundBiome = Biome.Rainbow;
+        public Biome obstacleBiome = Biome.Rainbow;
 
         private System.Random rng;
         private Transform floorParent, obstacleParent;
@@ -36,7 +37,8 @@ namespace Unrailed.Terrain
 
                 for (int z = 0; z < mapWidth; z++)
                 {
-                    Tile tile = Region.GetTile(groundRegions, heightMap[x, z]);
+                    // Gets tile type based on height map
+                    Tile tile = groundBiome.GetTile(heightMap[x, z]);
                     var obj = Instantiate(tile, new Vector3(x, 0, z), Quaternion.identity, rowParent);
                     obj.name = obj.name.Substring(0, obj.name.Length - 7) + " " + z;
                 }
@@ -56,7 +58,8 @@ namespace Unrailed.Terrain
             {
                 for (int z = 0; z < mapWidth; z++)
                 {
-                    Tile tile = Region.GetTile(obstacleRegions, heightMap[x, z]);
+                    // Gets tile type based on height map
+                    Tile tile = obstacleBiome.GetTile(heightMap[x, z]);
                     if (tile == null) continue;
 
                     var obj = Instantiate(tile, new Vector3(x, 1, z), Quaternion.Euler(0, rng.Next(3) * 90, 0), obstacleParent);

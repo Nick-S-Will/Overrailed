@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 48882614102991751}
   - component: {fileID: 8098470855400629273}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Stone Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bafd50eaa25837478fc362986d4a021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileHeight: 1
+  liquid: {fileID: 0}
+  waveHeight: 0.2
 --- !u!1 &8231537262157128673
 GameObject:
   m_ObjectHideFlags: 0
@@ -56,7 +57,7 @@ GameObject:
   - component: {fileID: 8389951501395740142}
   - component: {fileID: 4628047495398986159}
   - component: {fileID: 2412904941776026041}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

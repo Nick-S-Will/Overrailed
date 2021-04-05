@@ -130,6 +130,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   liquid: {fileID: 0}
+  waveHeight: 0
   handOffset: {fileID: 5797680922245980834}
   tier: 1
   breakTileCode: Tree

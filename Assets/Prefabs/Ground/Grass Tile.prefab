@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1679962919904034318}
   - component: {fileID: -7425801750402064875}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Grass Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bafd50eaa25837478fc362986d4a021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileHeight: 1
+  liquid: {fileID: 0}
+  waveHeight: 0.2
 --- !u!1 &7332296297757310568
 GameObject:
   m_ObjectHideFlags: 0
@@ -56,7 +57,7 @@ GameObject:
   - component: {fileID: 7175042713569122407}
   - component: {fileID: 6325278774092663846}
   - component: {fileID: 3927591220462756912}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

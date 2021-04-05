@@ -35,40 +35,14 @@ namespace Unrailed.Player
             if (Input.GetMouseButtonDown(0))
             {
                 RaycastHit hit;
-                if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, 1, interactMask, QueryTriggerInteraction.Collide))
+                if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, 1, interactMask))
                 {
                     var obj = hit.collider.gameObject.GetComponent<Tile>();
 
-                    if (heldObject == null)
-                    {
-                        if (obj is IPickupable pickup)
-                        {
-                            bool isPickup = pickup is PickupTile;
-
-                            pickup.PickUp(isPickup ? pickupHolder : toolHolder);
-                            OnPickUp?.Invoke(isPickup);
-                            heldObject = obj;
-                        }
-                    }
-                    else
-                    {
-                        if (!isSwinging && heldObject is Tool tool)
-                        {
-                            if (tool.InteractWith(obj, hit)) StartCoroutine(SwingTool());
-                        }
-                        else if (heldObject is PickupTile pickup && obj is PickupTile stack)
-                        {
-                            pickup.TryStackOn(stack);
-                            OnDrop?.Invoke(true);
-                        }
-                    }
+                    if (heldObject == null) TryPickup(obj);
+                    else UseItem(obj, hit);
                 }
-                else if (heldObject != null)
-                {
-                    map.PlaceTile(heldObject, transform.position + Vector3.up + transform.forward);
-                    OnDrop?.Invoke(heldObject is PickupTile);
-                    heldObject = null;
-                }
+                else TryPlace();
             }
         }
 
@@ -83,6 +57,41 @@ namespace Unrailed.Player
                 transform.forward = Vector3.RotateTowards(transform.forward, input, turnSpeed * Mathf.Deg2Rad * Time.deltaTime, 0);
             }
         }
+
+        #region Interact
+        private void TryPickup(Tile tile)
+        {
+            if (tile is IPickupable pickup)
+            {
+                bool isPickup = pickup is PickupTile;
+
+                pickup.PickUp(isPickup ? pickupHolder : toolHolder);
+                OnPickUp?.Invoke(isPickup);
+                heldObject = tile;
+            }
+        }
+
+        private void TryPlace()
+        {
+            if (heldObject == null) return;
+
+            map.PlaceTile(heldObject, transform.position + Vector3.up + transform.forward);
+            OnDrop?.Invoke(heldObject is PickupTile);
+            heldObject = null;
+        }
+
+        private void UseItem(Tile item, RaycastHit data)
+        {
+            if (!isSwinging && heldObject is Tool tool)
+            {
+                if (tool.InteractWith(item, data)) StartCoroutine(SwingTool());
+            }
+            else if (heldObject is PickupTile pickup && item is PickupTile stack)
+            {
+                if (pickup.TryStackOn(stack)) OnDrop?.Invoke(true);
+            }
+        }
+        #endregion
 
         #region Arm Movement
         private void RaiseArms(bool both)

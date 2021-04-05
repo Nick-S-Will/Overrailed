@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Unrailed.Terrain
 {
-    public class PickupTile : Tile, IPickupable
+    public class PickupTile : Tile, IPickupable, IStackable
     {
         public enum Type { Wood, Rock, Rail }
 
@@ -19,8 +19,9 @@ namespace Unrailed.Terrain
             transform.localPosition = Vector3.up;
         }
 
-        public void TryStackOn(PickupTile stack)
+        public bool TryStackOn(IStackable stack)
         {
+            return false;
             // TODO: Implement this
         }
     }

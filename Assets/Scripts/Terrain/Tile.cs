@@ -7,7 +7,7 @@ namespace Unrailed.Terrain
     public class Tile : MonoBehaviour
     {
         public Transform liquid;
-        public float waveHeight = 0.2f;
+        public float waveHeight = 0;
 
         protected virtual void Start()
         {

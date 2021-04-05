@@ -43,7 +43,10 @@ namespace Unrailed.Terrain
                 {
                     toSpawn = t.lowerTier;
 
-                    var p = Instantiate(breakParticles, hit.point, breakParticles.transform.rotation);
+                    Vector3 particleSpawn;
+                    if (toSpawn is BreakableTile) particleSpawn = hit.point;
+                    else particleSpawn = hit.collider.transform.position;
+                    var p = Instantiate(breakParticles, particleSpawn, breakParticles.transform.rotation);
                     Destroy(p.gameObject, breakParticles.main.startLifetime.constant);
 
                     var settings = p.main;
