@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Unrailed.Terrain;
+using Uncooked.Terrain;
 
-namespace Unrailed.Player
+namespace Uncooked.Player
 {
     public class PlayerController : MonoBehaviour
     {
         public System.Action<bool> OnPickUp, OnDrop; // True for Pickups false for Tools
 
-        public float moveSpeed = 5, turnSpeed = 360, armTurnSpeed = 2, armSwingSpeed = 3;
-        public LayerMask interactMask;
+        [SerializeField] private float moveSpeed = 5, turnSpeed = 420, armTurnSpeed = 180, armSwingSpeed = 360;
+        [SerializeField] private int strength = 1;
+        [SerializeField] private MapManager map;
+        [SerializeField] private LayerMask interactMask;
 
-        [Header("Transforms")] public Transform toolHolder;
-        public Transform pickupHolder, armL, armR;
+        [Header("Transforms")] [SerializeField] private Transform armL;
+        [SerializeField] private Transform armR, toolHolder, pickupHolder;
 
         private Rigidbody rb;
-        private MapManager map;
         private Tile heldObject;
         private bool isSwinging;
 
@@ -42,7 +43,7 @@ namespace Unrailed.Player
                     if (heldObject == null) TryPickup(obj);
                     else UseItem(obj, hit);
                 }
-                else TryPlace();
+                else TryDrop();
             }
         }
 
@@ -65,13 +66,12 @@ namespace Unrailed.Player
             {
                 bool isPickup = pickup is PickupTile;
 
-                pickup.PickUp(isPickup ? pickupHolder : toolHolder);
                 OnPickUp?.Invoke(isPickup);
-                heldObject = tile;
+                heldObject = pickup.PickUp(isPickup ? pickupHolder : toolHolder, strength);
             }
         }
 
-        private void TryPlace()
+        private void TryDrop()
         {
             if (heldObject == null) return;
 
@@ -88,7 +88,11 @@ namespace Unrailed.Player
             }
             else if (heldObject is PickupTile pickup && item is PickupTile stack)
             {
-                if (pickup.TryStackOn(stack)) OnDrop?.Invoke(true);
+                if (pickup.TryStackOn(stack))
+                {
+                    OnDrop?.Invoke(true);
+                    heldObject = null;
+                }
             }
         }
         #endregion
@@ -124,17 +128,18 @@ namespace Unrailed.Player
         /// </summary>
         /// <param name="arm">Selected arm</param>
         /// <param name="rotation">Final x value on arm.eulerAngles.x</param>
-        /// <param name="speed">Speed of the animation</param>
+        /// <param name="speed">Speed of rotation in degrees per second</param>
         private IEnumerator TurnArm(Transform arm, float rotation, float speed)
         {
             Quaternion from = arm.localRotation, to = from * Quaternion.Euler(rotation - from.eulerAngles.x, 0, 0);
+            float animSpeed = speed / Quaternion.Angle(from, to);
             float percent = 0;
 
             while (percent < 1)
             {
                 yield return null;
 
-                percent += speed * Time.deltaTime;
+                percent += animSpeed * Time.deltaTime;
                 arm.localRotation = Quaternion.Lerp(from, to, percent);
             }
 

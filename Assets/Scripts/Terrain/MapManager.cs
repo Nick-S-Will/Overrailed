@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Unrailed.Terrain
+namespace Uncooked.Terrain
 {
     public class MapManager : MonoBehaviour
     {
@@ -13,8 +13,8 @@ namespace Unrailed.Terrain
         public Vector2 noiseOffset;
         [Range(1, 1000)] public int mapLength = 5, mapWidth = 5;
 
-        [Header("Regions")] public Biome groundBiome = Biome.Rainbow;
-        public Biome obstacleBiome = Biome.Rainbow;
+        [Header("Regions")] public Biome groundBiome = Biome.Base;
+        public Biome obstacleBiome = Biome.Base;
 
         private System.Random rng;
         private Transform floorParent, obstacleParent;
@@ -48,6 +48,7 @@ namespace Unrailed.Terrain
             groundCollider.parent = transform;
             groundCollider.position = new Vector3(mapLength / 2f - 0.5f, -0.5f, mapWidth / 2f - 0.5f);
             groundCollider.gameObject.AddComponent<BoxCollider>().size = new Vector3(mapLength, 1, mapWidth);
+            groundCollider.gameObject.layer = LayerMask.NameToLayer("Ground");
             #endregion
 
             #region Map Obstacles
@@ -56,13 +57,16 @@ namespace Unrailed.Terrain
 
             for (int x = 0; x < mapLength; x++)
             {
+                var rowParent = new GameObject("Row " + x).transform;
+                rowParent.parent = obstacleParent;
+
                 for (int z = 0; z < mapWidth; z++)
                 {
                     // Gets tile type based on height map
                     Tile tile = obstacleBiome.GetTile(heightMap[x, z]);
                     if (tile == null) continue;
 
-                    var obj = Instantiate(tile, new Vector3(x, 1, z), Quaternion.Euler(0, rng.Next(3) * 90, 0), obstacleParent);
+                    var obj = Instantiate(tile, new Vector3(x, 1, z), Quaternion.Euler(0, rng.Next(3) * 90, 0), rowParent);
                 }
             }
             #endregion
@@ -86,24 +90,12 @@ namespace Unrailed.Terrain
 
         public void PlaceTile(Tile tile, Vector3 position)
         {
+            print("placing " + tile.name);
             tile.transform.parent = obstacleParent;
             tile.transform.position = Vector3Int.RoundToInt(position);
             tile.transform.localRotation = Quaternion.identity;
 
             tile.GetComponent<BoxCollider>().enabled = true;
-        }
-
-        [System.Serializable]
-        public struct Region
-        {
-            [Range(0, 1)] public float maxHeight;
-            public Tile tile;
-
-            public static Tile GetTile(Region[] regions, float percent)
-            {
-                foreach (var r in regions) if (percent < r.maxHeight) return r.tile;
-                return regions[regions.Length - 1].tile;
-            }
         }
     }
 }

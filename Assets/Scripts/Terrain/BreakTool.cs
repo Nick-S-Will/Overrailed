@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Unrailed.Terrain
+namespace Uncooked.Terrain
 {
     public class BreakTool : Tool
     {

@@ -128,6 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   liquid: {fileID: 0}
+  waveHeight: 0
   lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticles: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
 --- !u!65 &4216135649280271202
@@ -141,8 +142,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.89329773, y: 2, z: 0.9269496}
-  m_Center: {x: 0.019715637, y: 0, z: 0.0011716485}
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5992328200218219935
 GameObject:
   m_ObjectHideFlags: 0

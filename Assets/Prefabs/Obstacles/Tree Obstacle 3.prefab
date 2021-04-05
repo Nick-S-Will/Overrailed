@@ -49,6 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   liquid: {fileID: 0}
+  waveHeight: 0
   lowerTier: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
   breakParticles: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
 --- !u!65 &6129035575911178868

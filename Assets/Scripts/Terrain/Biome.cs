@@ -1,19 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
-namespace Unrailed.Terrain
+namespace Uncooked.Terrain
 {
     [System.Serializable]
     public class Biome
     {
+        [SerializeField]
         private List<TileKey> keys = new List<TileKey>();
 
-        public static Biome Rainbow
+        public static Biome Base
         {
             get
             {
                 Biome b = new Biome();
+                b.AddKey(new TileKey(null, 0));
                 b.AddKey(new TileKey(null, 1));
                 return b;
             }
@@ -87,7 +90,7 @@ namespace Unrailed.Terrain
         }
 
         [System.Serializable]
-        public struct TileKey
+        public class TileKey
         {
             public Tile tile { get; private set; }
             public float percent { get; private set; }

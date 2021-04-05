@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-using Unrailed.Terrain;
+using Uncooked.Terrain;
 
-namespace Unrailed.Editors
+namespace Uncooked.Editors
 {
     public class BiomeWindow : EditorWindow
     {

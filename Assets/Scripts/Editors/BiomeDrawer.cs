@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-using Unrailed.Terrain;
+using Uncooked.Terrain;
 
-namespace Unrailed.Editors
+namespace Uncooked.Editors
 {
     [CustomPropertyDrawer(typeof(Biome))]
     public class BiomeDrawer : PropertyDrawer
@@ -14,10 +14,9 @@ namespace Unrailed.Editors
         {
             Biome target = (Biome)fieldInfo.GetValue(property.serializedObject.targetObject);
             Event guiEvent = Event.current;
-            int border = 2;
 
             float nameWidth = GUI.skin.label.CalcSize(label).x + 5;
-            Rect textureRect = new Rect(position.x + nameWidth, position.y + border, position.width - nameWidth, position.height - 2 * border);
+            Rect textureRect = new Rect(position.x + nameWidth, position.y + 2, position.width - nameWidth, position.height - 4);
 
             if (guiEvent.type == EventType.Repaint)
             {

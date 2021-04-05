@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-using Unrailed.Terrain;
+using Uncooked.Terrain;
 using System.Collections.Generic;
 
-namespace Unrailed.Editors
+namespace Uncooked.Editors
 {
     [CustomEditor(typeof(MapManager))]
     public class MapEditor : Editor

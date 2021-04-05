@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Unrailed.Terrain
+namespace Uncooked.Terrain
 {
     public class BreakableTile : Tile, IDamageable
     {
@@ -43,10 +43,7 @@ namespace Unrailed.Terrain
                 {
                     toSpawn = t.lowerTier;
 
-                    Vector3 particleSpawn;
-                    if (toSpawn is BreakableTile) particleSpawn = hit.point;
-                    else particleSpawn = hit.collider.transform.position;
-                    var p = Instantiate(breakParticles, particleSpawn, breakParticles.transform.rotation);
+                    var p = Instantiate(breakParticles, hit.transform.position, breakParticles.transform.rotation);
                     Destroy(p.gameObject, breakParticles.main.startLifetime.constant);
 
                     var settings = p.main;
