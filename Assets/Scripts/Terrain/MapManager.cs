@@ -90,7 +90,6 @@ namespace Uncooked.Terrain
 
         public void PlaceTile(Tile tile, Vector3 position)
         {
-            print("placing " + tile.name);
             tile.transform.parent = obstacleParent;
             tile.transform.position = Vector3Int.RoundToInt(position);
             tile.transform.localRotation = Quaternion.identity;

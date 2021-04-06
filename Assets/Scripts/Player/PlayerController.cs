@@ -10,15 +10,18 @@ namespace Uncooked.Player
     {
         public System.Action<bool> OnPickUp, OnDrop; // True for Pickups false for Tools
 
-        [SerializeField] private float moveSpeed = 5, turnSpeed = 420, armTurnSpeed = 180, armSwingSpeed = 360;
+        [SerializeField] private float moveSpeed = 5, armTurnSpeed = 180, armSwingSpeed = 360;
         [SerializeField] private int strength = 1;
         [SerializeField] private MapManager map;
         [SerializeField] private LayerMask interactMask;
+        [SerializeField] private Color highlightColor = Color.white;
 
         [Header("Transforms")] [SerializeField] private Transform armL;
         [SerializeField] private Transform armR, toolHolder, pickupHolder;
 
         private Rigidbody rb;
+        private Transform lastHit;
+        private List<Coroutine> currentArmTurns = new List<Coroutine>();
         private Tile heldObject;
         private bool isSwinging;
 
@@ -33,34 +36,72 @@ namespace Uncooked.Player
 
         void Update()
         {
+            RaycastHit hitData;
+            bool hit = Physics.Raycast(transform.position + Vector3.up, transform.forward, out hitData, 1, interactMask);
+
+            // Interact Input
             if (Input.GetMouseButtonDown(0))
             {
-                RaycastHit hit;
-                if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out hit, 1, interactMask))
+                if (hit)
                 {
-                    var obj = hit.collider.gameObject.GetComponent<Tile>();
+                    var obj = hitData.transform.GetComponent<Tile>();
 
-                    if (heldObject == null) TryPickup(obj);
-                    else UseItem(obj, hit);
+                    if (heldObject == null)
+                    {
+                        if (TryPickup(obj)) hit = false;
+                    }
+                    else UseItem(obj, hitData);
                 }
                 else TryDrop();
             }
+
+            // Highlight
+            if (hit)
+            {
+                if (hitData.transform != lastHit)
+                {
+                    lastHit = hitData.transform;
+                    StartCoroutine(HightlightObject(hitData.transform));
+                }
+            }
+            else lastHit = null;
         }
 
         void FixedUpdate()
         {
+            // Movement Input
             var input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 
             if (input != Vector3.zero)
             {
                 rb.MovePosition(transform.position + moveSpeed * input * Time.deltaTime);
+                transform.forward = input;
+            }
+        }
 
-                transform.forward = Vector3.RotateTowards(transform.forward, input, turnSpeed * Mathf.Deg2Rad * Time.deltaTime, 0);
+        private IEnumerator HightlightObject(Transform selected)
+        {
+            var renderers = selected.GetComponentsInChildren<MeshRenderer>();
+            var originalColors = new Color[renderers.Length];
+
+            // Tint mesh colors
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                originalColors[i] = renderers[i].material.color;
+                renderers[i].material.color = 0.5f * (originalColors[i] + highlightColor);
+            }
+
+            yield return new WaitWhile(() => selected == lastHit);
+
+            // Reset colors
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                renderers[i].material.color = originalColors[i];
             }
         }
 
         #region Interact
-        private void TryPickup(Tile tile)
+        private bool TryPickup(Tile tile)
         {
             if (tile is IPickupable pickup)
             {
@@ -68,16 +109,22 @@ namespace Uncooked.Player
 
                 OnPickUp?.Invoke(isPickup);
                 heldObject = pickup.PickUp(isPickup ? pickupHolder : toolHolder, strength);
+
+                return true;
             }
+
+            return false;
         }
 
-        private void TryDrop()
+        private bool TryDrop()
         {
-            if (heldObject == null) return;
+            if (heldObject == null) return false;
 
             map.PlaceTile(heldObject, transform.position + Vector3.up + transform.forward);
             OnDrop?.Invoke(heldObject is PickupTile);
             heldObject = null;
+
+            return true;
         }
 
         private void UseItem(Tile item, RaycastHit data)
@@ -100,25 +147,27 @@ namespace Uncooked.Player
         #region Arm Movement
         private void RaiseArms(bool both)
         {
-            StopAllCoroutines();
-            StartCoroutine(TurnArm(armR, -90, armTurnSpeed));
-            if (both) StartCoroutine(TurnArm(armL, -90, armTurnSpeed));
+            TryStopTurnArmRoutines();
+            currentArmTurns.Add(StartCoroutine(TurnArm(armR, -90, armTurnSpeed)));
+            if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, -90, armTurnSpeed)));
         }
 
         private void LowerArms(bool both)
         {
-            StopAllCoroutines();
-            StartCoroutine(TurnArm(armR, 0, armTurnSpeed));
-            if (both) StartCoroutine(TurnArm(armL, 0, armTurnSpeed));
+            TryStopTurnArmRoutines();
+            currentArmTurns.Add(StartCoroutine(TurnArm(armR, 0, armTurnSpeed)));
+            if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, 0, armTurnSpeed)));
         }
 
         private IEnumerator SwingTool()
         {
             isSwinging = true;
 
-            yield return StartCoroutine(TurnArm(armR, 0, armSwingSpeed));
+            currentArmTurns.Add(StartCoroutine(TurnArm(armR, 0, armSwingSpeed)));
+            yield return currentArmTurns[currentArmTurns.Count - 1];
             yield return new WaitForSeconds(0.1f);
-            yield return StartCoroutine(TurnArm(armR, -90, armTurnSpeed));
+            currentArmTurns.Add(StartCoroutine(TurnArm(armR, -90, armTurnSpeed)));
+            yield return currentArmTurns[currentArmTurns.Count - 1];
 
             isSwinging = false;
         }
@@ -144,6 +193,16 @@ namespace Uncooked.Player
             }
 
             arm.localRotation = to;
+        }
+
+        private bool TryStopTurnArmRoutines()
+        {
+            if (currentArmTurns.Count == 0) return false;
+
+            foreach (var c in currentArmTurns) StopCoroutine(c);
+            currentArmTurns.Clear();
+
+            return true;
         }
         #endregion
     }

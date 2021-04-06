@@ -28,8 +28,6 @@ namespace Uncooked.Terrain
 
         public Tile PickUp(Transform parent, int amount)
         {
-            print("picking up " + name);
-
             PickupTile toPickUp = this;
             int stackSize = GetStackSize(this);
 
@@ -84,7 +82,6 @@ namespace Uncooked.Terrain
                 top.nextInStack.stackIndex = top.stackIndex + 1;
                 top = top.nextInStack;
             }
-            print("stack size " + (top.stackIndex + 1));
 
             return true;
         }
