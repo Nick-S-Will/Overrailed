@@ -12,6 +12,8 @@ namespace Uncooked.Terrain
         [SerializeField] private bool startsPowered;
 
         private Vector3Int inDirection = Vector3Int.zero, outDirection = Vector3Int.zero;
+        private int connectCount;
+
         private static LayerMask mask;
 
         public bool IsPowered => inDirection != Vector3Int.zero;
@@ -36,7 +38,7 @@ namespace Uncooked.Terrain
         public override Tile TryPickUp(Transform parent, int amount)
         {
             if (startsPowered) return null;
-            if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero);
+            if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0);
 
             return base.TryPickUp(parent, amount);
         }
@@ -65,16 +67,16 @@ namespace Uncooked.Terrain
                 dir = Quaternion.AngleAxis(90, Vector3.up) * dir;
             }
 
-            if (poweredRails.Count == 1)
+            if (poweredRails.Count > 0)
             {
                 var dirToThis = coords - Vector3Int.FloorToInt(poweredRails[0].transform.position);
 
-                if (poweredRails[0].outDirection != dirToThis) poweredRails[0].SetState(poweredRails[0].inDirection, dirToThis);
-                SetState(dirToThis, dirToThis);
+                if (poweredRails[0].outDirection != dirToThis) poweredRails[0].SetState(poweredRails[0].inDirection, dirToThis, 2);
+                SetState(dirToThis, dirToThis, 1);
             }
         }
 
-        private void SetState(Vector3Int inDir, Vector3Int outDir)
+        private void SetState(Vector3Int inDir, Vector3Int outDir, int connectionCount)
         {
             if (inDir != Vector3Int.zero)
             {
@@ -90,8 +92,7 @@ namespace Uncooked.Terrain
                 {
                     // Sus code, don't look
                     Vector3Int deltaPos = inDir + outDir;
-                    print(deltaPos);
-
+                    
                     if (Mathf.Abs(deltaPos.x + deltaPos.z) == 0)
                     {
                         if (inDir.x == 1 || inDir.y == 1) bentMesh.forward = Vector3.back;
@@ -117,12 +118,18 @@ namespace Uncooked.Terrain
                 if (Physics.Raycast(transform.position, outDirection, out hitInfo, 1, mask))
                 {
                     var rail = hitInfo.transform.GetComponent<RailTile>();
-                    if (rail != null && rail.IsPowered) rail.SetState(Vector3Int.zero, rail.outDirection);
+                    if (rail != null && rail.IsPowered) rail.SetState(Vector3Int.zero, rail.outDirection, 0);
+                }
+                if (Physics.Raycast(transform.position, -inDirection, out hitInfo, 1, mask))
+                {
+                    var rail = hitInfo.transform.GetComponent<RailTile>();
+                    if (rail != null && rail.IsPowered) rail.connectCount = 1;
                 }
             }
 
             inDirection = inDir;
             outDirection = outDir;
+            connectCount = connectionCount;
         }
     }
 }
