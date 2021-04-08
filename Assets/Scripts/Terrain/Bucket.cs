@@ -17,7 +17,7 @@ namespace Uncooked.Terrain
         public override bool InteractWith(Tile tile, RaycastHit hit)
         {
             print(tile.name);
-            if (tile.liquid != null)
+            if (tile.Liquid != null)
             {
                 isFull = !isFull;
                 liquid.gameObject.SetActive(isFull);

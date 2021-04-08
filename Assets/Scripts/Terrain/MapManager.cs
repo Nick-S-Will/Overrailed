@@ -4,17 +4,17 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Uncooked.Terrain
+namespace Uncooked.Terrain.Generation
 {
     public class MapManager : MonoBehaviour
     {
-        [Header("Generation")] public int seed = 0;
-        public float noiseScale = 10;
-        public Vector2 noiseOffset;
-        [Range(1, 1000)] public int mapLength = 5, mapWidth = 5;
+        [Header("Generation")] [SerializeField] private int seed = 0;
+        [SerializeField] private float noiseScale = 10;
+        [SerializeField] private Vector2 noiseOffset;
+        [Range(1, 1000)] [SerializeField] private int mapLength = 25, mapWidth = 19;
 
-        [Header("Regions")] public Biome groundBiome = Biome.Base;
-        public Biome obstacleBiome = Biome.Base;
+        [Header("Regions")] [SerializeField] private Biome groundBiome = Biome.Base;
+        [SerializeField] private Biome obstacleBiome = Biome.Base;
 
         private System.Random rng;
         private Transform floorParent, obstacleParent;
@@ -88,10 +88,10 @@ namespace Uncooked.Terrain
             return heightMap;
         }
 
-        public void PlaceTile(Tile tile, Vector3 position)
+        public void PlaceTile(Tile tile, Vector3Int coords)
         {
             tile.transform.parent = obstacleParent;
-            tile.transform.position = Vector3Int.RoundToInt(position);
+            tile.transform.position = coords;
             tile.transform.localRotation = Quaternion.identity;
 
             tile.GetComponent<BoxCollider>().enabled = true;

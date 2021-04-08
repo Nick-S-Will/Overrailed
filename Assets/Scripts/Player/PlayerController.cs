@@ -12,7 +12,7 @@ namespace Uncooked.Player
 
         [SerializeField] private float moveSpeed = 5, armTurnSpeed = 180, armSwingSpeed = 360;
         [SerializeField] private int strength = 1;
-        [SerializeField] private MapManager map;
+        [SerializeField] private Terrain.Generation.MapManager map;
         [SerializeField] private LayerMask interactMask;
         [SerializeField] private Color highlightColor = Color.white;
 
@@ -31,7 +31,7 @@ namespace Uncooked.Player
             OnDrop += LowerArms;
 
             rb = GetComponent<Rigidbody>();
-            map = FindObjectOfType<MapManager>();
+            map = FindObjectOfType<Terrain.Generation.MapManager>();
         }
 
         void Update()
@@ -44,13 +44,11 @@ namespace Uncooked.Player
             {
                 if (hit)
                 {
-                    var obj = hitData.transform.GetComponent<Tile>();
-
                     if (heldObject == null)
                     {
-                        if (TryPickup(obj)) hit = false;
+                        if (TryPickup(hitData.transform.GetComponent<Tile>())) hit = false;
                     }
-                    else UseItem(obj, hitData);
+                    else UseItemOn(hitData.transform.GetComponent<Tile>(), hitData);
                 }
                 else TryDrop();
             }
@@ -96,7 +94,8 @@ namespace Uncooked.Player
             // Reset colors
             for (int i = 0; i < renderers.Length; i++)
             {
-                renderers[i].material.color = originalColors[i];
+                if (renderers[i] == null) break;
+                else renderers[i].material.color = originalColors[i];
             }
         }
 
@@ -105,12 +104,12 @@ namespace Uncooked.Player
         {
             if (tile is IPickupable pickup)
             {
-                bool isPickup = pickup is PickupTile;
+                bool isPickup = pickup is StackTile;
 
-                OnPickUp?.Invoke(isPickup);
-                heldObject = pickup.PickUp(isPickup ? pickupHolder : toolHolder, strength);
+                heldObject = pickup.TryPickUp(isPickup ? pickupHolder : toolHolder, strength);
+                if (heldObject != null) OnPickUp?.Invoke(isPickup);
 
-                return true;
+                return heldObject != null;
             }
 
             return false;
@@ -120,25 +119,35 @@ namespace Uncooked.Player
         {
             if (heldObject == null) return false;
 
-            map.PlaceTile(heldObject, transform.position + Vector3.up + transform.forward);
-            OnDrop?.Invoke(heldObject is PickupTile);
+            Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
+            map.PlaceTile(heldObject, coords);
+            heldObject.OnDrop(coords);
+            OnDrop?.Invoke(heldObject is StackTile);
             heldObject = null;
 
             return true;
         }
 
-        private void UseItem(Tile item, RaycastHit data)
+        private void UseItemOn(Tile tile, RaycastHit data)
         {
             if (!isSwinging && heldObject is Tool tool)
             {
-                if (tool.InteractWith(item, data)) StartCoroutine(SwingTool());
+                // Use Tool
+                if (tool.InteractWith(tile, data)) StartCoroutine(SwingTool());
             }
-            else if (heldObject is PickupTile pickup && item is PickupTile stack)
+            else if (heldObject is StackTile pickup)
             {
-                if (pickup.TryStackOn(stack))
+                // Stack
+                if (tile is StackTile stack && pickup.TryStackOn(stack))
                 {
                     OnDrop?.Invoke(true);
                     heldObject = null;
+                }
+                else if (pickup.Bridge != null && tile.Liquid != null)
+                {
+                    // Build Bridge
+                    TryDrop();
+                    pickup.BuildBridge(tile);
                 }
             }
         }

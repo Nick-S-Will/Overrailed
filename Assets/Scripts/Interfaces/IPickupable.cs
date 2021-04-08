@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IPickupable
 {
-    Uncooked.Terrain.Tile PickUp(Transform parent, int amount);
+    Uncooked.Terrain.Tile TryPickUp(Transform parent, int amount);
 }

@@ -290,6 +290,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cd50a07fb45784db462506730451eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  liquid: {fileID: 0}
+  waveHeight: 0
   pickupType: 1
   tileHeight: 0.4
 --- !u!65 &6937254749402404536

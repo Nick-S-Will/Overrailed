@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   liquid: {fileID: 0}
-  waveHeight: 0.2
+  waveHeight: 0
 --- !u!1 &7332296297757310568
 GameObject:
   m_ObjectHideFlags: 0

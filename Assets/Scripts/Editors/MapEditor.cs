@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-using Uncooked.Terrain;
-using System.Collections.Generic;
+using Uncooked.Terrain.Generation;
 
 namespace Uncooked.Editors
 {

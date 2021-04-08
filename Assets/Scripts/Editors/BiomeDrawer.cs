@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-using Uncooked.Terrain;
+using Uncooked.Terrain.Generation;
 
 namespace Uncooked.Editors
 {

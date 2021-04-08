@@ -6,8 +6,8 @@ namespace Uncooked.Terrain
 {
     public class BreakableTile : Tile, IDamageable
     {
-        public Tile lowerTier;
-        public ParticleSystem breakParticles;
+        [SerializeField] private Tile lowerTier;
+        [SerializeField] private ParticleSystem breakParticles;
 
         private Gradient meshColors;
 

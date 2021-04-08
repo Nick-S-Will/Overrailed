@@ -14,7 +14,7 @@ namespace Uncooked.Terrain
             {
                 if (breakT.name.Contains(breakTileCode))
                 {
-                    breakT.TakeHit(tier, hit);
+                    breakT.TakeHit(Tier, hit);
                     return true;
                 }
             }

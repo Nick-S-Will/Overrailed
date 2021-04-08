@@ -6,13 +6,17 @@ namespace Uncooked.Terrain
 {
     public class Tile : MonoBehaviour
     {
-        public Transform liquid;
-        public float waveHeight = 0;
+        [SerializeField] protected Transform liquid;
+        [SerializeField] private float waveHeight = 0;
+
+        public Transform Liquid => liquid;
 
         protected virtual void Start()
         {
             if (liquid != null) StartCoroutine(AnimateLiquid());
         }
+
+        public virtual void OnDrop(Vector3Int position) { }
 
         protected IEnumerator AnimateLiquid()
         {

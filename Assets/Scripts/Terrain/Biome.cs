@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Uncooked.Terrain
+namespace Uncooked.Terrain.Generation
 {
     [System.Serializable]
     public class Biome
     {
-        [SerializeField]
-        private List<TileKey> keys = new List<TileKey>();
+        [SerializeField] private List<TileKey> keys = new List<TileKey>();
 
         public static Biome Base
         {
@@ -92,12 +91,12 @@ namespace Uncooked.Terrain
         [System.Serializable]
         public class TileKey
         {
-            public Tile tile { get; private set; }
-            public float percent { get; private set; }
+            [SerializeField] public Tile tile { get; private set; }
+            [SerializeField] public float percent { get; private set; }
 
             public Color Color => color;
 
-            private Color color;
+            [SerializeField] private Color color;
 
             public TileKey(Tile _tile, float _percent)
             {

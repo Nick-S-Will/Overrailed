@@ -6,10 +6,12 @@ namespace Uncooked.Terrain
 {
     public abstract class Tool : Tile, IPickupable
     {
-        public Transform handOffset;
-        public int tier = 1;
+        [SerializeField] private Transform handOffset;
+        [SerializeField] private int tier = 1;
 
-        public Tile PickUp(Transform parent, int amount)
+        public int Tier => tier;
+
+        public Tile TryPickUp(Transform parent, int amount)
         {
             GetComponent<BoxCollider>().enabled = false;
 

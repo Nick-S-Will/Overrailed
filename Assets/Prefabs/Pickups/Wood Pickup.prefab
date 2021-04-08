@@ -107,7 +107,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3533072125319269045}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.0029640198, y: -0.85, z: 0.24998567}
+  m_LocalPosition: {x: 0, y: -0.85, z: 0.25}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.9}
   m_Children: []
   m_Father: {fileID: 1539566906146536684}
@@ -188,7 +188,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4223889070562411810}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.0029640198, y: -0.85, z: -0.24998567}
+  m_LocalPosition: {x: 0, y: -0.85, z: -0.25}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.9}
   m_Children: []
   m_Father: {fileID: 1539566906146536684}
@@ -291,6 +291,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cd50a07fb45784db462506730451eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  liquid: {fileID: 0}
+  waveHeight: 0
+  bridge: {fileID: 8000788900880814408, guid: 38de585089c892f4d93cb9f74028c9a4, type: 3}
+  pickupType: 0
   tileHeight: 0.2
 --- !u!65 &7657482902444645850
 BoxCollider:
