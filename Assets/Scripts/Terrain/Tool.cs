@@ -31,13 +31,5 @@ namespace Uncooked.Terrain
         }
 
         public virtual void OnDrop(Vector3Int position) { }
-
-        /// <summary>
-        /// Custom way child Tool classes interact with given Tile
-        /// </summary>
-        /// <param name="tile">Tile to be interacted with</param>
-        /// <param name="hit">Info about the Raycast used to find this</param>
-        /// <returns>True if an interaction happened</returns>
-        public abstract bool InteractWith(IInteractable interactable, RaycastHit hit);
     }
 }

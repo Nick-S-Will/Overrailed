@@ -23,7 +23,7 @@ namespace Uncooked.Player
         private Rigidbody rb;
         private Transform lastHit;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
-        private IPickupable heldObject;
+        private IPickupable heldItem;
         private bool isSwinging;
 
         void Start()
@@ -45,11 +45,15 @@ namespace Uncooked.Player
             {
                 if (hit)
                 {
-                    if (heldObject == null)
+                    if (heldItem == null)
                     {
-                        if (TryPickup(hitData.transform.GetComponent<Tile>())) hit = false;
+                        if (TryPickup(hitData.transform.GetComponent<IPickupable>())) hit = false;
                     }
-                    else UseItemOn(hitData.transform.GetComponent<Tile>(), hitData);
+                    else
+                    {
+                        var interact = hitData.transform.GetComponent<IInteractable>();
+                        if (interact != null) UseItemOn(interact, hitData);
+                    }
                 }
                 else TryDrop();
             }
@@ -105,69 +109,53 @@ namespace Uncooked.Player
 
         #region Interact
         /// <summary>
-        /// Tries to pick up given Tile to hold
+        /// Tries to pick up given IPickupable
         /// </summary>
-        /// <returns></returns>
-        private bool TryPickup(Tile tile)
+        /// <returns>True if given item is picked up</returns>
+        private bool TryPickup(IPickupable pickup)
         {
-            if (tile is IPickupable pickup)
-            {
-                bool bothHands = pickup.IsTwoHanded();
+            if (pickup == null) return false;
 
-                heldObject = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, strength);
-                if (heldObject != null) OnPickUp?.Invoke(bothHands);
+            bool bothHands = pickup.IsTwoHanded();
 
-                return heldObject != null;
-            }
+            heldItem = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, strength);
+            if (heldItem != null) OnPickUp?.Invoke(bothHands);
 
-            return false;
+            return heldItem != null;
         }
 
         /// <summary>
-        /// Places heldObject on the ground if not null
+        /// Places heldItem on the ground if it's not null
         /// </summary>
-        /// <returns>True if heldObject was placed</returns>
+        /// <returns>True if heldItem was placed</returns>
         private bool TryDrop()
         {
-            if (heldObject == null) return false;
+            if (heldItem == null) return false;
 
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
-            map.PlacePickup(heldObject, coords);
-            heldObject.OnDrop(coords);
-            OnDrop?.Invoke(heldObject is StackTile);
-            heldObject = null;
+            map.PlacePickup(heldItem, coords);
+            heldItem.OnDrop(coords);
+            OnDrop?.Invoke(heldItem is StackTile);
+            heldItem = null;
 
             return true;
         }
 
         /// <summary>
-        /// Uses heldObject on the given Tile
+        /// Uses heldItem on the given Tile
         /// </summary>
-        private void UseItemOn(Tile tile, RaycastHit data)
+        private void UseItemOn(IInteractable interactable, RaycastHit hitInfo)
         {
-            if (!isSwinging && heldObject is Tool tool)
+            if (!isSwinging && heldItem is Tool)
             {
                 // Use Tool
-                if (tool.InteractWith(tile, data)) StartCoroutine(SwingTool());
+                if (interactable.TryInteractUsing(heldItem, hitInfo)) StartCoroutine(SwingTool());
             }
-            else if (heldObject is StackTile pickup)
+            // Place heldItem
+            else if (interactable.TryInteractUsing(heldItem, hitInfo))
             {
-                // Stack
-                if (tile is StackTile stack && pickup.TryStackOn(stack))
-                {
-                    OnDrop?.Invoke(true);
-                    heldObject = null;
-                }
-                else if (pickup.Bridge != null && tile.Liquid != null)
-                {
-                    // Build Bridge
-                    TryDrop();
-                    pickup.BuildBridge(tile);
-                }
-            }
-            else if (heldObject is Wagon wagon && tile is Wagon rail)
-            {
-                // Place Wagon On Rail
+                OnDrop?.Invoke(true);
+                heldItem = null;
             }
         }
         #endregion

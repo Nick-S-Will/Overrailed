@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IInteractable
 {
-
+    bool TryInteractUsing(IPickupable item, RaycastHit hitInfo);
 }

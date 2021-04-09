@@ -6,30 +6,22 @@ namespace Uncooked.Terrain
 {
     public class Bucket : Tool
     {
+        [Space]
+        [SerializeField] private Transform liquid;
+
         private bool isFull;
 
-        protected override void Start()
+        public bool IsFull => isFull;
+
+        protected virtual void Start()
         {
             liquid.gameObject.SetActive(isFull);
-            if (liquid != null) StartCoroutine(AnimateLiquid());
         }
 
-        /// <summary>
-        /// Tries to pick up or drop liquid
-        /// </summary>
-        /// <param name="obj">Tile to be interacted with</param>
-        /// <param name="hit">Info about the Raycast used to find this</param>
-        /// <returns>True if </returns>
-        public override bool InteractWith(IInteractable interactable, RaycastHit hit)
+        public void ToggleLiquid()
         {
-            if (interactable is Tile tile && tile.Liquid != null)
-            {
-                isFull = !isFull;
-                liquid.gameObject.SetActive(isFull);
-                return true;
-            }
-
-            return false;
+            isFull = !isFull;
+            liquid.gameObject.SetActive(isFull);
         }
     }
 }

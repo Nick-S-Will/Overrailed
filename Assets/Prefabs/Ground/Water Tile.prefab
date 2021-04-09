@@ -121,7 +121,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3269366255310241908}
-  - component: {fileID: 814116078792087380}
+  - component: {fileID: -3119896904868105016}
   - component: {fileID: 7833495729107115489}
   m_Layer: 4
   m_Name: Water Tile
@@ -145,7 +145,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &814116078792087380
+--- !u!114 &-3119896904868105016
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -154,11 +154,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8783466118250178313}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1bafd50eaa25837478fc362986d4a021, type: 3}
+  m_Script: {fileID: 11500000, guid: ab061331c16642f4a992ea244a44e0d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   liquid: {fileID: 8282603897148303172}
-  waveHeight: 0.25
+  waveHeight: 0.2
 --- !u!65 &7833495729107115489
 BoxCollider:
   m_ObjectHideFlags: 0

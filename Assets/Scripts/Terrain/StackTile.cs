@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Uncooked.Terrain
 {
-    public class StackTile : Tile, IPickupable
+    public class StackTile : Tile, IPickupable, IInteractable
     {
         public enum Type { Wood, Rock, Rail }
 
@@ -17,11 +17,9 @@ namespace Uncooked.Terrain
 
         public bool IsTwoHanded() => true;
 
-        protected override void Start()
+        protected virtual void Start()
         {
             if (startStackHeight > 1) SelfStack();
-            
-            base.Start();
         }
 
         public Tile Bridge => bridge;
@@ -50,6 +48,12 @@ namespace Uncooked.Terrain
                 height += top.tileHeight;
             }
             return height;
+        }
+
+        public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        {
+            if (item is StackTile stack) return stack.TryStackOn(this);
+            else return false;
         }
 
         /// <summary>
@@ -140,9 +144,9 @@ namespace Uncooked.Terrain
         /// Instantiates and places bridge, then destroys gameObject
         /// </summary>
         /// <param name="liquid">Liquid Tile in which bridge is to be placed</param>
-        public void BuildBridge(Tile liquid)
+        public void BuildBridge(LiquidTile liquid)
         {
-            Instantiate(bridge, transform.position + Vector3.down, transform.rotation, liquid.transform.parent);
+            Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform.parent);
             Destroy(gameObject);
 
             liquid.GetComponent<BoxCollider>().enabled = false;

@@ -6,7 +6,7 @@ using Uncooked.Terrain;
 
 namespace Uncooked.Train
 {
-    public class RailTile : StackTile
+    public class RailTile : StackTile, IInteractable
     {
         [SerializeField] private GameObject straightMesh, bentMesh;
         [Tooltip("Gameobject that enables/disables based on the rail's IsPowered")]
@@ -16,6 +16,7 @@ namespace Uncooked.Train
         [Tooltip("Must have odd number of points")] [SerializeField] private Transform bentPathParent;
         [Space]
         [SerializeField] private bool startsPowered;
+        [SerializeField] private bool showPath;
 
         private Vector3Int inDirection = Vector3Int.zero, outDirection = Vector3Int.zero;
         private int connectCount, wagonCount;
@@ -23,6 +24,9 @@ namespace Uncooked.Train
         public Transform Path => straightMesh.gameObject.activeSelf ? straightPathParent : bentPathParent;
         public bool IsPowered => inDirection != Vector3Int.zero;
         public bool IsStraight => straightMesh.activeSelf;
+
+        public void AddWagon() => wagonCount++;
+        public void RemoveWagon() => wagonCount--;
 
         protected override void Start()
         {
@@ -43,7 +47,7 @@ namespace Uncooked.Train
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (startsPowered) return null;
+            if (startsPowered || wagonCount > 0) return null;
             if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0);
 
             return base.TryPickUp(parent, amount);
@@ -212,6 +216,15 @@ namespace Uncooked.Train
                 forward = Vector3Int.left;
 
             return forward;
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (showPath)
+            {
+                if (straightMesh.activeSelf) foreach (Transform t in straightPathParent) Gizmos.DrawSphere(t.position, 0.05f);
+                if (bentMesh.activeSelf) foreach (Transform t in bentPathParent) Gizmos.DrawSphere(t.position, 0.05f);
+            }
         }
     }
 }

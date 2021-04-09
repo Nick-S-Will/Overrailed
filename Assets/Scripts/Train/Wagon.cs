@@ -7,7 +7,7 @@ using Uncooked.Managers;
 
 namespace Uncooked.Train
 {
-    public class Wagon : Tile, IPickupable, IInteractable
+    public class Wagon : LiquidTile, IPickupable, IInteractable
     {
         [SerializeField] private RailTile startRail;
 
@@ -51,7 +51,7 @@ namespace Uncooked.Train
 
                 transform.position = Vector3.MoveTowards(transform.position, target.position, GameManager.instance.TrainSpeed * Time.deltaTime);
                 float currentDst = (target.position - transform.position).magnitude;
-                transform.forward = Vector3.Lerp(startForward, target.forward, 1 - (currentDst / startDst));
+                transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
                 yield return null;
                 yield return new WaitWhile(() => GameManager.instance.IsEditing);
@@ -74,13 +74,13 @@ namespace Uncooked.Train
             return this;
         }
 
-        public void OnDrop(Vector3Int position) { }
+        public virtual void OnDrop(Vector3Int position) { }
 
         /// <summary>
         /// Places this Wagon on given RailTile
         /// </summary>
         /// <param name="rail"></param>
-        private void SetRail(RailTile rail)
+        public void SetRail(RailTile rail) // TODO: Make check if has a wagon right in front
         {
             UpdateRail(rail);
             pathIndex = currentRail.Path.childCount / 2;
@@ -91,20 +91,27 @@ namespace Uncooked.Train
             if (currentRail != null) StartCoroutine(Drive());
         }
 
-        private void UpdateRail(RailTile rail)
+        /// <summary>
+        /// Updates previous rail and newRail's wagonCount variables, then sets wagon's pathIndex and pathDir
+        /// </summary>
+        /// <param name="newRail">The RailTile the </param>
+        private void UpdateRail(RailTile newRail)
         {
-            currentRail = rail;
+            if (currentRail != null) currentRail.RemoveWagon();
+            newRail.AddWagon();
 
-            if (rail.IsStraight)
+            currentRail = newRail;
+
+            if (newRail.IsStraight)
             {
                 pathIndex = 0;
                 pathDir = 1;
             }
             else
             {
-                bool turnsRight = RailTile.BentRailToRight(rail);
+                bool turnsRight = RailTile.BentRailToRight(newRail);
 
-                pathIndex = turnsRight ? rail.Path.childCount - 1 : 0;
+                pathIndex = turnsRight ? newRail.Path.childCount - 1 : 0;
                 pathDir = turnsRight ? -1 : 1;
             }
         }

@@ -11,10 +11,8 @@ namespace Uncooked.Terrain
 
         private Gradient meshColors;
 
-        protected override void Start()
+        protected virtual void Start()
         {
-            base.Start();
-
             var mats = new List<Material>();
             var gradientPins = new List<GradientColorKey>();
 
@@ -31,6 +29,14 @@ namespace Uncooked.Terrain
             meshColors = new Gradient();
             meshColors.mode = GradientMode.Fixed;
             meshColors.colorKeys = gradientPins.ToArray();
+        }
+
+        public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        {
+            if (item is BreakTool breaker && name.Contains(breaker.BreakTileCode)) TakeHit(breaker.Tier, hitInfo);
+            else return false;
+
+            return true;
         }
 
         /// <summary>
