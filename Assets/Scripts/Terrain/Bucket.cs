@@ -14,10 +14,15 @@ namespace Uncooked.Terrain
             if (liquid != null) StartCoroutine(AnimateLiquid());
         }
 
-        public override bool InteractWith(Tile tile, RaycastHit hit)
+        /// <summary>
+        /// Tries to pick up or drop liquid
+        /// </summary>
+        /// <param name="obj">Tile to be interacted with</param>
+        /// <param name="hit">Info about the Raycast used to find this</param>
+        /// <returns>True if </returns>
+        public override bool InteractWith(IInteractable interactable, RaycastHit hit)
         {
-            print(tile.name);
-            if (tile.Liquid != null)
+            if (interactable is Tile tile && tile.Liquid != null)
             {
                 isFull = !isFull;
                 liquid.gameObject.SetActive(isFull);

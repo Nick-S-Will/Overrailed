@@ -9,19 +9,18 @@ namespace Uncooked.Terrain
         public enum Type { Wood, Rock, Rail }
 
         [SerializeField] private Tile bridge;
-        [SerializeField] private Type pickupType;
+        [SerializeField] private Type stackType;
         [SerializeField] private float tileHeight;
-        [SerializeField] private int startStackHeight = 1;
+        [Min(1)] [SerializeField] private int startStackHeight = 1;
 
         private StackTile nextInStack, prevInStack;
 
+        public bool IsTwoHanded() => true;
+
         protected override void Start()
         {
-            if (startStackHeight > 1)
-            {
-                // TODO: Add method that adds to a stack
-            }
-
+            if (startStackHeight > 1) SelfStack();
+            
             base.Start();
         }
 
@@ -53,7 +52,13 @@ namespace Uncooked.Terrain
             return height;
         }
 
-        public virtual Tile TryPickUp(Transform parent, int amount)
+        /// <summary>
+        /// Picks up, up to given amount of StackTiles from this
+        /// </summary>
+        /// <param name="parent">Transform this will be parented to</param>
+        /// <param name="amount">Max amount of tiles to be picked up from the stack</param>
+        /// <returns>Bottom StackTile of the stack to be picked up</returns>
+        public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
             StackTile toPickUp = this;
             int stackSize = GetStackCount(this);
@@ -86,9 +91,16 @@ namespace Uncooked.Terrain
             return toPickUp;
         }
 
+        public virtual void OnDrop(Vector3Int position) { }
+
+        /// <summary>
+        /// Places this on stackBase if they have the same stackType
+        /// </summary>
+        /// <param name="stackBase">Base of the stack for this to be placed on</param>
+        /// <returns>True if stack is successful</returns>
         public virtual bool TryStackOn(StackTile stackBase)
         {
-            if (pickupType != stackBase.pickupType) return false;
+            if (stackType != stackBase.stackType) return false;
 
             // Get top of stack
             StackTile top = stackBase;
@@ -100,7 +112,7 @@ namespace Uncooked.Terrain
             stackIndex = (top.stackIndex + 1);
             transform.parent = top.transform;
             transform.localPosition = top.tileHeight * Vector3.up;
-            transform.localRotation = Quaternion.Euler(0, Random.Range(-10, 10f), 0);
+            transform.rotation = Quaternion.Euler(0, Random.Range(-10, 10f), 0);
 
             // Update stackIndex
             top = this;
@@ -113,6 +125,21 @@ namespace Uncooked.Terrain
             return true;
         }
 
+        /// <summary>
+        /// Instantiates a clone of this, then stacks the clone on this
+        /// </summary>
+        private void SelfStack()
+        {
+            var newTile = Instantiate(this);
+
+            newTile.startStackHeight = startStackHeight - 1;
+            newTile.TryStackOn(this);
+        }
+
+        /// <summary>
+        /// Instantiates and places bridge, then destroys gameObject
+        /// </summary>
+        /// <param name="liquid">Liquid Tile in which bridge is to be placed</param>
         public void BuildBridge(Tile liquid)
         {
             Instantiate(bridge, transform.position + Vector3.down, transform.rotation, liquid.transform.parent);

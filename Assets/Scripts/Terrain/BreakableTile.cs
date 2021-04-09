@@ -33,6 +33,11 @@ namespace Uncooked.Terrain
             meshColors.colorKeys = gradientPins.ToArray();
         }
 
+        /// <summary>
+        /// Replaces this with it's lowerTier up to given damage number of times
+        /// </summary>
+        /// <param name="damage">Max amount of times Tile toSpawn will get its lowerTier</param>
+        /// <param name="hit">Info about the Raycast used to find this</param>
         public void TakeHit(int damage, RaycastHit hit)
         {
             Tile toSpawn = this;

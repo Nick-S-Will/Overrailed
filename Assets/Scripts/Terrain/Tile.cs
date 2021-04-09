@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Uncooked.Terrain
 {
-    public class Tile : MonoBehaviour
+    public class Tile : MonoBehaviour, IInteractable
     {
         [SerializeField] protected Transform liquid;
         [SerializeField] private float waveHeight = 0;
@@ -16,8 +16,9 @@ namespace Uncooked.Terrain
             if (liquid != null) StartCoroutine(AnimateLiquid());
         }
 
-        public virtual void OnDrop(Vector3Int position) { }
-
+        /// <summary>
+        /// Animates waves in liquid by scaling its local y in [1 - waveHeight, 1]
+        /// </summary>
         protected IEnumerator AnimateLiquid()
         {
             yield return new WaitForSeconds(0.2f * transform.position.x + 0.3f * transform.position.z);

@@ -292,8 +292,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   liquid: {fileID: 0}
   waveHeight: 0
-  pickupType: 1
+  bridge: {fileID: 0}
+  stackType: 1
   tileHeight: 0.4
+  startStackHeight: 1
 --- !u!65 &6937254749402404536
 BoxCollider:
   m_ObjectHideFlags: 0

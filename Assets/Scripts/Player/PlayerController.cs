@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Uncooked.Terrain;
+using Uncooked.Train;
 
 namespace Uncooked.Player
 {
@@ -22,7 +23,7 @@ namespace Uncooked.Player
         private Rigidbody rb;
         private Transform lastHit;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
-        private Tile heldObject;
+        private IPickupable heldObject;
         private bool isSwinging;
 
         void Start()
@@ -77,6 +78,9 @@ namespace Uncooked.Player
             }
         }
 
+        /// <summary>
+        /// Tints selected's childrens' meshes by highlightColor until new object is selected
+        /// </summary>
         private IEnumerator HightlightObject(Transform selected)
         {
             var renderers = selected.GetComponentsInChildren<MeshRenderer>();
@@ -100,14 +104,18 @@ namespace Uncooked.Player
         }
 
         #region Interact
+        /// <summary>
+        /// Tries to pick up given Tile to hold
+        /// </summary>
+        /// <returns></returns>
         private bool TryPickup(Tile tile)
         {
             if (tile is IPickupable pickup)
             {
-                bool isPickup = pickup is StackTile;
+                bool bothHands = pickup.IsTwoHanded();
 
-                heldObject = pickup.TryPickUp(isPickup ? pickupHolder : toolHolder, strength);
-                if (heldObject != null) OnPickUp?.Invoke(isPickup);
+                heldObject = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, strength);
+                if (heldObject != null) OnPickUp?.Invoke(bothHands);
 
                 return heldObject != null;
             }
@@ -115,12 +123,16 @@ namespace Uncooked.Player
             return false;
         }
 
+        /// <summary>
+        /// Places heldObject on the ground if not null
+        /// </summary>
+        /// <returns>True if heldObject was placed</returns>
         private bool TryDrop()
         {
             if (heldObject == null) return false;
 
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
-            map.PlaceTile(heldObject, coords);
+            map.PlacePickup(heldObject, coords);
             heldObject.OnDrop(coords);
             OnDrop?.Invoke(heldObject is StackTile);
             heldObject = null;
@@ -128,6 +140,9 @@ namespace Uncooked.Player
             return true;
         }
 
+        /// <summary>
+        /// Uses heldObject on the given Tile
+        /// </summary>
         private void UseItemOn(Tile tile, RaycastHit data)
         {
             if (!isSwinging && heldObject is Tool tool)
@@ -150,10 +165,18 @@ namespace Uncooked.Player
                     pickup.BuildBridge(tile);
                 }
             }
+            else if (heldObject is Wagon wagon && tile is Wagon rail)
+            {
+                // Place Wagon On Rail
+            }
         }
         #endregion
 
         #region Arm Movement
+        /// <summary>
+        /// Points armR to the local forwards
+        /// </summary>
+        /// <param name="both">Makes armL point forwards too</param>
         private void RaiseArms(bool both)
         {
             TryStopTurnArmRoutines();
@@ -161,6 +184,10 @@ namespace Uncooked.Player
             if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, -90, armTurnSpeed)));
         }
 
+        /// <summary>
+        /// Points armR to the local downwards
+        /// </summary>
+        /// <param name="both">Makes armL point downwards too</param>
         private void LowerArms(bool both)
         {
             TryStopTurnArmRoutines();
@@ -168,6 +195,9 @@ namespace Uncooked.Player
             if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, 0, armTurnSpeed)));
         }
 
+        /// <summary>
+        /// Rotates armR down, waits 0.1 seconds, then back up
+        /// </summary>
         private IEnumerator SwingTool()
         {
             isSwinging = true;
@@ -204,6 +234,10 @@ namespace Uncooked.Player
             arm.localRotation = to;
         }
 
+        /// <summary>
+        /// Cancels all ongoing TurnArm routines
+        /// </summary>
+        /// <returns>True if there were any TurnArm routines in progress</returns>
         private bool TryStopTurnArmRoutines()
         {
             if (currentArmTurns.Count == 0) return false;

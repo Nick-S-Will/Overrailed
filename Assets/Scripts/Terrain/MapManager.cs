@@ -17,8 +17,12 @@ namespace Uncooked.Terrain.Generation
         [SerializeField] private Biome obstacleBiome = Biome.Base;
 
         private System.Random rng;
-        private Transform floorParent, obstacleParent;
+        [Header("Parents")] [SerializeField] private Transform floorParent;
+        [SerializeField] private Transform obstacleParent;
 
+        /// <summary>
+        /// Generates map floor and obstacles based on based on Generation variables
+        /// </summary>
         public void GenerateMap()
         {
             foreach (Transform t in transform.Cast<Transform>().ToList()) DestroyImmediate(t.gameObject);
@@ -72,6 +76,11 @@ namespace Uncooked.Terrain.Generation
             #endregion
         }
 
+        /// <summary>
+        /// Generates 2D perlin noise based on Generation variables
+        /// </summary>
+        /// <param name="noiseScale"></param>
+        /// <returns></returns>
         private float[,] GenerateHeightMap(float noiseScale)
         {
             float[,] heightMap = new float[mapLength, mapWidth];
@@ -88,13 +97,18 @@ namespace Uncooked.Terrain.Generation
             return heightMap;
         }
 
-        public void PlaceTile(Tile tile, Vector3Int coords)
+        /// <summary>
+        /// Places given Tile at coords, sets obstacleParent as its parent, and enables its BoxCollider
+        /// </summary>
+        public void PlacePickup(IPickupable pickup, Vector3Int coords)
         {
-            tile.transform.parent = obstacleParent;
-            tile.transform.position = coords;
-            tile.transform.localRotation = Quaternion.identity;
+            Transform obj = (pickup as Tile).transform;
 
-            tile.GetComponent<BoxCollider>().enabled = true;
+            obj.parent = obstacleParent;
+            obj.position = coords;
+            obj.localRotation = Quaternion.identity;
+
+            obj.GetComponent<BoxCollider>().enabled = true;
         }
     }
 }
