@@ -109,6 +109,7 @@ namespace Uncooked.Terrain.Generation
             obj.localRotation = Quaternion.identity;
 
             obj.GetComponent<BoxCollider>().enabled = true;
+            pickup.OnDrop(coords);
         }
     }
 }

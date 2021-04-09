@@ -9,7 +9,9 @@ namespace Uncooked.Train
 {
     public class Wagon : LiquidTile, IPickupable, IInteractable
     {
+        [Space]
         [SerializeField] private RailTile startRail;
+        [SerializeField] private bool isPermeable;
 
         private RailTile currentRail;
         private int pathIndex, pathDir;
@@ -83,10 +85,13 @@ namespace Uncooked.Train
         public void SetRail(RailTile rail) // TODO: Make check if has a wagon right in front
         {
             UpdateRail(rail);
-            pathIndex = currentRail.Path.childCount / 2;
+            pathIndex = rail.Path.childCount / 2;
 
-            transform.position = rail.transform.position;
-            transform.rotation = rail.transform.rotation;
+            transform.parent = rail.transform;
+            transform.position = rail.Path.GetChild(pathIndex).position;
+            transform.forward = pathDir * rail.Path.GetChild(pathIndex).forward;
+
+            GetComponent<BoxCollider>().enabled = !isPermeable;
 
             if (currentRail != null) StartCoroutine(Drive());
         }
@@ -97,7 +102,6 @@ namespace Uncooked.Train
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
-            if (currentRail != null) currentRail.RemoveWagon();
             newRail.AddWagon();
 
             currentRail = newRail;

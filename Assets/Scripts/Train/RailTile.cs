@@ -26,7 +26,6 @@ namespace Uncooked.Train
         public bool IsStraight => straightMesh.activeSelf;
 
         public void AddWagon() => wagonCount++;
-        public void RemoveWagon() => wagonCount--;
 
         protected override void Start()
         {
@@ -51,6 +50,14 @@ namespace Uncooked.Train
             if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0);
 
             return base.TryPickUp(parent, amount);
+        }
+
+        public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        {
+            if (item is Wagon wagon) wagon.SetRail(this);
+            else return base.TryInteractUsing(item, hitInfo);
+
+            return true;
         }
 
         /// <summary>

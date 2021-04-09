@@ -134,8 +134,7 @@ namespace Uncooked.Player
 
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
             map.PlacePickup(heldItem, coords);
-            heldItem.OnDrop(coords);
-            OnDrop?.Invoke(heldItem is StackTile);
+            OnDrop?.Invoke(heldItem.IsTwoHanded());
             heldItem = null;
 
             return true;
