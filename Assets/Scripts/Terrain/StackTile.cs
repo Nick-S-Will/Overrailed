@@ -15,6 +15,8 @@ namespace Uncooked.Terrain
 
         private StackTile nextInStack, prevInStack;
 
+        public float TileHeight => tileHeight;
+        public Type StackType => stackType;
         public bool IsTwoHanded() => true;
 
         protected virtual void Start()
@@ -25,9 +27,9 @@ namespace Uncooked.Terrain
         public Tile Bridge => bridge;
         public int stackIndex { get; private set; } = 0;
 
-        protected static int GetStackCount(StackTile bottomTile)
+        public int GetStackCount()
         {
-            StackTile top = bottomTile;
+            StackTile top = this;
             int count = 1;
             while (top.nextInStack != null)
             {
@@ -37,17 +39,12 @@ namespace Uncooked.Terrain
             return count;
         }
 
-        // Probably unnecessary
-        protected static float GetStackHeight(StackTile bottomTile)
+        public StackTile GetStackTop()
         {
-            StackTile top = bottomTile;
-            float height = top.tileHeight;
-            while (top.nextInStack != null)
-            {
-                top = top.nextInStack;
-                height += top.tileHeight;
-            }
-            return height;
+            var top = this;
+            while (top.nextInStack) top = top.nextInStack;
+            
+            return top;
         }
 
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
@@ -65,10 +62,12 @@ namespace Uncooked.Terrain
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
             StackTile toPickUp = this;
-            int stackSize = GetStackCount(this);
+            int stackSize = GetStackCount();
 
             if (amount < stackSize)
             {
+                if (stackSize - amount == 1) GetComponent<BoxCollider>().isTrigger = true;
+
                 // Get bottom tile to pick up
                 for (int i = 0; i < stackSize - amount; i++) toPickUp = toPickUp.nextInStack;
                 
@@ -79,7 +78,7 @@ namespace Uncooked.Terrain
                 // Update toPickup stackIndex variables
                 toPickUp.stackIndex = 0;
                 StackTile top = toPickUp;
-                while (top.nextInStack != null)
+                while (top.nextInStack)
                 {
                     top = top.nextInStack;
                     top.stackIndex = top.prevInStack.stackIndex + 1;
@@ -106,9 +105,11 @@ namespace Uncooked.Terrain
         {
             if (stackType != stackBase.stackType) return false;
 
+            stackBase.GetComponent<BoxCollider>().isTrigger = false;
+
             // Get top of stack
             StackTile top = stackBase;
-            while (top.nextInStack != null) top = top.nextInStack;
+            while (top.nextInStack) top = top.nextInStack;
 
             // Place this on stack
             prevInStack = top;
@@ -120,7 +121,7 @@ namespace Uncooked.Terrain
 
             // Update stackIndex
             top = this;
-            while (top.nextInStack != null)
+            while (top.nextInStack)
             {
                 top = top.nextInStack;
                 top.stackIndex = top.prevInStack.stackIndex + 1;

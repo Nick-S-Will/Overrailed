@@ -37,7 +37,7 @@ namespace Uncooked.Terrain
             liquid.localScale = Vector3.one;
         }
 
-        public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
             if (item is StackTile stack && stack.Bridge != null) stack.BuildBridge(this);
             else if (item is Bucket bucket) bucket.ToggleLiquid();

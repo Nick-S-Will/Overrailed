@@ -75,11 +75,9 @@ namespace Uncooked.Player
             // Movement Input
             var input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 
-            if (input != Vector3.zero)
-            {
-                rb.MovePosition(transform.position + moveSpeed * input * Time.deltaTime);
-                transform.forward = input;
-            }
+            rb.velocity = moveSpeed * input;
+
+            if (input != Vector3.zero) transform.forward = input;
         }
 
         /// <summary>
@@ -145,14 +143,15 @@ namespace Uncooked.Player
         /// </summary>
         private void UseItemOn(IInteractable interactable, RaycastHit hitInfo)
         {
-            if (!isSwinging && heldItem is Tool)
+            // TODO: Fix tool stops working after a few pickups or uses?
+            if (heldItem is Tool)
             {
-                // Use Tool
-                if (interactable.TryInteractUsing(heldItem, hitInfo)) StartCoroutine(SwingTool());
+                print("tool");
+                if (!isSwinging && interactable.TryInteractUsing(heldItem, hitInfo)) StartCoroutine(SwingTool());
             }
-            // Place heldItem
             else if (interactable.TryInteractUsing(heldItem, hitInfo))
             {
+                print("other");
                 OnDrop?.Invoke(true);
                 heldItem = null;
             }

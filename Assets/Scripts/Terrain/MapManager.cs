@@ -43,7 +43,7 @@ namespace Uncooked.Terrain.Generation
                 {
                     // Gets tile type based on height map
                     Tile tile = groundBiome.GetTile(heightMap[x, z]);
-                    var obj = Instantiate(tile, new Vector3(x, 0, z), Quaternion.identity, rowParent);
+                    var obj = Instantiate(tile, new Vector3(x, transform.position.y, z), Quaternion.identity, rowParent);
                     obj.name = obj.name.Substring(0, obj.name.Length - 7) + " " + z;
                 }
             }
