@@ -6,6 +6,8 @@ namespace Uncooked.Terrain
 {
     public abstract class Tool : Tile, IPickupable
     {
+        public event System.Action<Tool> OnPickupEvent, OnDropEvent;
+
         [SerializeField] private Transform handOffset;
         [SerializeField] private int tier = 1;
 
@@ -27,9 +29,10 @@ namespace Uncooked.Terrain
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
 
+            OnPickupEvent?.Invoke(this);
             return this;
         }
 
-        public virtual void OnDrop(Vector3Int position) { }
+        public virtual void OnDrop(Vector3Int position) => OnDropEvent?.Invoke(this);
     }
 }
