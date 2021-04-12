@@ -18,17 +18,20 @@ namespace Uncooked.Train
         private IEnumerator Craft()
         {
             isCrafting = true;
-            craftResultHolder.canPickup = false;
 
             var craftResult = Instantiate(craftResultPrefab);
             var ingredientMeshes = new List<MeshRenderer[]>();
             var craftMeshes = craftResult.GetComponentsInChildren<MeshRenderer>();
             float percent = 0;
 
+            var craftHitbox = craftResult.GetComponent<BoxCollider>();
+            craftHitbox.enabled = false;
+
             if (craftResultHolder.SpawnPoint.childCount == 0)
             {
                 craftResult.transform.parent = craftResultHolder.SpawnPoint;
                 craftResult.transform.localPosition = Vector3.zero;
+                craftResult.transform.localRotation = Quaternion.identity;
             }
             else craftResult.TryStackOn(craftResultHolder.SpawnPoint.GetChild(0).GetComponent<StackTile>());
 
@@ -60,7 +63,7 @@ namespace Uncooked.Train
                 cp.stackCount--;
             }
 
-            craftResultHolder.canPickup = true;
+            craftHitbox.enabled = true;
             isCrafting = false;
         }
 

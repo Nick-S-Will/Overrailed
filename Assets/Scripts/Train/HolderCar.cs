@@ -10,13 +10,13 @@ namespace Uncooked.Train
     {
         [Space]
         [SerializeField] private Transform holderSpawnPoint;
-        public bool canPickup;
 
         public Transform SpawnPoint => holderSpawnPoint;
+        public bool CanPickup => holderSpawnPoint.childCount == 1 && holderSpawnPoint.GetChild(0).GetComponent<BoxCollider>().enabled;
 
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (canPickup) return TryPickupCraft(parent, amount);
+            if (CanPickup) return TryPickupCraft(parent, amount);
             else return base.TryPickUp(parent, amount);
         }
 

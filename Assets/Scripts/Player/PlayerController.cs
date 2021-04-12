@@ -146,12 +146,12 @@ namespace Uncooked.Player
             // TODO: Fix tool stops working after a few pickups or uses?
             if (heldItem is Tool)
             {
-                print("tool");
+                //print("tool");
                 if (!isSwinging && interactable.TryInteractUsing(heldItem, hitInfo)) StartCoroutine(SwingTool());
             }
             else if (interactable.TryInteractUsing(heldItem, hitInfo))
             {
-                print("other");
+                //print("other");
                 OnDrop?.Invoke(true);
                 heldItem = null;
             }

@@ -15,7 +15,7 @@ namespace Uncooked.Terrain
         [Tooltip("Must have odd number of points")] [SerializeField] private Transform straightPathParent;
         [Tooltip("Must have odd number of points")] [SerializeField] private Transform bentPathParent;
         [Space]
-        [SerializeField] private bool startsPowered;
+        [SerializeField] protected bool startsPowered;
         [SerializeField] private bool showPath;
 
         private Vector3Int inDirection = Vector3Int.zero, outDirection = Vector3Int.zero;
@@ -25,7 +25,10 @@ namespace Uncooked.Terrain
         public bool IsPowered => inDirection != Vector3Int.zero;
         public bool IsStraight => straightMesh.activeSelf;
 
-        public void AddWagon() => wagonCount++;
+        private void Awake()
+        {
+            if (startsPowered) gameObject.layer = LayerMask.NameToLayer("Rail");
+        }
 
         protected override void Start()
         {
@@ -34,11 +37,13 @@ namespace Uncooked.Terrain
                 straightPower.SetActive(true);
                 inDirection = Vector3Int.RoundToInt(straightMesh.transform.forward);
                 outDirection = Vector3Int.RoundToInt(straightMesh.transform.forward);
-                connectCount = Physics.Raycast(transform.position, outDirection, 1, LayerMask.GetMask("Default")) ? 2 : 1;
+                connectCount = Physics.Raycast(transform.position, outDirection, 1, LayerMask.GetMask("Rail")) ? 2 : 1;
             }
 
             base.Start();
         }
+
+        public void AddWagon() => wagonCount++;
 
         /// <summary>
         /// Checks if can be picked up, then unpowers it, then returns the base method
@@ -75,45 +80,32 @@ namespace Uncooked.Terrain
         /// </summary>
         public override void OnDrop(Vector3Int coords)
         {
-            List<RailTile> poweredRails = new List<RailTile>();
+            List<RailTile> connectableRails = new List<RailTile>();
             Vector3 dir = Vector3.forward;
 
             for (int i = 0; i < 4; i++)
             {
                 var rail = TryGetAdjacentRail(dir, true);
-                if (rail != null && Vector3.Dot(rail.inDirection, coords - rail.transform.position) >= 0)
-                    poweredRails.Add(rail);
+                if (rail != null && rail.connectCount < 2) connectableRails.Add(rail);
 
                 dir = Quaternion.AngleAxis(90, Vector3.up) * dir;
             }
 
-            if (poweredRails.Count > 0)
+            if (connectableRails.Count > 0)
             {
-                RailTile inRail = null;
-                foreach (RailTile r in poweredRails)
-                {
-                    if (r.connectCount < 2)
-                    {
-                        if (inRail == null)
-                        {
-                            inRail = r;
-                            break;
-                        }
-                    }
-                }
-                if (inRail == null) return;
-
+                RailTile inRail = connectableRails[0];
                 Vector3Int dirToThis = coords - Vector3Int.FloorToInt(inRail.transform.position);
 
                 if (inRail.outDirection != dirToThis) inRail.SetState(inRail.inDirection, dirToThis, 2);
+                else inRail.connectCount++;
                 SetState(dirToThis, dirToThis, 1);
             }
         }
 
         /// <summary>
-        /// Gets next powered rail in the track after this
+        /// Gets next rail in the track after this
         /// </summary>
-        /// <returns>Next RailTile if there is one, otherwise null</returns>
+        /// <returns>Next RailTile in the track if there is one, otherwise null</returns>
         public RailTile TryGetNextRail() => TryGetAdjacentRail(outDirection, true);
 
         /// <summary>
@@ -124,7 +116,8 @@ namespace Uncooked.Terrain
         private RailTile TryGetAdjacentRail(Vector3 direction, bool isPowered)
         {
             RaycastHit hitInfo;
-            var mask = LayerMask.GetMask("Default");
+            var mask = LayerMask.GetMask("Rail");
+
             if (Physics.Raycast(transform.position, direction, out hitInfo, 1, mask))
             {
                 var rail = hitInfo.transform.GetComponent<RailTile>();
@@ -153,14 +146,16 @@ namespace Uncooked.Terrain
                 straightPower.SetActive(isStraight);
                 bentPower.SetActive(!isStraight);
 
-                if (isStraight) transform.forward = outDir;
-                else transform.forward = InOutToForward(inDir, outDir);
+                transform.forward = isStraight ? outDir : InOutToForward(inDir, outDir);
 
-                var nextRail = TryGetAdjacentRail(outDir, false);
-                if (nextRail != null)
+                if (connectCount == 1)
                 {
-                    nextRail.SetState(outDir, outDir, 1);
-                    connectCount++;
+                    var nextRail = TryGetAdjacentRail(outDir, false);
+                    if (nextRail != null)
+                    {
+                        nextRail.SetState(outDir, outDir, 1);
+                        connectCount++;
+                    }
                 }
             }
             else
@@ -180,6 +175,8 @@ namespace Uncooked.Terrain
 
             inDirection = inDir;
             outDirection = outDir;
+
+            gameObject.layer = connectCount > 0 ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default");
         }
 
         /// <summary>

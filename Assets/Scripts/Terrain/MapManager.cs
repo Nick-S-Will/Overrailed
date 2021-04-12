@@ -72,6 +72,8 @@ namespace Uncooked.Terrain.Generation
 
                     var obj = Instantiate(tile, new Vector3(x, 1, z), Quaternion.Euler(0, rng.Next(3) * 90, 0), rowParent);
                 }
+
+                if (rowParent.childCount == 0) Destroy(rowParent.gameObject);
             }
             #endregion
         }
