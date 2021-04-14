@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Terrain.Tools;
+
 namespace Uncooked.Terrain
 {
     public class LiquidTile : Tile, IInteractable
@@ -40,7 +42,7 @@ namespace Uncooked.Terrain
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
             if (item is StackTile stack && stack.Bridge != null) stack.BuildBridge(this);
-            else if (item is Bucket bucket) bucket.ToggleLiquid();
+            else if (item is Bucket bucket) bucket.isFull = true;
             else return false;
 
             return true;

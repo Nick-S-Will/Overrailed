@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Uncooked.Terrain
+namespace Uncooked.Terrain.Tools
 {
     public abstract class Tool : Tile, IPickupable
     {

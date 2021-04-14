@@ -59,7 +59,7 @@ namespace Uncooked.Terrain
 
         public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (item is TrainCar wagon) wagon.SetRail(this);
+            if (item is TrainCar wagon) wagon.SetRail(this, true);
             else return base.TryInteractUsing(item, hitInfo);
 
             return true;
@@ -109,9 +109,9 @@ namespace Uncooked.Terrain
         public RailTile TryGetNextRail() => TryGetAdjacentRail(outDirection, true);
 
         /// <summary>
-        /// Gets adjacent powered rail in the given direction from this transform
+        /// Gets adjacent rail in the given direction from this transform
         /// </summary>
-        /// <param name="isPowered">If the search require rail to be true or not</param>
+        /// <param name="isPowered">If the search require rail to be powered or not</param>
         /// <returns>Adjacent RailTile if there is one, otherwise null</returns>
         private RailTile TryGetAdjacentRail(Vector3 direction, bool isPowered)
         {

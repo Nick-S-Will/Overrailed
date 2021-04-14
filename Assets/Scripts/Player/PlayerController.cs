@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Terrain;
-using Uncooked.Train;
+using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Player
 {

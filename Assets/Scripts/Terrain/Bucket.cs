@@ -2,26 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Uncooked.Terrain
+namespace Uncooked.Terrain.Tools
 {
     public class Bucket : Tool
     {
         [Space]
         [SerializeField] private Transform liquid;
 
-        private bool isFull;
-
-        public bool IsFull => isFull;
+        public bool isFull
+        {
+            get => liquid.gameObject.activeSelf;
+            set => liquid.gameObject.SetActive(value);
+        }
 
         protected virtual void Start()
         {
             liquid.gameObject.SetActive(isFull);
         }
 
-        public void ToggleLiquid()
+        public bool TryUse()
         {
-            isFull = !isFull;
-            liquid.gameObject.SetActive(isFull);
+            if (isFull)
+            {
+                isFull = false;
+                return true;
+            }
+            else return false;
         }
     }
 }

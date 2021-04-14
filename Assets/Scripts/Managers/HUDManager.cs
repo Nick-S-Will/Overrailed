@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using Uncooked.Terrain;
+using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Managers
 {

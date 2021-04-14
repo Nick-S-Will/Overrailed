@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Terrain.Tools;
+
 namespace Uncooked.Terrain
 {
     public class BreakableTile : Tile, IDamageable
