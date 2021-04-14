@@ -22,7 +22,7 @@ namespace Uncooked.Terrain
         private int connectCount, wagonCount;
 
         public Transform Path => straightMesh.gameObject.activeSelf ? straightPathParent : bentPathParent;
-        public bool IsPowered => inDirection != Vector3Int.zero;
+        public bool IsPowered => connectCount > 0;
         public bool IsStraight => straightMesh.activeSelf;
 
         private void Awake()
@@ -80,6 +80,8 @@ namespace Uncooked.Terrain
         /// </summary>
         public override void OnDrop(Vector3Int coords)
         {
+            if (NextInStack) return;
+
             List<RailTile> connectableRails = new List<RailTile>();
             Vector3 dir = Vector3.forward;
 
@@ -147,15 +149,16 @@ namespace Uncooked.Terrain
 
                 transform.forward = isStraight ? outDir : InOutToForward(inDir, outDir);
 
-                if (connectCount == 1)
+                // TODO: Fix this
+                /*if (connectCount == 1)
                 {
                     var nextRail = TryGetAdjacentRail(outDir, false);
-                    if (nextRail != null)
+                    if (nextRail != null && nextRail.GetStackCount() == 1)
                     {
                         nextRail.SetState(outDir, outDir, 1);
                         connectCount++;
                     }
-                }
+                }*/
             }
             else
             {
@@ -167,7 +170,7 @@ namespace Uncooked.Terrain
                 transform.forward = Vector3.forward;
 
                 var nextRail = TryGetAdjacentRail(outDirection, true);
-                if (nextRail != null) nextRail.SetState(Vector3Int.zero, nextRail.outDirection, 0);
+                if (nextRail != null) nextRail.SetState(Vector3Int.zero, Vector3Int.zero, 0);
                 var prevRail = TryGetAdjacentRail(-inDirection, true);
                 if (prevRail != null) prevRail.connectCount = 1;
             }
@@ -184,7 +187,7 @@ namespace Uncooked.Terrain
         /// <returns>True if rail turns right, otherwise false</returns>
         public static bool BentRailToRight(RailTile rail)
         {
-            if (rail.straightMesh.activeSelf) Debug.LogError("Given Rail not bent");
+            if (!rail.bentMesh.activeSelf) Debug.LogError("Given Rail not bent");
 
             // No Vector3Int.forward or back in this version wtf?
             var forward = new Vector3Int(0, 0, 1);

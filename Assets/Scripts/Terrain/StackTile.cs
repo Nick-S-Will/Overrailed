@@ -15,8 +15,10 @@ namespace Uncooked.Terrain
 
         private StackTile nextInStack, prevInStack;
 
-        public float TileHeight => tileHeight;
+        public StackTile NextInStack => nextInStack;
+        public StackTile PrevInStack => prevInStack;
         public Type StackType => stackType;
+        public float TileHeight => tileHeight;
         public bool IsTwoHanded() => true;
 
         protected virtual void Start()
@@ -104,6 +106,7 @@ namespace Uncooked.Terrain
         public virtual bool TryStackOn(StackTile stackBase)
         {
             if (stackType != stackBase.stackType) return false;
+            if (transform == stackBase.transform) throw new System.Exception("Self Parenting");
 
             stackBase.GetComponent<BoxCollider>().isTrigger = false;
 
@@ -111,13 +114,13 @@ namespace Uncooked.Terrain
             StackTile top = stackBase;
             while (top.nextInStack) top = top.nextInStack;
 
-            // Place this on stack
+            // Place and orient this on stack
             prevInStack = top;
             top.nextInStack = this;
             stackIndex = (top.stackIndex + 1);
             transform.parent = top.transform;
             transform.localPosition = top.tileHeight * Vector3.up;
-            transform.rotation = Quaternion.Euler(0, Random.Range(-10, 10f), 0);
+            transform.localRotation = Quaternion.Euler(0, Random.Range(-10, 10f), 0);
 
             // Update stackIndex
             top = this;

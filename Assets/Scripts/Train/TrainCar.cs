@@ -10,6 +10,8 @@ namespace Uncooked.Train
 {
     public abstract class TrainCar : Tile, IPickupable, IInteractable
     {
+        public event System.Action OnDeath;
+
         [Space]
         [SerializeField] private ParticleSystem burningParticlePrefab;
         [SerializeField] private Transform burnPoint;
@@ -26,6 +28,7 @@ namespace Uncooked.Train
         protected virtual void Start()
         {
             if (startRail != null) SetRail(startRail, false);
+            OnDeath += Die;
         }
 
         private IEnumerator Drive()
@@ -178,6 +181,11 @@ namespace Uncooked.Train
 
             if (Physics.Raycast(point, direction, out hitInfo, 1, mask)) return hitInfo.transform.GetComponent<TrainCar>();
             else return null;
+        }
+
+        private void Die()
+        {
+
         }
     }
 }
