@@ -6,11 +6,17 @@ namespace Uncooked.Train
 {
     public class Locomotive : TrainCar
     {
+        [Space]
+        [SerializeField] private ParticleSystem smokeParticlePrefab;
+        [SerializeField] private Transform smokePoint;
+
+        protected ParticleSystem smokeParticles;
+
         protected override void Start()
         {
             base.Start();
 
-            // TODO: Add smoke particles
+            smokeParticles = Instantiate(smokeParticlePrefab, smokePoint);
         }
     }
 }

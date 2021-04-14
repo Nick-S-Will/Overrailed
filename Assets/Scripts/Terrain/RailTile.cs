@@ -103,9 +103,9 @@ namespace Uncooked.Terrain
         }
 
         /// <summary>
-        /// Gets next rail in the track after this
+        /// Gets next powered rail in the track after this
         /// </summary>
-        /// <returns>Next RailTile in the track if there is one, otherwise null</returns>
+        /// <returns>Next RailTile in the track if there is a powered one, otherwise null</returns>
         public RailTile TryGetNextRail() => TryGetAdjacentRail(outDirection, true);
 
         /// <summary>
@@ -116,12 +116,11 @@ namespace Uncooked.Terrain
         private RailTile TryGetAdjacentRail(Vector3 direction, bool isPowered)
         {
             RaycastHit hitInfo;
-            var mask = LayerMask.GetMask("Rail");
+            var mask = isPowered ? LayerMask.GetMask("Rail") : LayerMask.GetMask("Default");
 
             if (Physics.Raycast(transform.position, direction, out hitInfo, 1, mask))
             {
-                var rail = hitInfo.transform.GetComponent<RailTile>();
-                if (rail != null && !(isPowered ^ rail.IsPowered)) return rail;
+                return hitInfo.transform.GetComponent<RailTile>();
             }
 
             return null;
@@ -196,9 +195,6 @@ namespace Uncooked.Terrain
                 (rail.inDirection == -forward && rail.outDirection == Vector3Int.left)) return true;
             else return false;
         }
-
-        // Probably unnecessary
-        public static Vector3Int BentRailToForward(RailTile rail) => InOutToForward(rail.inDirection, rail.outDirection);
 
         /// <summary>
         /// Jank way to convert in and out directions to local forward for bent rails

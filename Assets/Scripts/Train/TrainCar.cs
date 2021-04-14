@@ -11,13 +11,15 @@ namespace Uncooked.Train
     public abstract class TrainCar : Tile, IPickupable, IInteractable
     {
         [Space]
+        [SerializeField] private ParticleSystem burningParticlePrefab;
+        [SerializeField] private Transform burnPoint;
         [SerializeField] private RailTile startRail;
         [SerializeField] protected int tier = 1;
         [SerializeField] protected bool isPermeable;
 
+        protected ParticleSystem burningParticles;
         protected RailTile currentRail;
         private int pathIndex, pathDir;
-        protected bool isBurning;
 
         public bool IsTwoHanded() => true;
 
@@ -80,15 +82,18 @@ namespace Uncooked.Train
         public virtual void OnDrop(Vector3Int position) { }
 
         /// <summary>
-        /// 
+        /// Puts out the fire on this car if buck has water
         /// </summary>
-        /// <param name="bucket"></param>
-        /// <returns></returns>
+        /// <param name="bucket">Bucket used to put out the fire</param>
+        /// <returns>True if fire was put out, otherwise null</returns>
         private bool TryExtinguish(Bucket bucket)
         {
-            if (isBurning && bucket.TryUse())
+            if (burningParticles && bucket.TryUse())
             {
-                isBurning = false; // <= gonna be more complex later
+                Destroy(burningParticles.gameObject, burningParticles.main.duration);
+                var settings = burningParticles.main;
+                settings.loop = false;
+                burningParticles = null;
                 return true;
             }
             else return false;
@@ -102,15 +107,15 @@ namespace Uncooked.Train
 
         public IEnumerator Ignite()
         {
-            isBurning = true; // <= TODO: Add particle effects
+            burningParticles = Instantiate(burningParticlePrefab, burnPoint);
 
             yield return new WaitForSeconds(4);
 
             var carF = TryGetAdjacentCar(transform.position, transform.forward);
             var carB = TryGetAdjacentCar(transform.position, -transform.forward);
 
-            if (carF && !carF.isBurning && carF.currentRail != null) StartCoroutine(carF.Ignite());
-            if (carB && !carB.isBurning && carB.currentRail != null) StartCoroutine(carB.Ignite());
+            if (carF && !carF.burningParticles && carF.currentRail != null) StartCoroutine(carF.Ignite());
+            if (carB && !carB.burningParticles && carB.currentRail != null) StartCoroutine(carB.Ignite());
         }
 
         /// <summary>

@@ -33,13 +33,13 @@ namespace Uncooked.Train
                 }
 
                 liquid.localScale = new Vector3(1, liquidPercent, 1);
-                yield return new WaitForSeconds(liquidUsageInterval);
                 if (liquidPercent == 0)
                 {
                     StartCoroutine(Ignite());
                     yield return new WaitWhile(() => liquidPercent == 0);
                     liquid.gameObject.SetActive(true);
                 }
+                yield return new WaitForSeconds(liquidUsageInterval);
             }
         }
 
