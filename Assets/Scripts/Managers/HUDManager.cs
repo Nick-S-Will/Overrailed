@@ -11,33 +11,30 @@ namespace Uncooked.Managers
     {
         [SerializeField] private GameObject toolHUDPrefab;
         [SerializeField] [Range(0, 1)] private float warningScreenPercentage;
-        [SerializeField] private Tool[] tools;
-
-        private ToolHUD[] toolHUDs;
+        [SerializeField] private ToolHUD[] tools;
 
         void Start()
         {
-            toolHUDs = new ToolHUD[tools.Length];
-
             for (int i = 0; i < tools.Length; i++)
             {
-                tools[i].OnPickupEvent += OnToolPickup;
-                tools[i].OnDropEvent += OnToolDrop;
+                tools[i].Tool.OnPickupEvent += OnToolPickup;
+                tools[i].Tool.OnDropEvent += OnToolDrop;
 
                 var toolHUD = Instantiate(toolHUDPrefab, transform).GetComponent<RectTransform>();
-                MoveRectToTransform(toolHUD, tools[i].transform);
+                toolHUD.GetChild(0).GetChild(0).GetComponent<Image>().sprite = tools[i].ToolImage;
+                MoveRectToTransform(toolHUD, tools[i].Tool.transform);
 
-                toolHUDs[i] = new ToolHUD(tools[i], toolHUD);
+                tools[i].rect = toolHUD;
             }
         }
 
         private void Update()
         {
-            foreach (var toolHUD in toolHUDs)
+            foreach (var toolHUD in tools)
             {
-                if (toolHUD.Rect.gameObject.activeSelf)
+                if (toolHUD.rect.gameObject.activeSelf)
                 {
-                    MoveRectToTransform(toolHUD.Rect, toolHUD.Tool.transform);
+                    MoveRectToTransform(toolHUD.rect, toolHUD.Tool.transform);
                     if (toolHUD.ScreenPercent < warningScreenPercentage && !toolHUD.isInDanger) StartCoroutine(FlashColor(toolHUD));
                 }
             }
@@ -53,14 +50,14 @@ namespace Uncooked.Managers
         private void OnToolDrop(Tool tool) => SetToolHUD(tool, true);
         private void SetToolHUD(Tool tool, bool isVisible)
         {
-            foreach (var t in toolHUDs) if (tool == t.Tool) t.Rect.gameObject.SetActive(isVisible);
+            foreach (var t in tools) if (tool == t.Tool) t.rect.gameObject.SetActive(isVisible);
         }
 
         private IEnumerator FlashColor(ToolHUD tool)
         {
             tool.isInDanger = true;
 
-            Image image = tool.Rect.GetComponentInChildren<Image>();
+            Image image = tool.rect.GetComponentInChildren<Image>();
             Color originalColor = image.color, highlightColor = new Color(1, 0, 0, originalColor.a);
 
             while (tool.ScreenPercent < warningScreenPercentage)
@@ -75,23 +72,18 @@ namespace Uncooked.Managers
             tool.isInDanger = false;
         }
 
+        [System.Serializable]
         private struct ToolHUD
         {
-            public bool isInDanger;
+            [SerializeField] private Tool tool;
+            [SerializeField] private Sprite toolImage;
 
-            private Tool tool;
-            private RectTransform rect;
+            [HideInInspector] public RectTransform rect;
+            [HideInInspector] public bool isInDanger;
 
             public Tool Tool => tool;
-            public RectTransform Rect => rect;
+            public Sprite ToolImage => toolImage;
             public float ScreenPercent => (rect.position.x + Screen.width) / Screen.width - 1;
-
-            public ToolHUD(Tool _tool, RectTransform _rect)
-            {
-                tool = _tool;
-                rect = _rect;
-                isInDanger = false;
-            }
         }
     }
 }
