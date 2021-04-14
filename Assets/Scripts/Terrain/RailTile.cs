@@ -88,12 +88,16 @@ namespace Uncooked.Terrain
             for (int i = 0; i < 4; i++)
             {
                 var rail = TryGetAdjacentRail(dir, true);
-                if (rail != null && rail.connectCount < 2) connectableRails.Add(rail);
+                if (rail != null && rail.connectCount < 2)
+                {
+                    connectableRails.Add(rail);
+                    break;
+                }
 
                 dir = Quaternion.AngleAxis(90, Vector3.up) * dir;
             }
 
-            if (connectableRails.Count > 0)
+            if (connectableRails.Count == 1)
             {
                 RailTile inRail = connectableRails[0];
                 Vector3Int dirToThis = coords - Vector3Int.FloorToInt(inRail.transform.position);
@@ -128,6 +132,20 @@ namespace Uncooked.Terrain
             return null;
         }
 
+        // For preventing StackOverflow when rails connect multiple in a row
+        /// <summary>
+        /// Waits a frame, then does SetState
+        /// </summary>
+        /// <param name="inDir">Direction to this rail from the previous one</param>
+        /// <param name="outDir">Direction from this rail to the next one</param>
+        /// <param name="connectionCount">The amount of rails this is connecting to [0, 2]</param>
+        private IEnumerator DelaySetState(Vector3Int inDir, Vector3Int outDir, int connectionCount)
+        {
+            yield return null;
+
+            SetState(inDir, outDir, connectionCount);
+        }
+
         /// <summary>
         /// Sets rail's connections
         /// </summary>
@@ -136,8 +154,6 @@ namespace Uncooked.Terrain
         /// <param name="connectionCount">The amount of rails this is connecting to [0, 2]</param>
         private void SetState(Vector3Int inDir, Vector3Int outDir, int connectionCount)
         {
-            connectCount = connectionCount;
-
             if (inDir != Vector3Int.zero)
             {
                 bool isStraight = inDir - outDir == Vector3Int.zero;
@@ -149,16 +165,16 @@ namespace Uncooked.Terrain
 
                 transform.forward = isStraight ? outDir : InOutToForward(inDir, outDir);
 
-                // TODO: Fix this
-                /*if (connectCount == 1)
+                // Tries to connect this to proceeding rails
+                if (connectionCount == 1)
                 {
                     var nextRail = TryGetAdjacentRail(outDir, false);
                     if (nextRail != null && nextRail.GetStackCount() == 1)
                     {
-                        nextRail.SetState(outDir, outDir, 1);
-                        connectCount++;
+                        StartCoroutine(nextRail.DelaySetState(outDir, outDir, 1));
+                        connectionCount++;
                     }
-                }*/
+                }
             }
             else
             {
@@ -169,14 +185,16 @@ namespace Uncooked.Terrain
 
                 transform.forward = Vector3.forward;
 
+                // Tries to disconnect this and proceeding rails from track
                 var nextRail = TryGetAdjacentRail(outDirection, true);
-                if (nextRail != null) nextRail.SetState(Vector3Int.zero, Vector3Int.zero, 0);
+                if (nextRail != null) StartCoroutine(nextRail.DelaySetState(Vector3Int.zero, Vector3Int.zero, 0));
                 var prevRail = TryGetAdjacentRail(-inDirection, true);
                 if (prevRail != null) prevRail.connectCount = 1;
             }
 
             inDirection = inDir;
             outDirection = outDir;
+            connectCount = connectionCount;
 
             gameObject.layer = connectCount > 0 ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default");
         }
