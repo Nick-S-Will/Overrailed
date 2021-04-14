@@ -81,6 +81,12 @@ namespace Uncooked.Train
 
         public virtual void OnDrop(Vector3Int position) { }
 
+        public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        {
+            if (item is Bucket bucket) return TryExtinguish(bucket);
+            else return false;
+        }
+
         /// <summary>
         /// Puts out the fire on this car if buck has water
         /// </summary>
@@ -91,17 +97,10 @@ namespace Uncooked.Train
             if (burningParticles && bucket.TryUse())
             {
                 Destroy(burningParticles.gameObject, burningParticles.main.duration);
-                var settings = burningParticles.main;
-                settings.loop = false;
+                burningParticles.enableEmission = false;
                 burningParticles = null;
                 return true;
             }
-            else return false;
-        }
-
-        public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
-        {
-            if (item is Bucket bucket) return TryExtinguish(bucket);
             else return false;
         }
 
@@ -110,6 +109,8 @@ namespace Uncooked.Train
             burningParticles = Instantiate(burningParticlePrefab, burnPoint);
 
             yield return new WaitForSeconds(4);
+
+            if (!burningParticles) yield break;
 
             var carF = TryGetAdjacentCar(transform.position, transform.forward);
             var carB = TryGetAdjacentCar(transform.position, -transform.forward);
