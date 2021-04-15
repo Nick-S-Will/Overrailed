@@ -8,7 +8,7 @@ namespace Uncooked.Player
 {
     public class PlayerController : MonoBehaviour
     {
-        public System.Action<bool> OnPickUp, OnDrop; // True for Pickups false for Tools
+        public System.Action<bool> OnPickUp, OnDrop; // True for two handed pickup
 
         [SerializeField] private float moveSpeed = 5, armTurnSpeed = 180, armSwingSpeed = 360;
         [SerializeField] private int strength = 1;

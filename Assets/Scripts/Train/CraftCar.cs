@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Terrain;
+using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Train
 {

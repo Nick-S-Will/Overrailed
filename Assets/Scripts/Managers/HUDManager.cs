@@ -17,8 +17,8 @@ namespace Uncooked.Managers
         {
             for (int i = 0; i < tools.Length; i++)
             {
-                tools[i].Tool.OnPickupEvent += OnToolPickup;
-                tools[i].Tool.OnDropEvent += OnToolDrop;
+                tools[i].Tool.OnPickup += OnToolPickup;
+                tools[i].Tool.OnDrop += OnToolDrop;
 
                 var toolHUD = Instantiate(toolHUDPrefab, transform).GetComponent<RectTransform>();
                 toolHUD.GetChild(0).GetChild(0).GetComponent<Image>().sprite = tools[i].ToolImage;

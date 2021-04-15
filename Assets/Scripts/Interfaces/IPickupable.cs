@@ -20,5 +20,5 @@ public interface IPickupable
     /// <summary>
     /// Does special action if needed by the class
     /// </summary>
-    void OnDrop(Vector3Int position);
+    void Drop(Vector3Int position);
 }

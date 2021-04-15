@@ -5,6 +5,7 @@ using UnityEngine;
 
 using Uncooked.Managers;
 using Uncooked.Terrain.Tools;
+using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Train
 {
@@ -82,7 +83,7 @@ namespace Uncooked.Train
             return this;
         }
 
-        public virtual void OnDrop(Vector3Int position) { }
+        public virtual void Drop(Vector3Int position) { }
 
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {

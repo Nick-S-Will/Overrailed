@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 using Uncooked.Terrain.Generation;
-using Uncooked.Terrain;
+using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Editors
 {
