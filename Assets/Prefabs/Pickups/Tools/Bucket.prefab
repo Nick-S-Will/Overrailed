@@ -243,10 +243,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1c31d28eedee79499e4b7e1db5a95a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  liquid: {fileID: 8986870579608214646}
-  waveHeight: 0.05
   handOffset: {fileID: 5470045993996298689}
   tier: 1
+  liquid: {fileID: 8986870579608214646}
 --- !u!65 &3102169558612024035
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -593,7 +592,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: aef45a9f7354e6c438cd6301512d476c, type: 2}
+  - {fileID: 2100000, guid: 1ccd4b6d77b0e2f4695a797b922e9182, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

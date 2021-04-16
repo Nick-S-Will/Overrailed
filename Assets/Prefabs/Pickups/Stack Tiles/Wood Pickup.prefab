@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bridge: {fileID: 8000788900880814408, guid: 38de585089c892f4d93cb9f74028c9a4, type: 3}
-  stackType: 0
+  stackType: Wood
   tileHeight: 0.2
   startStackHeight: 1
 --- !u!65 &7657482902444645850

@@ -291,7 +291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bridge: {fileID: 0}
-  stackType: 1
+  stackType: Rock
   tileHeight: 0.4
   startStackHeight: 1
 --- !u!65 &6937254749402404536

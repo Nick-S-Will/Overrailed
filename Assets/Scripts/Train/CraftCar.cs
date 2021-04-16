@@ -9,10 +9,10 @@ namespace Uncooked.Train
     public class CraftCar : TrainCar
     {
         [Space]
+        [SerializeField] [Min(0.05f)] private float craftSpeed = 0.25f;
         [SerializeField] private HolderCar craftResultHolder;
         [SerializeField] private StackTile craftResultPrefab;
         [SerializeField] private CraftPoint[] craftPoints;
-        [SerializeField] [Min(0.05f)] private float craftSpeed = 0.25f;
 
         private bool isCrafting;
 
@@ -136,12 +136,12 @@ namespace Uncooked.Train
         private class CraftPoint
         {
             [SerializeField] private Transform transform;
-            [SerializeField] private StackTile.Type stackType;
+            [SerializeField] private string stackType;
 
             [HideInInspector] public StackTile stackTop;
 
             public Transform Transform => transform;
-            public StackTile.Type StackType => stackType;
+            public string StackType => stackType;
             public bool CanCraft => transform.childCount == 1;
         }
     }

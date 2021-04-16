@@ -557,11 +557,12 @@ MonoBehaviour:
   craftResultPrefab: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
   craftPoints:
   - transform: {fileID: 712608435093044323}
-    stackType: 0
+    stackType: Wood
     stackTop: {fileID: 0}
   - transform: {fileID: 712608436103181771}
-    stackType: 1
+    stackType: Rock
     stackTop: {fileID: 0}
+  craftSpeed: 0.25
 --- !u!65 &712608436525509802
 BoxCollider:
   m_ObjectHideFlags: 0

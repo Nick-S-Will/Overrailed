@@ -6,10 +6,9 @@ namespace Uncooked.Terrain.Tiles
 {
     public class StackTile : Tile, IPickupable, IInteractable
     {
-        public enum Type { Wood, Rock, Rail }
-
         [SerializeField] private Tile bridge;
-        [SerializeField] private Type stackType;
+        [Tooltip("Must have same exact same string to stack with")]
+        [SerializeField] private string stackType;
         [SerializeField] private float tileHeight;
         [Min(1)] [SerializeField] private int startStackHeight = 1;
 
@@ -17,7 +16,7 @@ namespace Uncooked.Terrain.Tiles
 
         public StackTile NextInStack => nextInStack;
         public StackTile PrevInStack => prevInStack;
-        public Type StackType => stackType;
+        public string StackType => stackType;
         public float TileHeight => tileHeight;
         public bool IsTwoHanded() => true;
 

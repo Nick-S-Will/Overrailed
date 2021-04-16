@@ -127,7 +127,7 @@ namespace Uncooked.Player
         /// <returns>True if heldItem was placed</returns>
         private bool TryDrop()
         {
-            if (heldItem == null) return false;
+            if (heldItem == null || (heldItem is Tool tool && tool.OnTryDrop())) return false;
 
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
             map.PlacePickup(heldItem, coords);

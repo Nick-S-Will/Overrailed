@@ -2,17 +2,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Managers;
 using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Terrain.Tools
 {
+    [RequireComponent(typeof(LineRenderer))]
     public class Rod : Tool
     {
+        [Space]
+        [SerializeField] private float bobHeight = 0.05f;
+        [SerializeField] private float fishReactionTime = 1;
+        [SerializeField] [Min(0)] private float catchTimeMin = 2, catchTimeMax = 6;
+        [Space]
+        [SerializeField] private ParticleSystem splashParticles;
         [SerializeField] private Transform bobberParent, bobber;
-        [SerializeField] private float bobHeight = 0.05f, fishReactionTime = 1;
 
-        // Add line renderer for fishing line
-        private bool isCast, tryCatchFish;
+        private LineRenderer line;
+        private Coroutine fishing;
+        private bool isCast, tryCatchFish, isWaiting;
+
+        private Vector3[] LinePoints => new Vector3[] { bobberParent.position, bobber.position };
+
+        protected virtual void Start()
+        {
+            line = GetComponent<LineRenderer>();
+            line.positionCount = 2;
+        }
+
+        private void Update()
+        {
+            line.SetPositions(LinePoints);
+        }
 
         public void Use(LiquidTile tile)
         {
@@ -21,40 +42,64 @@ namespace Uncooked.Terrain.Tools
             bobber.parent = isCast ? tile.SurfacePoint : bobberParent;
             bobber.localPosition = Vector3.zero;
 
-            if (isCast) StartCoroutine(Fishing());
-            else tryCatchFish = true;
+            if (isCast) fishing = StartCoroutine(Fishing());
+            else if (isWaiting) tryCatchFish = true;
+            else StopCoroutine(fishing);
         }
 
+        /// <summary>
+        /// Intercepts Rod drop if bobber is out
+        /// </summary>
+        /// <returns></returns>
+        public override bool OnTryDrop()
+        {
+            if (isCast) Use(null);
+            else return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Makes bobber bob for [catchTimeMin, catchTimeMax] seconds, then gives a catching window of fishReactionTime seconds
+        /// </summary>
         private IEnumerator Fishing()
         {
             while (isCast)
             {
-                float foundFishTime = 10 * Random.value + Time.time;
+                float foundFishTime = Random.Range(catchTimeMin, catchTimeMax) + Time.time;
 
                 // Bob normally
                 while (Time.time < foundFishTime)
                 {
-                    bobber.localPosition = (Mathf.PingPong(Time.time, 2 * bobHeight) - bobHeight) * Vector3.up;
+                    bobber.localPosition = (Mathf.PingPong(0.1f * Time.time, 2 * bobHeight) - bobHeight) * Vector3.up;
                     yield return null;
                 }
-                bobber.localPosition = Vector3.zero;
 
-                // Thrust down to indicate fish
+                // Thrust down
                 while (bobber.localPosition.y > -2 * bobHeight)
                 {
                     bobber.localPosition += 2 * Time.deltaTime * Vector3.down;
                     yield return null;
                 }
 
-                float waitTime = fishReactionTime + Time.time;
-                yield return new WaitUntil(() => Time.time > waitTime || tryCatchFish);
+                // Spawn particles to indicate fish
+                var splash = Instantiate(splashParticles, bobber);
+                Destroy(splash.gameObject, splash.main.duration);
 
-                // Pick fish
+                // Wait
+                float waitTime = fishReactionTime + Time.time;
+                isWaiting = true;
+                yield return new WaitUntil(() => Time.time > waitTime || tryCatchFish);
+                isWaiting = false;
+
+                // Catch fish
                 if (tryCatchFish)
                 {
-                    print("caught fish");
+                    var pos = Vector3Int.RoundToInt(transform.parent.parent.parent.parent.position + Vector3.up);
+                    AnimalManager.instance.RandomFish.transform.position = pos;
                     isCast = false;
                 }
+                else print("missed fish");
             }
 
             tryCatchFish = false;
