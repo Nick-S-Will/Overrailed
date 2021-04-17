@@ -6,6 +6,7 @@ using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Player
 {
+    [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour
     {
         public System.Action<bool> OnPickUp, OnDrop; // True for two handed pickup
@@ -19,7 +20,7 @@ namespace Uncooked.Player
         [Header("Transforms")] [SerializeField] private Transform armL;
         [SerializeField] private Transform armR, toolHolder, pickupHolder;
 
-        private Rigidbody rb;
+        private CharacterController cc;
         private Transform lastHit;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
         private IPickupable heldItem;
@@ -30,7 +31,7 @@ namespace Uncooked.Player
             OnPickUp += RaiseArms;
             OnDrop += LowerArms;
 
-            rb = GetComponent<Rigidbody>();
+            cc = GetComponent<CharacterController>();
             map = FindObjectOfType<Terrain.Generation.MapManager>();
         }
 
@@ -74,9 +75,14 @@ namespace Uncooked.Player
             // Movement Input
             var input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 
-            rb.velocity = moveSpeed * input;
+            if (input == Vector3.zero) return;
 
-            if (input != Vector3.zero) transform.forward = input;
+            transform.forward = input;
+
+            var deltaPos = moveSpeed * input * Time.fixedDeltaTime;
+            var mask = LayerMask.GetMask("Ground");
+            if (Physics.OverlapSphere(transform.position + deltaPos, moveSpeed * Time.fixedDeltaTime, mask).Length > 0) 
+                cc.Move(deltaPos);
         }
 
         /// <summary>

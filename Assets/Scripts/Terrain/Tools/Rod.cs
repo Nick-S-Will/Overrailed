@@ -96,7 +96,7 @@ namespace Uncooked.Terrain.Tools
                 if (tryCatchFish)
                 {
                     var pos = Vector3Int.RoundToInt(transform.parent.parent.parent.parent.position + Vector3.up);
-                    AnimalManager.instance.RandomFish.transform.position = pos;
+                    MobManager.instance.RandomFish.transform.position = pos;
                     isCast = false;
                 }
                 else print("missed fish");

@@ -56,10 +56,10 @@ namespace Uncooked.Terrain.Tiles
                 {
                     toSpawn = t.lowerTier;
 
-                    var p = Instantiate(breakParticles, hit.transform.position, breakParticles.transform.rotation);
-                    Destroy(p.gameObject, breakParticles.main.startLifetime.constant);
+                    var particles = Instantiate(breakParticles, hit.transform.position, breakParticles.transform.rotation);
+                    Destroy(particles.gameObject, breakParticles.main.startLifetime.constant);
 
-                    var settings = p.main;
+                    var settings = particles.main;
                     var colors = new ParticleSystem.MinMaxGradient(meshColors);
                     colors.mode = ParticleSystemGradientMode.RandomColor;
                     settings.startColor = colors;

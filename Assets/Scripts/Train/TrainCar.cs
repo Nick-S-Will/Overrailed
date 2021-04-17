@@ -101,8 +101,10 @@ namespace Uncooked.Train
             if (burningParticles && bucket.TryUse())
             {
                 Destroy(burningParticles.gameObject, burningParticles.main.duration);
-                burningParticles.enableEmission = false;
+                var emissionSettings = burningParticles.emission;
+                emissionSettings.enabled = false;
                 burningParticles = null;
+
                 return true;
             }
             else return false;

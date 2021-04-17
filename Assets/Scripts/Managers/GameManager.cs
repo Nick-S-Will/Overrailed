@@ -17,7 +17,7 @@ namespace Uncooked.Managers
         void Awake()
         {
             if (instance == null) instance = this;
-            else Debug.LogError("Multiple Game Managers Exist");
+            else Debug.LogError("Multiple GameManagers Exist");
         }
 
         private void OnDestroy()

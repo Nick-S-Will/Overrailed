@@ -42,8 +42,8 @@ namespace Uncooked.Managers
 
         private void MoveRectToTransform(RectTransform hudElement, Transform worldElement)
         {
-            hudElement.position = Camera.main.WorldToScreenPoint(worldElement.transform.position);
-            hudElement.rotation = Quaternion.Inverse(Camera.main.transform.rotation);
+            hudElement.position = CameraManager.instance.Main.WorldToScreenPoint(worldElement.transform.position);
+            hudElement.rotation = Quaternion.Inverse(CameraManager.instance.Main.transform.rotation);
         }
 
         private void OnToolPickup(Tool tool) => SetToolHUD(tool, false);
