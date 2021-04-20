@@ -50,10 +50,10 @@ namespace Uncooked.Editors
             {
                 GUILayout.BeginArea(settingsRect);
                 EditorGUI.BeginChangeCheck();
-                Tile newTile = (Tile)EditorGUILayout.ObjectField(biome.GetKey(selectedKeyIndex).tile, typeof(Tile), true);
+                Tile newTile = (Tile)EditorGUILayout.ObjectField(biome.GetKey(selectedKeyIndex).Tile, typeof(Tile), true);
                 if (EditorGUI.EndChangeCheck()) biome.SetTile(selectedKeyIndex, newTile);
                 EditorGUI.BeginChangeCheck();
-                float newPercent = EditorGUILayout.FloatField(biome.GetKey(selectedKeyIndex).percent);
+                float newPercent = EditorGUILayout.FloatField(biome.GetKey(selectedKeyIndex).Percent);
                 if (EditorGUI.EndChangeCheck()) biome.SetPercent(selectedKeyIndex, newPercent);
                 GUILayout.EndArea();
             }
@@ -112,7 +112,7 @@ namespace Uncooked.Editors
         {
             Rect gradientRect = new Rect(windowBorder, windowBorder, position.width - 2 * windowBorder, 30);
             return new Rect(
-                gradientRect.x + biome.GetKey(index).percent * gradientRect.width - keyWidth / 2,
+                gradientRect.x + biome.GetKey(index).Percent * gradientRect.width - keyWidth / 2,
                 gradientRect.yMax + windowBorder,
                 keyWidth,
                 keyHeight);

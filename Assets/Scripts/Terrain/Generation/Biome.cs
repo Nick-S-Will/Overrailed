@@ -25,7 +25,7 @@ namespace Uncooked.Terrain.Generation
 
         public Color Evaluate(float percent)
         {
-            foreach (var key in keys) if (percent <= key.percent) return key.tile == null ? GetRainbow(percent) : key.Color;
+            foreach (var key in keys) if (percent <= key.Percent) return key.Tile == null ? GetRainbow(percent) : key.Color;
             return Color.white;
         }
 
@@ -33,15 +33,15 @@ namespace Uncooked.Terrain.Generation
         public TileKey GetKey(int index) => keys[index];
         public Tile GetTile(float percent)
         {
-            foreach (var key in keys) if (percent <= key.percent) return key.tile;
-            return keys[keys.Count - 1].tile;
+            foreach (var key in keys) if (percent <= key.Percent) return key.Tile;
+            return keys[keys.Count - 1].Tile;
         }
 
         public int AddKey(TileKey newKey)
         {
             for (int i = 0; i < keys.Count; i++)
             {
-                if (newKey.percent < keys[i].percent)
+                if (newKey.Percent < keys[i].Percent)
                 {
                     keys.Insert(i, newKey);
                     return i;
@@ -54,14 +54,14 @@ namespace Uncooked.Terrain.Generation
         {
             TileKey key = keys[index];
             keys.RemoveAt(index);
-            return AddKey(new TileKey(key.tile, _percent));
+            return AddKey(new TileKey(key.Tile, _percent));
         }
         public void RemoveKey(int index)
         {
             keys.RemoveAt(index);
         }
-        public void SetTile(int index, Tile newTile) => keys[index] = new TileKey(newTile, keys[index].percent);
-        public void SetPercent(int index, float _percent) => keys[index] = new TileKey(keys[index].tile, _percent);
+        public void SetTile(int index, Tile newTile) => keys[index] = new TileKey(newTile, keys[index].Percent);
+        public void SetPercent(int index, float _percent) => keys[index] = new TileKey(keys[index].Tile, _percent);
 
         public Texture2D GetTexture(int width)
         {
@@ -93,12 +93,13 @@ namespace Uncooked.Terrain.Generation
         [System.Serializable]
         public class TileKey
         {
-            [SerializeField] public Tile tile { get; private set; }
-            [SerializeField] public float percent { get; private set; }
-
-            public Color Color => color;
-
+            [SerializeField] private Tile tile;
             [SerializeField] private Color color;
+            [SerializeField] private float percent;
+
+            public Tile Tile => tile;
+            public Color Color => color;
+            public float Percent => percent;
 
             public TileKey(Tile _tile, float _percent)
             {
