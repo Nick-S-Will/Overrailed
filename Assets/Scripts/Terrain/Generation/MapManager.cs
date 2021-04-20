@@ -51,7 +51,7 @@ namespace Uncooked.Terrain.Generation
 
             var groundCollider = new GameObject("Ground Collider").transform;
             groundCollider.parent = transform;
-            groundCollider.position = new Vector3(mapLength / 2f - 0.5f, -0.5f, mapWidth / 2f - 0.5f);
+            groundCollider.position = new Vector3(mapLength / 2f - 0.5f, transform.position.y -0.5f, mapWidth / 2f - 0.5f);
             groundCollider.gameObject.AddComponent<BoxCollider>().size = new Vector3(mapLength, 1, mapWidth);
             groundCollider.gameObject.layer = LayerMask.NameToLayer("Ground");
             #endregion
@@ -71,10 +71,10 @@ namespace Uncooked.Terrain.Generation
                     Tile tile = obstacleBiome.GetTile(heightMap[x, z]);
                     if (tile == null) continue;
 
-                    var obj = Instantiate(tile, new Vector3(x, 1, z), Quaternion.Euler(0, rng.Next(3) * 90, 0), rowParent);
+                    var obj = Instantiate(tile, new Vector3(x, transform.position.y + 1, z), Quaternion.Euler(0, rng.Next(3) * 90, 0), rowParent);
                 }
 
-                if (rowParent.childCount == 0) Destroy(rowParent.gameObject);
+                if (rowParent.childCount == 0) DestroyImmediate(rowParent.gameObject);
             }
             #endregion
         }

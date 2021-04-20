@@ -12,7 +12,7 @@ namespace Uncooked.Train
         [SerializeField] [Min(0.05f)] private float craftSpeed = 0.25f;
         [SerializeField] private HolderCar craftResultHolder;
         [SerializeField] private StackTile craftResultPrefab;
-        [SerializeField] private CraftPoint[] craftPoints;
+        [SerializeField] private StackPoint[] craftPoints;
 
         private bool isCrafting;
 
@@ -21,7 +21,7 @@ namespace Uncooked.Train
             get
             {
                 if (isCrafting) return false;
-                foreach (CraftPoint cp in craftPoints) if (!cp.CanCraft) return false;
+                foreach (StackPoint cp in craftPoints) if (!cp.CanCraft) return false;
                 return true;
             }
         }
@@ -52,18 +52,19 @@ namespace Uncooked.Train
             // Animate crafting
             while (percent < 1)
             {
+                float oldPercent = percent;
                 percent += craftSpeed * tier * Time.deltaTime;
 
-                float onCount;
+                int onCount;
                 foreach (var renderers in ingredientMeshes)
                 {
-                    onCount = percent * renderers.Length;
+                    onCount = (int)(percent * renderers.Length);
 
-                    for (int i = 0; i < onCount - 1; i++) renderers[i].enabled = false;
+                    if (onCount - (int)(oldPercent * renderers.Length) == 1) renderers[onCount - 1].enabled = false;
                 }
 
-                onCount = percent * craftMeshes.Length;
-                for (int i = 0; i < onCount - 1; i++) craftMeshes[i].enabled = true;
+                onCount = (int)(percent * craftMeshes.Length);
+                if (onCount - (int)(oldPercent * craftMeshes.Length) == 1) craftMeshes[onCount - 1].enabled = true;
 
                 yield return null;
             }
@@ -94,7 +95,7 @@ namespace Uncooked.Train
         private bool TryAddItem(StackTile stack)
         {
             // Find point for stack to add to
-            CraftPoint craftPoint = null;
+            StackPoint craftPoint = null;
             foreach (var cp in craftPoints)
             {
                 if (stack.StackType == cp.StackType)
@@ -130,19 +131,6 @@ namespace Uncooked.Train
             a.parent = b;
             a.localPosition = Vector3.zero;
             a.localRotation = Quaternion.identity;
-        }
-
-        [System.Serializable]
-        private class CraftPoint
-        {
-            [SerializeField] private Transform transform;
-            [SerializeField] private string stackType;
-
-            [HideInInspector] public StackTile stackTop;
-
-            public Transform Transform => transform;
-            public string StackType => stackType;
-            public bool CanCraft => transform.childCount == 1;
         }
     }
 }

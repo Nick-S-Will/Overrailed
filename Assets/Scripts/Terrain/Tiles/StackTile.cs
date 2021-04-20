@@ -119,7 +119,8 @@ namespace Uncooked.Terrain.Tiles
             stackIndex = (top.stackIndex + 1);
             transform.parent = top.transform;
             transform.localPosition = top.tileHeight * Vector3.up;
-            transform.localRotation = Quaternion.Euler(0, Random.Range(-10, 10f), 0);
+            transform.rotation = stackBase.transform.parent.rotation;
+            transform.localRotation = Quaternion.Euler(0, Random.Range(-5, 5f), 0);
 
             // Update stackIndex
             top = this;
@@ -138,6 +139,7 @@ namespace Uncooked.Terrain.Tiles
         private void SelfStack()
         {
             var newTile = Instantiate(this);
+            newTile.GetComponent<BoxCollider>().enabled = false;
 
             newTile.startStackHeight = startStackHeight - 1;
             newTile.TryStackOn(this);

@@ -25,7 +25,7 @@ namespace Uncooked.Train
         {
             while (liquid != null)
             {
-                if (liquidPercent > 0) liquidPercent -= Time.fixedDeltaTime;
+                if (liquidPercent > 0) liquidPercent -= Time.fixedDeltaTime / tier;
                 else
                 {
                     liquidPercent = 0;

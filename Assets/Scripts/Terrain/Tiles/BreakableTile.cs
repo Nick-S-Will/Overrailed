@@ -9,7 +9,7 @@ namespace Uncooked.Terrain.Tiles
     public class BreakableTile : Tile, IDamageable
     {
         [SerializeField] private Tile lowerTier;
-        [SerializeField] private ParticleSystem breakParticles;
+        [SerializeField] private ParticleSystem breakParticlePrefab;
 
         private Gradient meshColors;
 
@@ -35,6 +35,8 @@ namespace Uncooked.Terrain.Tiles
 
         public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
+            print(name + " was interacted with");
+
             if (item is BreakTool breaker && name.Contains(breaker.BreakTileCode)) TakeHit(breaker.Tier, hitInfo);
             else return false;
 
@@ -56,8 +58,8 @@ namespace Uncooked.Terrain.Tiles
                 {
                     toSpawn = t.lowerTier;
 
-                    var particles = Instantiate(breakParticles, hit.transform.position, breakParticles.transform.rotation);
-                    Destroy(particles.gameObject, breakParticles.main.startLifetime.constant);
+                    var particles = Instantiate(breakParticlePrefab, hit.transform.position, breakParticlePrefab.transform.rotation);
+                    Destroy(particles.gameObject, breakParticlePrefab.main.startLifetime.constant);
 
                     var settings = particles.main;
                     var colors = new ParticleSystem.MinMaxGradient(meshColors);

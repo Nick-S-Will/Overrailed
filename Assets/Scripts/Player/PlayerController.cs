@@ -9,8 +9,6 @@ namespace Uncooked.Player
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour
     {
-        public System.Action<bool> OnPickUp, OnDrop; // True for two handed pickup
-
         [SerializeField] private float moveSpeed = 5, armTurnSpeed = 180, armSwingSpeed = 360;
         [SerializeField] private int strength = 1;
         [SerializeField] private Terrain.Generation.MapManager map;
@@ -28,9 +26,6 @@ namespace Uncooked.Player
 
         void Start()
         {
-            OnPickUp += RaiseArms;
-            OnDrop += LowerArms;
-
             cc = GetComponent<CharacterController>();
             map = FindObjectOfType<Terrain.Generation.MapManager>();
         }
@@ -86,7 +81,7 @@ namespace Uncooked.Player
         }
 
         /// <summary>
-        /// Tints selected's childrens' meshes by highlightColor until new object is selected
+        /// Tints selected's childrends' meshes by highlightColor until new object is selected
         /// </summary>
         private IEnumerator HightlightObject(Transform selected)
         {
@@ -122,7 +117,7 @@ namespace Uncooked.Player
             bool bothHands = pickup.IsTwoHanded();
 
             heldItem = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, strength);
-            if (heldItem != null) OnPickUp?.Invoke(bothHands);
+            if (heldItem != null) RaiseArms(bothHands);
 
             return heldItem != null;
         }
@@ -133,11 +128,11 @@ namespace Uncooked.Player
         /// <returns>True if heldItem was placed</returns>
         private bool TryDrop()
         {
-            if (heldItem == null || (heldItem is Tool tool && tool.OnTryDrop())) return false;
+            if (heldItem == null || isSwinging || (heldItem is Tool tool && tool.OnTryDrop())) return false;
 
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
             map.PlacePickup(heldItem, coords);
-            OnDrop?.Invoke(heldItem.IsTwoHanded());
+            LowerArms(heldItem.IsTwoHanded());
             heldItem = null;
 
             return true;
@@ -148,16 +143,13 @@ namespace Uncooked.Player
         /// </summary>
         private void UseItemOn(IInteractable interactable, RaycastHit hitInfo)
         {
-            // TODO: Fix tool stops working after a few pickups or uses?
             if (heldItem is Tool)
             {
-                //print("tool");
                 if (!isSwinging && interactable.TryInteractUsing(heldItem, hitInfo)) StartCoroutine(SwingTool());
             }
             else if (interactable.TryInteractUsing(heldItem, hitInfo))
             {
-                //print("other");
-                OnDrop?.Invoke(true);
+                LowerArms(true);
                 heldItem = null;
             }
         }

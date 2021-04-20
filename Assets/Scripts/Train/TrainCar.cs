@@ -11,7 +11,7 @@ namespace Uncooked.Train
 {
     public abstract class TrainCar : Tile, IPickupable, IInteractable
     {
-        public event System.Action OnDeath;
+        public event System.Action OnDeath, OnStartDriving, OnPauseDriving;
 
         [Space]
         [SerializeField] private ParticleSystem burningParticlePrefab;
@@ -24,6 +24,7 @@ namespace Uncooked.Train
         protected RailTile currentRail;
         private int pathIndex, pathDir;
 
+        public bool HasRail => currentRail;
         public bool IsTwoHanded() => true;
 
         protected virtual void Start()
@@ -32,8 +33,12 @@ namespace Uncooked.Train
             OnDeath += Die;
         }
 
+        public void StartDriving() => _ = StartCoroutine(Drive());
+
         private IEnumerator Drive()
         {
+            OnStartDriving?.Invoke();
+
             var target = currentRail.Path.GetChild(pathIndex);
             var startForward = transform.forward;
             float startDst = (target.position - transform.position).magnitude;
@@ -48,7 +53,7 @@ namespace Uncooked.Train
                         var nextRail = currentRail.TryGetNextRail();
                         if (nextRail == null)
                         {
-                            Debug.Log("Train Died => TODO: Make train death animation");
+                            OnDeath?.Invoke();
                             yield break;
                         }
                         else UpdateRail(nextRail);
@@ -63,7 +68,12 @@ namespace Uncooked.Train
                 transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
                 yield return null;
-                yield return new WaitWhile(() => GameManager.instance.IsEditing);
+                if (GameManager.instance.IsPaused)
+                {
+                    OnPauseDriving?.Invoke();
+                    yield return new WaitWhile(() => GameManager.instance.IsPaused);
+                    OnStartDriving?.Invoke();
+                }
             }
         }
 
@@ -143,8 +153,6 @@ namespace Uncooked.Train
             transform.forward = dir;
 
             GetComponent<BoxCollider>().enabled = !isPermeable;
-
-            if (currentRail != null) StartCoroutine(Drive());
         }
 
         /// <summary>
@@ -188,7 +196,21 @@ namespace Uncooked.Train
 
         private void Die()
         {
+            Debug.Log("Train Died => TODO: Make train death animation");
+        }
 
+
+        [System.Serializable]
+        public class StackPoint
+        {
+            [SerializeField] private Transform transform;
+            [SerializeField] private string stackType;
+
+            [HideInInspector] public StackTile stackTop;
+
+            public Transform Transform => transform;
+            public string StackType => stackType;
+            public bool CanCraft => transform.childCount == 1;
         }
     }
 }

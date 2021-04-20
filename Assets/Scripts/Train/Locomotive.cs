@@ -14,9 +14,22 @@ namespace Uncooked.Train
 
         protected override void Start()
         {
+            OnStartDriving += StartEmittingSmoke;
+            OnPauseDriving += StopEmittingSmoke;
+            
             base.Start();
 
             smokeParticles = Instantiate(smokeParticlePrefab, smokePoint);
+            SetEmitSmoke(false);
+        }
+
+        protected void StartEmittingSmoke() => SetEmitSmoke(true);
+        protected void StopEmittingSmoke() => SetEmitSmoke(false);
+
+        private void SetEmitSmoke(bool emit)
+        {
+            var emissionSettings = smokeParticles.emission;
+            emissionSettings.enabled = emit;
         }
     }
 }

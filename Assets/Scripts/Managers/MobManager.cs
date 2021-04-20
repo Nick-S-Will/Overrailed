@@ -19,5 +19,10 @@ namespace Uncooked.Managers
         }
 
         public StackTile RandomFish => Instantiate(fishPrefabs[Random.Range(0, fishPrefabs.Length - 1)], transform);
+
+        private void OnDestroy()
+        {
+            instance = null;
+        }
     }
 }

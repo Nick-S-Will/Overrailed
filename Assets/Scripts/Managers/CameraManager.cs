@@ -29,5 +29,10 @@ namespace Uncooked.Managers
             Vector3 oldPos = mainCamera.transform.position;
             mainCamera.transform.position = new Vector3(mainFollow.position.x + startOffsetX, oldPos.y, oldPos.z);
         }
+
+        private void OnDestroy()
+        {
+            instance = null;
+        }
     }
 }

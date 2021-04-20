@@ -22,8 +22,6 @@ namespace Uncooked.Terrain.Tools
         private Coroutine fishing;
         private bool isCast, tryCatchFish, isWaiting;
 
-        private Vector3[] LinePoints => new Vector3[] { bobberParent.position, bobber.position };
-
         protected virtual void Start()
         {
             line = GetComponent<LineRenderer>();
@@ -32,7 +30,7 @@ namespace Uncooked.Terrain.Tools
 
         private void Update()
         {
-            line.SetPositions(LinePoints);
+            line.SetPositions(new Vector3[] { bobberParent.position, bobber.position });
         }
 
         public void Use(LiquidTile tile)
