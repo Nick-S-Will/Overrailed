@@ -32,7 +32,7 @@ namespace Uncooked.Terrain.Tiles
         {
             StackTile top = this;
             int count = 1;
-            while (top.nextInStack != null)
+            while (top.nextInStack)
             {
                 count++;
                 top = top.nextInStack;
@@ -139,7 +139,9 @@ namespace Uncooked.Terrain.Tiles
         private void SelfStack()
         {
             var newTile = Instantiate(this);
-            newTile.GetComponent<BoxCollider>().enabled = false;
+            var box = newTile.GetComponent<BoxCollider>();
+            box.isTrigger = true;
+            box.enabled = false;
 
             newTile.startStackHeight = startStackHeight - 1;
             newTile.TryStackOn(this);

@@ -18,12 +18,12 @@ namespace Uncooked.Train
         {
             base.Start();
 
-            if (currentRail != null) StartCoroutine(UseLiquid());
+            if (currentRail) StartCoroutine(UseLiquid());
         }
 
         private IEnumerator UseLiquid()
         {
-            while (liquid != null)
+            while (liquid)
             {
                 if (liquidPercent > 0) liquidPercent -= Time.fixedDeltaTime / tier;
                 else

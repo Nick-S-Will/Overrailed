@@ -9,6 +9,7 @@ namespace Uncooked.Managers
         [SerializeField] private Transform mainFollow;
         [Header("Cameras")]
         [SerializeField] private Camera mainCamera;
+        [SerializeField] private Camera editCamera;
 
         private float startOffsetX;
 
@@ -28,6 +29,13 @@ namespace Uncooked.Managers
         {
             Vector3 oldPos = mainCamera.transform.position;
             mainCamera.transform.position = new Vector3(mainFollow.position.x + startOffsetX, oldPos.y, oldPos.z);
+        }
+
+        public void TransitionEditMode(bool editMode)
+        {
+            // TODO: Make transition smooth
+            mainCamera.enabled = !editMode;
+            editCamera.enabled = editMode;
         }
 
         private void OnDestroy()

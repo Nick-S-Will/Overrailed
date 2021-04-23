@@ -8,7 +8,9 @@ namespace Uncooked.Managers
 {
     public class GameManager : MonoBehaviour
     {
-        [SerializeField] [Min(0)] private float trainSpeed = 0.1f, trainInitialDelay = 8;
+        public event System.Action OnCheckpoint, OnEndCheckpoint;
+
+        [SerializeField] [Min(0)] private float baseTrainSpeed = 0.1f, checkpointSpeedMultiplier = 2, trainInitialDelay = 8;
         [SerializeField] private bool isEditing, isPaused;
 
         public float TrainSpeed => trainSpeed;
@@ -16,6 +18,7 @@ namespace Uncooked.Managers
         public bool IsPaused => isPaused || isEditing;
 
         private TrainCar[] cars;
+        private float trainSpeed;
 
         public static GameManager instance;
 
@@ -28,6 +31,7 @@ namespace Uncooked.Managers
         void Start()
         {
             cars = FindObjectsOfType<TrainCar>();
+            trainSpeed = baseTrainSpeed;
 
             StartTrainWithDelay(trainInitialDelay);
         }
@@ -47,6 +51,44 @@ namespace Uncooked.Managers
             }
 
             foreach (var car in cars) if (car.HasRail) car.StartDriving();
+        }
+
+        public void SpeedToCheckpoint()
+        {
+            trainSpeed = checkpointSpeedMultiplier * baseTrainSpeed;
+        }
+
+        public void ReachCheckpoint()
+        {
+            isEditing = true;
+            trainSpeed = baseTrainSpeed;
+            CameraManager.instance.TransitionEditMode(true);
+
+            OnCheckpoint?.Invoke();
+            // TODO: Make edit menu, with train upgrades
+        }
+
+        public void ContinueFromCheckpoint()
+        {
+            isEditing = false;
+            CameraManager.instance.TransitionEditMode(false);
+
+            OnEndCheckpoint?.Invoke();
+        }
+
+        public static void MoveToLayer(Transform root, int layer)
+        {
+            Stack<Transform> moveTargets = new Stack<Transform>();
+            moveTargets.Push(root);
+
+            Transform currentTarget;
+            while (moveTargets.Count != 0)
+            {
+                currentTarget = moveTargets.Pop();
+                currentTarget.gameObject.layer = layer;
+                foreach (Transform child in currentTarget)
+                    moveTargets.Push(child);
+            }
         }
 
         private void OnDestroy()

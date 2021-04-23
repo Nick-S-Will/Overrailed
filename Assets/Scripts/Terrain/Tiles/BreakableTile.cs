@@ -10,6 +10,7 @@ namespace Uncooked.Terrain.Tiles
     {
         [SerializeField] private Tile lowerTier;
         [SerializeField] private ParticleSystem breakParticlePrefab;
+        [SerializeField] private bool IsUnmineable;
 
         private Gradient meshColors;
 
@@ -21,7 +22,7 @@ namespace Uncooked.Terrain.Tiles
             foreach (Transform t in transform)
             {
                 var renderer = t.GetComponent<MeshRenderer>();
-                if (renderer != null) mats.Add(renderer.material);
+                if (renderer) mats.Add(renderer.material);
             }
             for (int i = 0; i < mats.Count; i++)
             {
@@ -35,7 +36,7 @@ namespace Uncooked.Terrain.Tiles
 
         public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            print(name + " was interacted with");
+            if (IsUnmineable) return false;
 
             if (item is BreakTool breaker && name.Contains(breaker.BreakTileCode)) TakeHit(breaker.Tier, hitInfo);
             else return false;

@@ -29,7 +29,7 @@ namespace Uncooked.Train
 
         protected virtual void Start()
         {
-            if (startRail != null) SetRail(startRail, false);
+            if (startRail) SetRail(startRail, false);
             OnDeath += Die;
         }
 
@@ -43,7 +43,7 @@ namespace Uncooked.Train
             var startForward = transform.forward;
             float startDst = (target.position - transform.position).magnitude;
 
-            while (currentRail != null)
+            while (currentRail)
             {
                 while (transform.position == target.position)
                 {
@@ -131,8 +131,8 @@ namespace Uncooked.Train
             var carF = TryGetAdjacentCar(transform.position, transform.forward);
             var carB = TryGetAdjacentCar(transform.position, -transform.forward);
 
-            if (carF && !carF.burningParticles && carF.currentRail != null) StartCoroutine(carF.Ignite());
-            if (carB && !carB.burningParticles && carB.currentRail != null) StartCoroutine(carB.Ignite());
+            if (carF && !carF.burningParticles && carF.currentRail) StartCoroutine(carF.Ignite());
+            if (carB && !carB.burningParticles && carB.currentRail) StartCoroutine(carB.Ignite());
         }
 
         /// <summary>
@@ -161,6 +161,8 @@ namespace Uncooked.Train
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
+            if (newRail.IsFinalCheckpoint) GameManager.instance.ReachCheckpoint();
+
             newRail.AddWagon();
 
             currentRail = newRail;
