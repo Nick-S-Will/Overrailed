@@ -18,7 +18,7 @@ namespace Uncooked.Train
         {
             base.Start();
 
-            if (currentRail) StartCoroutine(UseLiquid());
+            if (currentRail) _ = StartCoroutine(UseLiquid());
         }
 
         private IEnumerator UseLiquid()
@@ -35,7 +35,7 @@ namespace Uncooked.Train
                 liquid.localScale = new Vector3(1, liquidPercent, 1);
                 if (liquidPercent == 0)
                 {
-                    StartCoroutine(Ignite());
+                    _ = StartCoroutine(Ignite());
                     yield return new WaitWhile(() => liquidPercent == 0);
                     liquid.gameObject.SetActive(true);
                 }

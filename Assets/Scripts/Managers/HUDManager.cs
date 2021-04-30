@@ -35,7 +35,7 @@ namespace Uncooked.Managers
                 if (toolHUD.rect.gameObject.activeSelf)
                 {
                     MoveRectToTransform(toolHUD.rect, toolHUD.Tool.transform);
-                    if (toolHUD.ScreenPercent < warningScreenPercentage && !toolHUD.isInDanger) StartCoroutine(FlashColor(toolHUD));
+                    if (toolHUD.ScreenPercent < warningScreenPercentage && !toolHUD.isInDanger) _ = StartCoroutine(FlashColor(toolHUD));
                 }
             }
         }

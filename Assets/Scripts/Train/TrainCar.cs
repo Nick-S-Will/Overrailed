@@ -50,7 +50,7 @@ namespace Uncooked.Train
                     pathIndex += pathDir;
                     if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
                     {
-                        var nextRail = currentRail.TryGetNextRail();
+                        var nextRail = currentRail.TryGetNextPoweredRail();
                         if (nextRail == null)
                         {
                             OnDeath?.Invoke();
@@ -131,8 +131,8 @@ namespace Uncooked.Train
             var carF = TryGetAdjacentCar(transform.position, transform.forward);
             var carB = TryGetAdjacentCar(transform.position, -transform.forward);
 
-            if (carF && !carF.burningParticles && carF.currentRail) StartCoroutine(carF.Ignite());
-            if (carB && !carB.burningParticles && carB.currentRail) StartCoroutine(carB.Ignite());
+            if (carF && !carF.burningParticles && carF.currentRail) _ = StartCoroutine(carF.Ignite());
+            if (carB && !carB.burningParticles && carB.currentRail) _ = StartCoroutine(carB.Ignite());
         }
 
         /// <summary>

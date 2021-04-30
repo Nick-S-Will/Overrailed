@@ -59,7 +59,7 @@ namespace Uncooked.Player
                 if (hitData.transform != lastHit)
                 {
                     lastHit = hitData.transform;
-                    StartCoroutine(HightlightObject(hitData.transform));
+                    _ = StartCoroutine(HightlightObject(hitData.transform));
                 }
             }
             else lastHit = null;
@@ -145,7 +145,7 @@ namespace Uncooked.Player
         {
             if (heldItem is Tool)
             {
-                if (!isSwinging && interactable.TryInteractUsing(heldItem, hitInfo)) StartCoroutine(SwingTool());
+                if (!isSwinging && interactable.TryInteractUsing(heldItem, hitInfo)) _ = StartCoroutine(SwingTool());
             }
             else if (interactable.TryInteractUsing(heldItem, hitInfo))
             {

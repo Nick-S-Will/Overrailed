@@ -26,7 +26,6 @@ namespace Uncooked.Terrain.Tiles
         }
 
         public Tile Bridge => bridge;
-        public int stackIndex { get; private set; } = 0;
 
         public int GetStackCount()
         {
@@ -75,15 +74,6 @@ namespace Uncooked.Terrain.Tiles
                 // Disconnect toPickup from stack
                 toPickUp.prevInStack.nextInStack = null;
                 toPickUp.prevInStack = null;
-
-                // Update toPickup stackIndex variables
-                toPickUp.stackIndex = 0;
-                StackTile top = toPickUp;
-                while (top.nextInStack)
-                {
-                    top = top.nextInStack;
-                    top.stackIndex = top.prevInStack.stackIndex + 1;
-                }
             }
 
             // Moving bottom of pickup stack to hands
@@ -105,9 +95,9 @@ namespace Uncooked.Terrain.Tiles
         public virtual bool TryStackOn(StackTile stackBase)
         {
             if (stackType != stackBase.stackType) return false;
-            if (transform == stackBase.transform) throw new System.Exception("Self Parenting");
+            if (transform == stackBase.transform) throw new System.Exception("Potentially Recursive Hierarchy");
 
-            stackBase.GetComponent<BoxCollider>().isTrigger = false;
+            if (!stackBase.prevInStack) stackBase.GetComponent<BoxCollider>().isTrigger = false;
 
             // Get top of stack
             StackTile top = stackBase;
@@ -116,19 +106,11 @@ namespace Uncooked.Terrain.Tiles
             // Place and orient this on stack
             prevInStack = top;
             top.nextInStack = this;
-            stackIndex = (top.stackIndex + 1);
+            // stackIndex = (top.stackIndex + 1);
             transform.parent = top.transform;
             transform.localPosition = top.tileHeight * Vector3.up;
             transform.rotation = stackBase.transform.parent.rotation;
             transform.localRotation = Quaternion.Euler(0, Random.Range(-5, 5f), 0);
-
-            // Update stackIndex
-            top = this;
-            while (top.nextInStack)
-            {
-                top = top.nextInStack;
-                top.stackIndex = top.prevInStack.stackIndex + 1;
-            }
 
             return true;
         }

@@ -46,7 +46,7 @@ namespace Uncooked.Managers
             {
                 yield return new WaitWhile(() => isPaused);
 
-                Debug.Log(countDown);
+                // Debug.Log(countDown);
                 yield return new WaitForSeconds(1);
             }
 

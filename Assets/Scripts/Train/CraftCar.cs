@@ -83,7 +83,7 @@ namespace Uncooked.Train
 
             // See if another can be crafted
             yield return null; // Required for destroy cleanup
-            if (CanCraft) StartCoroutine(Craft());
+            if (CanCraft) _ = StartCoroutine(Craft());
         }
 
         public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
@@ -116,7 +116,7 @@ namespace Uncooked.Train
             else craftPoint.stackTop = stack.GetStackTop();
 
             // Try start crafting
-            if (CanCraft) StartCoroutine(Craft());
+            if (CanCraft) _ = StartCoroutine(Craft());
 
             return true;
         }

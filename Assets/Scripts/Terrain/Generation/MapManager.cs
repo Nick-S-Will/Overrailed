@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using Uncooked.Managers;
 using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Terrain.Generation
@@ -19,14 +20,22 @@ namespace Uncooked.Terrain.Generation
 
         private System.Random rng;
         [Header("Parents")] [SerializeField] private Transform floorParent;
-        [SerializeField] private Transform obstacleParent;
+        [SerializeField] private Transform obstacleParent, railParent;
+
+        public void Start()
+        {
+            GameManager.instance.OnCheckpoint += HideObstacles;
+            GameManager.instance.OnEndCheckpoint += ShowObstacles;
+        }
 
         /// <summary>
         /// Generates map floor and obstacles based on based on Generation variables
         /// </summary>
         public void GenerateMap()
         {
-            foreach (Transform t in transform.Cast<Transform>().ToList()) DestroyImmediate(t.gameObject);
+            System.Action<Object> destroyType = DestroyImmediate;
+            if (Application.isPlaying) destroyType = Destroy;
+            foreach (Transform t in transform.Cast<Transform>().ToList()) destroyType(t.gameObject);
 
             rng = new System.Random(seed);
             var heightMap = GenerateHeightMap(noiseScale);
@@ -107,12 +116,21 @@ namespace Uncooked.Terrain.Generation
         {
             Transform obj = (pickup as Tile).transform;
 
-            obj.parent = obstacleParent;
+            obj.parent = pickup is RailTile ? railParent : obstacleParent;
             obj.position = coords;
             obj.localRotation = Quaternion.identity;
 
             obj.GetComponent<BoxCollider>().enabled = true;
             pickup.Drop(coords);
+        }
+
+        private void HideObstacles() => SetObstacles(false);
+        private void ShowObstacles() => SetObstacles(true);
+
+        private void SetObstacles(bool enabled)
+        {
+            obstacleParent.gameObject.SetActive(enabled);
+            floorParent.gameObject.SetActive(enabled);
         }
     }
 }

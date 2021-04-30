@@ -16,7 +16,7 @@ namespace Uncooked.Terrain.Tiles
 
         protected virtual void Start()
         {
-            if (liquid) StartCoroutine(AnimateLiquid());
+            if (liquid) _ = StartCoroutine(AnimateLiquid());
         }
 
         /// <summary>
