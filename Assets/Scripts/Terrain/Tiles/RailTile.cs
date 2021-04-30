@@ -74,7 +74,7 @@ namespace Uncooked.Terrain.Tiles
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
             if (startsPowered || isCheckpoint || wagonCount > 0) return null;
-            if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
+            if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, false);
 
             return base.TryPickUp(parent, amount);
         }
@@ -127,7 +127,7 @@ namespace Uncooked.Terrain.Tiles
                 RailTile inRail = connectableRails[0];
                 Vector3Int dirToThis = coords - Vector3Int.FloorToInt(inRail.transform.position);
 
-                if (inRail.outDirection != dirToThis) inRail.SetState(inRail.inDirection, dirToThis, 2, true);
+                if (inRail.outDirection != dirToThis) inRail.SetState(inRail.inDirection, dirToThis, 2, false);
                 else inRail.connectionCount++;
                 SetState(dirToThis, dirToThis, 1, true);
             }
@@ -235,7 +235,7 @@ namespace Uncooked.Terrain.Tiles
                     for (int i = 0; i < 3; i++)
                     {
                         var nextRail = TryGetAdjacentRail(dir, false);
-                        if (nextRail && nextRail.GetStackCount() == 1 && !nextRail.IsFinalCheckpoint)
+                        if (nextRail && nextRail.GetStackCount() == 1)
                         {
                             if (nextRail.isCheckpoint || nextRail.connectionCount < 2)
                             {
@@ -250,10 +250,10 @@ namespace Uncooked.Terrain.Tiles
                                 else if (nextRail.connectionCount < 2)
                                 {
                                     _ = StartCoroutine(nextRail.DelaySetState(dir, dir, 1, true));
-                                }
 
-                                SetState(inDir, dir, 2, false);
-                                return;
+                                    SetState(inDir, dir, 2, false);
+                                    return;
+                                }
                             }
                         }
 
