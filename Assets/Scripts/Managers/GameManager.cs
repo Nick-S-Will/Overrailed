@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Uncooked.Train;
+using Uncooked.UI;
 
 namespace Uncooked.Managers
 {
@@ -12,6 +13,8 @@ namespace Uncooked.Managers
 
         [SerializeField] [Min(0)] private float baseTrainSpeed = 0.1f, checkpointSpeedMultiplier = 2, trainInitialDelay = 8;
         [SerializeField] private bool isEditing, isPaused;
+        [Header("Buttons")]
+        [SerializeField] private TriggerButton checkpointContinueButton;
 
         public float TrainSpeed => trainSpeed;
         public bool IsEditing => isEditing;
@@ -26,6 +29,9 @@ namespace Uncooked.Managers
         {
             if (instance == null) instance = this;
             else Debug.LogError("Multiple GameManagers Exist");
+
+            checkpointContinueButton.OnClick += ContinueFromCheckpoint;
+            checkpointContinueButton.GetComponent<BoxCollider>().enabled = IsEditing;
         }
         
         void Start()
@@ -64,14 +70,19 @@ namespace Uncooked.Managers
             trainSpeed = baseTrainSpeed;
             CameraManager.instance.TransitionEditMode(true);
 
+            Vector3 pos = checkpointContinueButton.transform.position;
+            checkpointContinueButton.GetComponent<BoxCollider>().enabled = true;
+            checkpointContinueButton.transform.position = new Vector3(pos.x, pos.y, CameraManager.instance.FirstTarget.transform.position.z - 1);
+
             OnCheckpoint?.Invoke();
-            // TODO: Make edit menu, with train upgrades
         }
 
         public void ContinueFromCheckpoint()
         {
             isEditing = false;
             CameraManager.instance.TransitionEditMode(false);
+
+            checkpointContinueButton.GetComponent<BoxCollider>().enabled = false;
 
             OnEndCheckpoint?.Invoke();
         }
