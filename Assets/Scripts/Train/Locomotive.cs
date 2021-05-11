@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Managers;
+
 namespace Uncooked.Train
 {
     public class Locomotive : TrainCar
@@ -30,6 +32,13 @@ namespace Uncooked.Train
         {
             var emissionSettings = smokeParticles.emission;
             emissionSettings.enabled = emit;
+        }
+
+        protected override void Die()
+        {
+            GameManager.instance.SpeedUp();
+            CameraManager.instance.StopFollowing();
+            base.Die();
         }
     }
 }

@@ -549,10 +549,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
+  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
+  meshParent: {fileID: 712608436380757253}
   burnPoint: {fileID: 5518146035113473052}
   startRail: {fileID: 0}
   tier: 1
   isPermeable: 0
+  craftSpeed: 0.25
   craftResultHolder: {fileID: 0}
   craftResultPrefab: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
   craftPoints:
@@ -562,7 +565,6 @@ MonoBehaviour:
   - transform: {fileID: 712608436103181771}
     stackType: Rock
     stackTop: {fileID: 0}
-  craftSpeed: 0.25
 --- !u!65 &712608436525509802
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -18,6 +18,12 @@ public interface IPickupable
     IPickupable TryPickUp(Transform parent, int amount);
 
     /// <summary>
+    /// Used in PlayerController.TryDrop() to do custom action and choose if the IPickupable is held or dropped
+    /// </summary>
+    /// <returns>True if implementation wants IPickupable to be dropped, otherwise false</returns>
+    bool OnTryDrop();
+
+    /// <summary>
     /// Does special action if needed by the class
     /// </summary>
     void Drop(Vector3Int position);

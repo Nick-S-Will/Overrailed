@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IDamageable : IInteractable
+public interface IDamageable
 {
     void TakeHit(int damage, RaycastHit hit);
 }

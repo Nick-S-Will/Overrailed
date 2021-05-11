@@ -11,7 +11,7 @@ namespace Uncooked.Managers
     {
         public event System.Action OnCheckpoint, OnEndCheckpoint;
 
-        [SerializeField] [Min(0)] private float baseTrainSpeed = 0.1f, checkpointSpeedMultiplier = 2, trainInitialDelay = 8;
+        [SerializeField] [Min(0)] private float baseTrainSpeed = 0.1f, speedUpMultiplier = 2, trainInitialDelay = 8;
         [SerializeField] private bool isEditing, isPaused;
         [Header("Buttons")]
         [SerializeField] private TriggerButton checkpointContinueButton;
@@ -19,6 +19,7 @@ namespace Uncooked.Managers
         public float TrainSpeed => trainSpeed;
         public bool IsEditing => isEditing;
         public bool IsPaused => isPaused || isEditing;
+        public bool IsSpeed => trainSpeed > baseTrainSpeed;
 
         private TrainCar[] cars;
         private float trainSpeed;
@@ -59,11 +60,8 @@ namespace Uncooked.Managers
             foreach (var car in cars) if (car.HasRail) car.StartDriving();
         }
 
-        public void SpeedToCheckpoint()
-        {
-            trainSpeed = checkpointSpeedMultiplier * baseTrainSpeed;
-        }
-
+        public void SpeedUp() => trainSpeed = speedUpMultiplier * baseTrainSpeed;
+        
         public void ReachCheckpoint()
         {
             isEditing = true;

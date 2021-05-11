@@ -35,11 +35,7 @@ namespace Uncooked.Terrain.Tools
             return this;
         }
 
-        /// <summary>
-        /// Used in PlayerController.TryDrop() to do custom action, and can choose if the Tool is held or dropped
-        /// </summary>
-        /// <returns>True if implementation wants Tool to continue being held, otherwise false</returns>
-        public virtual bool OnTryDrop() { return false; }
+        public virtual bool OnTryDrop() => true;
 
         public virtual void Drop(Vector3Int position) => OnDrop?.Invoke(this);
     }

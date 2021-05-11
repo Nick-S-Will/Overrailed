@@ -15,6 +15,9 @@ namespace Uncooked.Train
 
         [Space]
         [SerializeField] private ParticleSystem burningParticlePrefab;
+        [SerializeField] private ParticleSystem breakParticlePrefab;
+        [Space]
+        [SerializeField] private Transform meshParent;
         [SerializeField] private Transform burnPoint;
         [SerializeField] private RailTile startRail;
         [SerializeField] protected int tier = 1;
@@ -29,7 +32,7 @@ namespace Uncooked.Train
 
         protected virtual void Start()
         {
-            if (startRail) SetRail(startRail, false);
+            if (startRail) _ = TrySetRail(startRail, false);
             OnDeath += Die;
         }
 
@@ -48,7 +51,9 @@ namespace Uncooked.Train
                 while (transform.position == target.position)
                 {
                     pathIndex += pathDir;
-                    if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
+                    if (pathIndex == currentRail.Path.childCount / 2 + 1 && currentRail.IsFinalCheckpoint) 
+                        GameManager.instance.ReachCheckpoint();
+                    else if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
                     {
                         var nextRail = currentRail.TryGetNextPoweredRail();
                         if (nextRail == null)
@@ -80,7 +85,6 @@ namespace Uncooked.Train
         /// <summary>
         /// Picks up this Wagon
         /// </summary>
-        /// <returns></returns>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
             if (!GameManager.instance.IsEditing) return null;
@@ -93,11 +97,14 @@ namespace Uncooked.Train
             return this;
         }
 
+        public virtual bool OnTryDrop() => false;
+        
         public virtual void Drop(Vector3Int position) { }
 
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (item is Bucket bucket) return TryExtinguish(bucket);
+            if (GameManager.instance.IsEditing) return false;
+            else if (item is Bucket bucket) return TryExtinguish(bucket);
             else return false;
         }
 
@@ -140,19 +147,21 @@ namespace Uncooked.Train
         /// </summary>
         /// <param name="rail">Rail to be set</param>
         /// <param name="connectCheck">If placing requires checking for a TrainCar ahead</param>
-        public void SetRail(RailTile rail, bool connectCheck)
+        public bool TrySetRail(RailTile rail, bool connectCheck)
         {
             UpdateRail(rail);
             pathIndex = rail.Path.childCount / 2;
 
             var pos = rail.Path.GetChild(pathIndex).position;
             var dir = pathDir * rail.Path.GetChild(pathIndex).forward;
-            if (connectCheck && !TryGetAdjacentCar(pos, dir)) return;
+            if (connectCheck && !TryGetAdjacentCar(pos, dir)) return false;
 
             transform.position = pos;
             transform.forward = dir;
 
             GetComponent<BoxCollider>().enabled = !isPermeable;
+
+            return true;
         }
 
         /// <summary>
@@ -161,8 +170,6 @@ namespace Uncooked.Train
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
-            if (newRail.IsFinalCheckpoint) GameManager.instance.ReachCheckpoint();
-
             newRail.AddWagon();
 
             currentRail = newRail;
@@ -196,11 +203,12 @@ namespace Uncooked.Train
             else return null;
         }
 
-        private void Die()
+        protected virtual void Die()
         {
-            Debug.Log("Train Died => TODO: Make train death animation");
-        }
+            BreakIntoParticles(breakParticlePrefab, GetMeshColors(meshParent), transform.position);
 
+            Destroy(gameObject, Time.deltaTime);
+        }
 
         [System.Serializable]
         public class StackPoint

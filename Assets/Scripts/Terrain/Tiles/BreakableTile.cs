@@ -12,28 +12,6 @@ namespace Uncooked.Terrain.Tiles
         [SerializeField] private ParticleSystem breakParticlePrefab;
         [SerializeField] private bool IsUnmineable;
 
-        private Gradient meshColors;
-
-        protected virtual void Start()
-        {
-            var mats = new List<Material>();
-            var gradientPins = new List<GradientColorKey>();
-
-            foreach (Transform t in transform)
-            {
-                var renderer = t.GetComponent<MeshRenderer>();
-                if (renderer) mats.Add(renderer.material);
-            }
-            for (int i = 0; i < mats.Count; i++)
-            {
-                gradientPins.Add(new GradientColorKey(mats[i].color, (i + 1f) / mats.Count));
-            }
-
-            meshColors = new Gradient();
-            meshColors.mode = GradientMode.Fixed;
-            meshColors.colorKeys = gradientPins.ToArray();
-        }
-
         public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
             if (IsUnmineable) return false;
@@ -59,13 +37,7 @@ namespace Uncooked.Terrain.Tiles
                 {
                     toSpawn = t.lowerTier;
 
-                    var particles = Instantiate(breakParticlePrefab, hit.transform.position, breakParticlePrefab.transform.rotation);
-                    Destroy(particles.gameObject, breakParticlePrefab.main.startLifetime.constant);
-
-                    var settings = particles.main;
-                    var colors = new ParticleSystem.MinMaxGradient(meshColors);
-                    colors.mode = ParticleSystemGradientMode.RandomColor;
-                    settings.startColor = colors;
+                    BreakIntoParticles(breakParticlePrefab, toSpawn.GetMeshColors(toSpawn.transform), hit.transform.position);
                 }
                 else break;
             }

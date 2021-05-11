@@ -52,9 +52,9 @@ namespace Uncooked.Terrain.Tools
         public override bool OnTryDrop()
         {
             if (isCast) Use(null);
-            else return false;
+            else return true;
 
-            return true;
+            return false;
         }
 
         /// <summary>

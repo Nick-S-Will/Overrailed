@@ -85,6 +85,8 @@ namespace Uncooked.Terrain.Tiles
             return toPickUp;
         }
 
+        public virtual bool OnTryDrop() => true;
+
         public virtual void Drop(Vector3Int position) { }
 
         /// <summary>

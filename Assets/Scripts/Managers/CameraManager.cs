@@ -15,6 +15,7 @@ namespace Uncooked.Managers
         [SerializeField] private List<Locomotive> followPoints;
 
         private float startOffsetX;
+        private bool isFollowing = true;
 
         public Camera Main => mainCamera;
         public Locomotive FirstTarget => followPoints[0];
@@ -27,12 +28,22 @@ namespace Uncooked.Managers
             else Debug.LogError("Multiple CameraManagers Exist");
 
             startOffsetX = mainCamera.transform.position.x - GetAverageFollowX();
+            _ = StartCoroutine(Follow());
         }
 
-        void Update()
+        public void ContinueFollowing() => isFollowing = true;
+        public void StopFollowing() => isFollowing = false;
+
+        private IEnumerator Follow()
         {
-            Vector3 oldPos = mainCamera.transform.position;
-            mainCamera.transform.position = new Vector3(GetAverageFollowX() + startOffsetX, oldPos.y, oldPos.z);
+            while (this)
+            {
+                yield return null;
+                yield return new WaitWhile(() => !isFollowing);
+
+                Vector3 oldPos = mainCamera.transform.position;
+                mainCamera.transform.position = new Vector3(GetAverageFollowX() + startOffsetX, oldPos.y, oldPos.z);
+            }
         }
 
         public void TransitionEditMode(bool editMode)

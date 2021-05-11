@@ -73,18 +73,16 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (startsPowered || isCheckpoint || wagonCount > 0) return null;
-            if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, false);
+            if (startsPowered || isCheckpoint || wagonCount > 0 || GameManager.instance.IsSpeed) return null;
+            if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
 
             return base.TryPickUp(parent, amount);
         }
 
         public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (item is TrainCar wagon) wagon.SetRail(this, true);
+            if (item is TrainCar car) return car.TrySetRail(this, true);
             else return base.TryInteractUsing(item, hitInfo);
-
-            return true;
         }
 
         /// <summary>
@@ -129,6 +127,7 @@ namespace Uncooked.Terrain.Tiles
 
                 if (inRail.outDirection != dirToThis) inRail.SetState(inRail.inDirection, dirToThis, 2, false);
                 else inRail.connectionCount++;
+
                 SetState(dirToThis, dirToThis, 1, true);
             }
         }
@@ -205,7 +204,7 @@ namespace Uncooked.Terrain.Tiles
                 straightPower.SetActive(false);
                 bentPower.SetActive(false);
 
-                transform.forward = Vector3.forward;
+                if (!isCheckpoint) transform.forward = Vector3.forward;
 
                 // Tries to disconnect this and proceeding rails from track
                 if (tryExtend)
@@ -231,18 +230,21 @@ namespace Uncooked.Terrain.Tiles
                 // Tries to connect this to proceeding rail
                 if (tryExtend && !IsFinalCheckpoint)
                 {
+                    // Iterates left, forward, right, to find rail to connect to
                     Vector3Int dir = Vector3Int.RoundToInt(Quaternion.AngleAxis(-90, Vector3.up) * outDir);
                     for (int i = 0; i < 3; i++)
                     {
+                        // Tries to get rail in currently iterated direction
                         var nextRail = TryGetAdjacentRail(dir, false);
                         if (nextRail && nextRail.GetStackCount() == 1)
                         {
+                            // If this can connect to nextRail
                             if (nextRail.isCheckpoint || nextRail.connectionCount < 2)
                             {
                                 if (nextRail.isCheckpoint && nextRail.connectionCount < 2 || (isCheckpoint && nextRail.isCheckpoint))
                                 {
                                     _ = StartCoroutine(nextRail.DelaySetState(dir, nextRail.outDirection, 2, true));
-                                    GameManager.instance.SpeedToCheckpoint();
+                                    GameManager.instance.SpeedUp();
 
                                     SetState(inDir, dir, 2, false);
                                     return;
