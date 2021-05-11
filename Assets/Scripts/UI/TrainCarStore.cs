@@ -16,10 +16,23 @@ namespace Uncooked.UI
         private TrainCarHolder[] holders;
         private float panelWidth;
 
+        private static int coins;
+
+        public static int coinCount
+        {
+            get { return coins; }
+            set
+            {
+                HUDManager.instance.UpdateCoinsText(value.ToString());
+                coins = value;
+            }
+        }
+
         void Start()
         {
             holders = new TrainCarHolder[carTypes.Length];
             panelWidth = GetComponent<SpriteRenderer>().size.x;
+            coinCount = 0;
 
             for (int i = 0; i < carTypes.Length; i++)
             {

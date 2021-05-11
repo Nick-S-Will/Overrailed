@@ -6,7 +6,7 @@ using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Terrain.Tiles
 {
-    public class BreakableTile : Tile, IDamageable
+    public class BreakableTile : Tile, IDamageable, IInteractable
     {
         [SerializeField] private Tile lowerTier;
         [SerializeField] private ParticleSystem breakParticlePrefab;
@@ -35,9 +35,9 @@ namespace Uncooked.Terrain.Tiles
             {
                 if (toSpawn is BreakableTile t)
                 {
-                    toSpawn = t.lowerTier;
-
                     BreakIntoParticles(breakParticlePrefab, toSpawn.GetMeshColors(toSpawn.transform), hit.transform.position);
+                    
+                    toSpawn = t.lowerTier;
                 }
                 else break;
             }

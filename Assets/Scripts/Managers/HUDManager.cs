@@ -9,33 +9,69 @@ namespace Uncooked.Managers
 {
     public class HUDManager : MonoBehaviour
     {
+        [Space]
         [SerializeField] private GameObject toolHUDPrefab;
-        [SerializeField] [Range(0, 1)] private float warningScreenPercentage;
+        [SerializeField] [Range(0, 1)] private float warningScreenPercentage = 0.1f;
         [SerializeField] private ToolHUD[] tools;
+        [Header("Transforms")]
+        [SerializeField] private Transform hudParent;
+        [Header("Texts")]
+        [SerializeField] private Text seedText;
+        [SerializeField] private Text speedText, coinsText;
+
+        private int seedStartLength, speedStartLength, coinsStartLength;
+        [HideInInspector] public bool isUpdating;
+
+        public static HUDManager instance;
+
+        private void Awake()
+        {
+            if (instance == null) instance = this;
+            else Debug.LogError("Multiple HUDManagers Exist");
+
+            seedStartLength = seedText.text.Length;
+            speedStartLength = speedText.text.Length;
+            coinsStartLength = coinsText.text.Length;
+        }
 
         void Start()
         {
+            // Spawns Tool HUDs
             for (int i = 0; i < tools.Length; i++)
             {
                 tools[i].Tool.OnPickup += OnToolPickup;
                 tools[i].Tool.OnDrop += OnToolDrop;
 
-                var toolHUD = Instantiate(toolHUDPrefab, transform).GetComponent<RectTransform>();
+                var toolHUD = Instantiate(toolHUDPrefab, hudParent).GetComponent<RectTransform>();
                 toolHUD.GetChild(0).GetChild(0).GetComponent<Image>().sprite = tools[i].ToolImage;
-                MoveRectToTransform(toolHUD, tools[i].Tool.transform);
 
                 tools[i].rect = toolHUD;
             }
+
+            _ = StartCoroutine(UpdateHUD());
         }
 
-        private void Update()
+        private IEnumerator UpdateHUD()
         {
-            foreach (var toolHUD in tools)
+            while (this)
             {
-                if (toolHUD.rect.gameObject.activeSelf)
+                foreach (var toolHUD in tools)
                 {
-                    MoveRectToTransform(toolHUD.rect, toolHUD.Tool.transform);
-                    if (toolHUD.ScreenPercent < warningScreenPercentage && !toolHUD.isInDanger) _ = StartCoroutine(FlashColor(toolHUD));
+                    if (toolHUD.rect.gameObject.activeSelf)
+                    {
+                        MoveRectToTransform(toolHUD.rect, toolHUD.Tool.transform);
+                        if (toolHUD.ScreenPercent < warningScreenPercentage && !toolHUD.isInDanger) _ = StartCoroutine(FlashColor(toolHUD));
+                    }
+                }
+
+                yield return null;
+                if (!isUpdating)
+                {
+                    foreach (var toolHUD in tools) SetToolHUD(toolHUD.Tool, false);
+
+                    yield return new WaitUntil(() => isUpdating);
+
+                    foreach (var toolHUD in tools) SetToolHUD(toolHUD.Tool, true);
                 }
             }
         }
@@ -46,11 +82,26 @@ namespace Uncooked.Managers
             hudElement.rotation = Quaternion.Inverse(CameraManager.instance.Main.transform.rotation);
         }
 
+        public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
+        public void UpdateSpeedText(string newSpeed) => UpdateText(speedText, speedStartLength, newSpeed);
+        public void UpdateCoinsText(string newCoinCount) => UpdateText(coinsText, coinsStartLength, newCoinCount);
+        private void UpdateText(Text textElement, int baseLength, string newString)
+        {
+            textElement.text = textElement.text.Substring(0, baseLength) + newString;
+        }
+
         private void OnToolPickup(Tool tool) => SetToolHUD(tool, false);
         private void OnToolDrop(Tool tool) => SetToolHUD(tool, true);
         private void SetToolHUD(Tool tool, bool isVisible)
         {
-            foreach (var t in tools) if (tool == t.Tool) t.rect.gameObject.SetActive(isVisible);
+            foreach (var t in tools)
+            {
+                if (tool == t.Tool)
+                {
+                    t.rect.gameObject.SetActive(isVisible);
+                    break;
+                }
+            }
         }
 
         private IEnumerator FlashColor(ToolHUD tool)
@@ -70,6 +121,11 @@ namespace Uncooked.Managers
             image.color = originalColor;
 
             tool.isInDanger = false;
+        }
+
+        private void OnDestroy()
+        {
+            instance = null;
         }
 
         [System.Serializable]

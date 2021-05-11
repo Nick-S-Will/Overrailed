@@ -26,6 +26,8 @@ namespace Uncooked.Terrain.Generation
         {
             GameManager.instance.OnCheckpoint += HideObstacles;
             GameManager.instance.OnEndCheckpoint += ShowObstacles;
+
+            HUDManager.instance.UpdateSeedText(seed.ToString());
         }
 
         /// <summary>
@@ -38,6 +40,7 @@ namespace Uncooked.Terrain.Generation
             foreach (Transform t in transform.Cast<Transform>().ToList()) destroyType(t.gameObject);
 
             rng = new System.Random(seed);
+            HUDManager.instance.UpdateSeedText(seed.ToString());
             var heightMap = GenerateHeightMap(noiseScale);
 
             #region Map Floor

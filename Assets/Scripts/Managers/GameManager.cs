@@ -11,7 +11,7 @@ namespace Uncooked.Managers
     {
         public event System.Action OnCheckpoint, OnEndCheckpoint;
 
-        [SerializeField] [Min(0)] private float baseTrainSpeed = 0.1f, speedUpMultiplier = 2, trainInitialDelay = 8;
+        [SerializeField] [Min(0)] private float baseTrainSpeed = 0.05f, trainSpeedIncrement = 0.05f, speedUpMultiplier = 2, trainInitialDelay = 8;
         [SerializeField] private bool isEditing, isPaused;
         [Header("Buttons")]
         [SerializeField] private TriggerButton checkpointContinueButton;
@@ -23,6 +23,7 @@ namespace Uncooked.Managers
 
         private TrainCar[] cars;
         private float trainSpeed;
+        private int checkpointCount;
 
         public static GameManager instance;
 
@@ -39,6 +40,8 @@ namespace Uncooked.Managers
         {
             cars = FindObjectsOfType<TrainCar>();
             trainSpeed = baseTrainSpeed;
+
+            HUDManager.instance.UpdateSpeedText(trainSpeed.ToString());
 
             StartTrainWithDelay(trainInitialDelay);
         }
@@ -60,13 +63,14 @@ namespace Uncooked.Managers
             foreach (var car in cars) if (car.HasRail) car.StartDriving();
         }
 
-        public void SpeedUp() => trainSpeed = speedUpMultiplier * baseTrainSpeed;
+        public void SpeedUp() => trainSpeed = speedUpMultiplier * (baseTrainSpeed + trainSpeedIncrement * checkpointCount);
         
         public void ReachCheckpoint()
         {
             isEditing = true;
-            trainSpeed = baseTrainSpeed;
+            checkpointCount++;
             CameraManager.instance.TransitionEditMode(true);
+            HUDManager.instance.isUpdating = false;
 
             Vector3 pos = checkpointContinueButton.transform.position;
             checkpointContinueButton.GetComponent<BoxCollider>().enabled = true;
@@ -78,7 +82,10 @@ namespace Uncooked.Managers
         public void ContinueFromCheckpoint()
         {
             isEditing = false;
+            trainSpeed = baseTrainSpeed + trainSpeedIncrement * checkpointCount;
             CameraManager.instance.TransitionEditMode(false);
+            HUDManager.instance.UpdateSpeedText(trainSpeed.ToString());
+            HUDManager.instance.isUpdating = true;
 
             checkpointContinueButton.GetComponent<BoxCollider>().enabled = false;
 
@@ -102,6 +109,7 @@ namespace Uncooked.Managers
 
         private void OnDestroy()
         {
+            checkpointContinueButton.OnClick -= ContinueFromCheckpoint;
             instance = null;
         }
     }

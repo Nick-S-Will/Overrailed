@@ -207,7 +207,7 @@ namespace Uncooked.Train
         {
             BreakIntoParticles(breakParticlePrefab, GetMeshColors(meshParent), transform.position);
 
-            Destroy(gameObject, Time.deltaTime);
+            Destroy(gameObject, 2 * Time.deltaTime);
         }
 
         [System.Serializable]

@@ -143,7 +143,7 @@ namespace Uncooked.Player
         /// </summary>
         private void UseItemOn(IInteractable interactable, RaycastHit hitInfo)
         {
-            if (heldItem is Tool)
+            if (!heldItem.IsTwoHanded())
             {
                 if (!isSwinging && interactable.TryInteractUsing(heldItem, hitInfo)) _ = StartCoroutine(SwingTool());
             }

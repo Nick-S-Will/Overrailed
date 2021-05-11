@@ -22,11 +22,14 @@ namespace Uncooked.Managers
 
         public static CameraManager instance;
 
-        void Start()
+        private void Awake()
         {
             if (instance == null) instance = this;
             else Debug.LogError("Multiple CameraManagers Exist");
+        }
 
+        void Start()
+        {
             startOffsetX = mainCamera.transform.position.x - GetAverageFollowX();
             _ = StartCoroutine(Follow());
         }
@@ -38,11 +41,13 @@ namespace Uncooked.Managers
         {
             while (this)
             {
-                yield return null;
-                yield return new WaitWhile(() => !isFollowing);
+                if (isFollowing)
+                {
+                    Vector3 oldPos = mainCamera.transform.position;
+                    mainCamera.transform.position = new Vector3(GetAverageFollowX() + startOffsetX, oldPos.y, oldPos.z);
+                }
 
-                Vector3 oldPos = mainCamera.transform.position;
-                mainCamera.transform.position = new Vector3(GetAverageFollowX() + startOffsetX, oldPos.y, oldPos.z);
+                yield return null;
             }
         }
 
@@ -60,6 +65,7 @@ namespace Uncooked.Managers
         private float GetAverageFollowX()
         {
             float averageOffset = 0;
+
             followPoints.ForEach(l => averageOffset += l.transform.position.x);
             averageOffset /= followPoints.Count;
 
