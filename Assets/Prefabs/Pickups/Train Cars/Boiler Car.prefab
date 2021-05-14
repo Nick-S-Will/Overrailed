@@ -619,6 +619,7 @@ MonoBehaviour:
   meshParent: {fileID: 2439802911898205024}
   burnPoint: {fileID: 5388166772327102525}
   startRail: {fileID: 0}
+  price: 0
   tier: 1
   isPermeable: 0
   liquid: {fileID: 5553327889204682102}
@@ -634,7 +635,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 2, z: 1}
+  m_Size: {x: 1.05, y: 2, z: 1.05}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2439802911898205025
 GameObject:

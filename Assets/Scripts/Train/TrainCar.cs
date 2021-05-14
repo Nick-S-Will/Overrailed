@@ -20,6 +20,7 @@ namespace Uncooked.Train
         [SerializeField] private Transform meshParent;
         [SerializeField] private Transform burnPoint;
         [SerializeField] private RailTile startRail;
+        [SerializeField] private int price = 1;
         [SerializeField] protected int tier = 1;
         [SerializeField] protected bool isPermeable;
 
@@ -27,6 +28,7 @@ namespace Uncooked.Train
         protected RailTile currentRail;
         private int pathIndex, pathDir;
 
+        public int Price => price;
         public bool HasRail => currentRail;
         public bool IsTwoHanded() => true;
 
@@ -48,13 +50,20 @@ namespace Uncooked.Train
 
             while (currentRail)
             {
+                #region Update Path
                 while (transform.position == target.position)
                 {
                     pathIndex += pathDir;
-                    if (pathIndex == currentRail.Path.childCount / 2 + 1 && currentRail.IsFinalCheckpoint) 
+
+                    // If pathIndex is the middle index of the final checkpoint
+                    if (pathIndex == currentRail.Path.childCount / 2 + 1 && currentRail.IsFinalCheckpoint)
+                    {
                         GameManager.instance.ReachCheckpoint();
+                    }
+                    // If pathIndex is outside bounds of path
                     else if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
                     {
+                        // Tries to get next rail
                         var nextRail = currentRail.TryGetNextPoweredRail();
                         if (nextRail == null)
                         {
@@ -63,49 +72,68 @@ namespace Uncooked.Train
                         }
                         else UpdateRail(nextRail);
                     }
+
                     target = currentRail.Path.GetChild(pathIndex);
                     startForward = transform.forward;
                     startDst = (target.position - transform.position).magnitude;
                 }
+                #endregion
 
-                transform.position = Vector3.MoveTowards(transform.position, target.position, GameManager.instance.TrainSpeed * Time.deltaTime);
-                float currentDst = (target.position - transform.position).magnitude;
-                transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
-
-                yield return null;
                 if (GameManager.instance.IsPaused)
                 {
                     OnPauseDriving?.Invoke();
                     yield return new WaitWhile(() => GameManager.instance.IsPaused);
                     OnStartDriving?.Invoke();
                 }
+
+                // Follow Path
+                transform.position = Vector3.MoveTowards(transform.position, target.position, GameManager.instance.TrainSpeed * Time.deltaTime);
+                float currentDst = (target.position - transform.position).magnitude;
+                transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
+
+                yield return null;
             }
         }
 
-        /// <summary>
-        /// Picks up this Wagon
-        /// </summary>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (!GameManager.instance.IsEditing) return null;
+            if (!GameManager.instance.IsEditing || (this is Locomotive && HasRail)) return null;
+
+            var prevCar = TryGetAdjacentCar(transform.position, -transform.forward);
 
             GetComponent<BoxCollider>().enabled = false;
             transform.parent = parent;
             transform.localPosition = Vector3.up;
             transform.localRotation = Quaternion.identity;
 
+            prevCar?.ShiftCars(true);
+
             return this;
         }
 
         public virtual bool OnTryDrop() => false;
-        
+
         public virtual void Drop(Vector3Int position) { }
 
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (GameManager.instance.IsEditing) return false;
+            if (item is TrainCar car) return TryPlaceCar(car);
+            else if (GameManager.instance.IsEditing) return false;
             else if (item is Bucket bucket) return TryExtinguish(bucket);
             else return false;
+        }
+
+        private bool TryPlaceCar(TrainCar car)
+        {
+            if (!HasRail) return false;
+
+            _ = car.TrySetRail(currentRail, false);
+            car.StartDriving();
+
+            if (GetType() == car.GetType()) OnDeath?.Invoke();
+            else ShiftCars(false);
+
+            return true;
         }
 
         /// <summary>
@@ -143,7 +171,27 @@ namespace Uncooked.Train
         }
 
         /// <summary>
-        /// Places this Wagon on given RailTile
+        /// Moves this and every car behind it forwards or backwars one rail
+        /// </summary>
+        /// <param name="forward">True to shift cars forwards, false to shift them backwards</param>
+        private void ShiftCars(bool forward)
+        {
+            TrainCar car = forward ? GetLastCar() : this, temp;
+            int dir = forward ? 1 : -1;
+
+            while (temp = TryGetAdjacentCar(car.transform.position, dir * car.transform.forward))
+            {
+                car.TrySetRail(temp.currentRail, false);
+                car = temp;
+            }
+
+            var rail = car.currentRail;
+            rail = forward ? rail.TryGetNextPoweredRail() : rail.TryGetPrevPoweredRail();
+            car.TrySetRail(rail, false);
+        }
+
+        /// <summary>
+        /// Places this car on given RailTile
         /// </summary>
         /// <param name="rail">Rail to be set</param>
         /// <param name="connectCheck">If placing requires checking for a TrainCar ahead</param>
@@ -156,6 +204,7 @@ namespace Uncooked.Train
             var dir = pathDir * rail.Path.GetChild(pathIndex).forward;
             if (connectCheck && !TryGetAdjacentCar(pos, dir)) return false;
 
+            transform.parent = rail.transform;
             transform.position = pos;
             transform.forward = dir;
 
@@ -165,12 +214,12 @@ namespace Uncooked.Train
         }
 
         /// <summary>
-        /// Updates previous rail and newRail's wagonCount variables, then sets wagon's pathIndex and pathDir
+        /// Updates newRail's hasBeenUsed variable, then sets TrainCar's pathIndex and pathDir
         /// </summary>
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
-            newRail.AddWagon();
+            newRail.SetUsed();
 
             currentRail = newRail;
 
@@ -188,13 +237,23 @@ namespace Uncooked.Train
             }
         }
 
+        private TrainCar GetLastCar()
+        {
+            TrainCar lastCar = this, temp = this;
+            
+            while (lastCar = TryGetAdjacentCar(lastCar.transform.position, -lastCar.transform.forward))
+                temp = lastCar;
+            
+            return temp;
+        }
+
         /// <summary>
         /// Gets TrainCar in the given direction from the given point
         /// </summary>
         /// <param name="point">Point from where the raycast is sent</param>
         /// <param name="direction">Direction where the raycast is sent to</param>
         /// <returns>TrainCar in the given direction from the given point if there is one, otherwise null</returns>
-        private TrainCar TryGetAdjacentCar(Vector3 point, Vector3 direction)
+        private static TrainCar TryGetAdjacentCar(Vector3 point, Vector3 direction)
         {
             RaycastHit hitInfo;
             var mask = LayerMask.GetMask("Train");

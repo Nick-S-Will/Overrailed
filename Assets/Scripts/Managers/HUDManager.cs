@@ -20,7 +20,7 @@ namespace Uncooked.Managers
         [SerializeField] private Text speedText, coinsText;
 
         private int seedStartLength, speedStartLength, coinsStartLength;
-        [HideInInspector] public bool isUpdating;
+        [HideInInspector] public bool isUpdating = true;
 
         public static HUDManager instance;
 

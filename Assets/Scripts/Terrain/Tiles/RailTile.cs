@@ -20,7 +20,8 @@ namespace Uncooked.Terrain.Tiles
         [SerializeField] private bool isCheckpoint, showPath;
 
         private Vector3Int inDirection = Vector3Int.zero, outDirection = Vector3Int.zero;
-        private int connectionCount, wagonCount;
+        private int connectionCount;
+        private bool hasBeenUsed;
 
         public Transform Path => straightMesh.gameObject.activeSelf ? straightPathParent : bentPathParent;
         public bool IsStraight => straightMesh.activeSelf;
@@ -30,13 +31,15 @@ namespace Uncooked.Terrain.Tiles
 
         private void Awake()
         {
-            if (startsPowered) GameManager.MoveToLayer(transform, LayerMask.NameToLayer("Rail"));
+            if (startsPowered)
+            {
+                GameManager.MoveToLayer(transform, LayerMask.NameToLayer("Rail"));
+                straightPower.SetActive(true);
+            }
         }
 
         protected override void Start()
         {
-            if (startsPowered) straightPower.SetActive(true);
-
             if (startsPowered || isCheckpoint)
             {
                 inDirection = Vector3Int.RoundToInt(straightMesh.transform.forward);
@@ -52,18 +55,18 @@ namespace Uncooked.Terrain.Tiles
                 }
             }
 
-            if (isCheckpoint) GameManager.instance.OnEndCheckpoint += EndCheckpoint;
+            if (isCheckpoint) GameManager.instance.OnCheckpoint += CheckHitCheckpoint;
             base.Start();
         }
 
-        public void AddWagon() => wagonCount++;
+        public void SetUsed() => hasBeenUsed = true;
 
-        private void EndCheckpoint()
+        private void CheckHitCheckpoint()
         {
-            if (wagonCount > 0)
+            if (hasBeenUsed)
             {
                 isCheckpoint = false;
-                GameManager.instance.OnEndCheckpoint -= EndCheckpoint;
+                GameManager.instance.OnEndCheckpoint -= CheckHitCheckpoint;
             }
         }
 
@@ -73,7 +76,7 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (startsPowered || isCheckpoint || wagonCount > 0 || GameManager.instance.IsSpeed) return null;
+            if (startsPowered || isCheckpoint || hasBeenUsed || GameManager.instance.IsSpeed) return null;
             if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
 
             return base.TryPickUp(parent, amount);
@@ -135,8 +138,14 @@ namespace Uncooked.Terrain.Tiles
         /// <summary>
         /// Gets next powered rail in the track after this
         /// </summary>
-        /// <returns>Next RailTile in the track if there is a powered one, otherwise null</returns>
+        /// <returns>Next RailTile in the track if there is one, otherwise null</returns>
         public RailTile TryGetNextPoweredRail() => TryGetAdjacentRail(outDirection, true);
+
+        /// <summary>
+        /// Gets previous powered rail in the track after before
+        /// </summary>
+        /// <returns>Previous RailTile in the track if there is one, otherwise null</returns>
+        public RailTile TryGetPrevPoweredRail() => TryGetAdjacentRail(-inDirection, true);
 
         /// <summary>
         /// Gets adjacent rail in the given direction from this transform
