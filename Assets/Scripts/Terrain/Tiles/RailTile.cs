@@ -67,6 +67,7 @@ namespace Uncooked.Terrain.Tiles
             }
         }
 
+        #region IInteractable Overrides
         /// <summary>
         /// Checks if can be picked up, then unpowers it, then returns the base method
         /// </summary>
@@ -131,6 +132,7 @@ namespace Uncooked.Terrain.Tiles
                 SetState(dirToThis, dirToThis, 1, true);
             }
         }
+        #endregion
 
         /// <summary>
         /// Gets next powered rail in the track after this
@@ -315,8 +317,11 @@ namespace Uncooked.Terrain.Tiles
         {
             if (showPath)
             {
-                if (straightMesh.activeSelf) foreach (Transform t in straightPathParent) Gizmos.DrawSphere(t.position, 0.05f);
-                if (bentMesh.activeSelf) foreach (Transform t in bentPathParent) Gizmos.DrawSphere(t.position, 0.05f);
+                var pathParent = straightPathParent;
+                if (bentMesh.activeSelf) pathParent = bentPathParent;
+                
+                foreach (Transform t in pathParent) Gizmos.DrawSphere(t.position, 0.05f);
+                for (int i = 0; i < pathParent.childCount - 1; i++) Gizmos.DrawLine(pathParent.GetChild(i).position, pathParent.GetChild(i + 1).position);
             }
         }
     }

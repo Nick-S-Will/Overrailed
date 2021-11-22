@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Terrain.Tools;
-
 namespace Uncooked.Player
 {
     [RequireComponent(typeof(CharacterController))]
@@ -28,6 +26,8 @@ namespace Uncooked.Player
         {
             cc = GetComponent<CharacterController>();
             map = FindObjectOfType<Terrain.Generation.MapManager>();
+
+            transform.position = map.StartPoint;
         }
 
         void Update()

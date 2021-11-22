@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Uncooked.Terrain.Tiles
 {
-    [RequireComponent(typeof(BoxCollider))]
     public class Tile : MonoBehaviour
     {
         public Gradient GetMeshColors(Transform meshParent)

@@ -44,8 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bafd50eaa25837478fc362986d4a021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  liquid: {fileID: 0}
-  waveHeight: 0
 --- !u!1 &8231537262157128673
 GameObject:
   m_ObjectHideFlags: 0
@@ -97,6 +95,7 @@ MeshRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
