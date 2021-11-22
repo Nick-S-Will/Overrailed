@@ -32,12 +32,12 @@ namespace Uncooked.UI
         {
             holders = new TrainCarHolder[carTypes.Length];
             panelWidth = GetComponent<SpriteRenderer>().size.x;
-            coinCount = 1;
+            coinCount = 0;
 
             for (int i = 0; i < carTypes.Length; i++)
             {
                 holders[i] = Instantiate(holderPrefab, transform);
-                var car = Instantiate(carTypes[i].CurrentTierPrefab);
+                var car = Instantiate(carTypes[i].tierPrefabs[0]);
 
                 float panelInterval = panelWidth / (carTypes.Length + 1);
                 float xOffset = (i + 1) * panelInterval - panelWidth / 2f;
@@ -56,20 +56,13 @@ namespace Uncooked.UI
 
         private void SetHolderVisibility()
         {
-            bool isVisible = GameManager.instance.IsEditing;
-            foreach (var h in holders) h.gameObject.SetActive(isVisible);
+            foreach (var h in holders) h.gameObject.SetActive(GameManager.instance.IsEditing);
         }
 
         [System.Serializable]
         private class SellPoint
         {
-            [SerializeField] private TrainCar[] tierPrefabs;
-            
-            private int index = 0;
-
-            public TrainCar CurrentTierPrefab => tierPrefabs[index];
-
-            public void ToNextTier() => index++;
+            public TrainCar[] tierPrefabs;
         }
     }
 }
