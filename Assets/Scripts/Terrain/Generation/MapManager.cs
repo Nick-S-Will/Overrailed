@@ -18,23 +18,23 @@ namespace Uncooked.Terrain.Generation
         [Header("Regions")] [SerializeField] private Biome groundBiome = Biome.Base;
         [SerializeField] private Biome obstacleBiome = Biome.Base;
 
-        private System.Random rng;
-        [Header("Parents")] [SerializeField] private Transform floorParent;
-        [SerializeField] private Transform obstacleParent, railParent;
-
-        [Header("Station")]
+        [Header("Stations")]
         [SerializeField] private GameObject stationPrefab;
         [SerializeField] private Tile stationBridge;
         [SerializeField] private Vector2Int stationSize = 5 * Vector2Int.one;
+        [SerializeField] private GameObject checkpointPrefab;
+        [SerializeField] private Vector2Int checkpointSize = 3 * Vector2Int.one;
 
-        private Vector3Int stationPos;
+        [SerializeField] [HideInInspector] private Transform floorParent, obstacleParent;
+        [SerializeField] [HideInInspector] private Vector3Int stationPos;
+        private System.Random rng;
 
         public Vector3 StartPoint => stationPos;
 
         public void Start()
         {
-            GameManager.instance.OnCheckpoint += HideObstacles;
-            GameManager.instance.OnEndCheckpoint += ShowObstacles;
+            GameManager.instance.OnCheckpoint += DisableObstacles;
+            GameManager.instance.OnEndCheckpoint += EnableObstacles;
 
             HUDManager.instance.UpdateSeedText(seed.ToString());
         }
@@ -55,9 +55,13 @@ namespace Uncooked.Terrain.Generation
             var heightMap = GenerateHeightMap();
 
             // Station info
-            int stationHalfX = stationSize.x / 2, stationHalfZ = stationSize.y / 2;
-            stationPos = new Vector3Int(stationHalfX, 0, rng.Next(stationHalfZ, mapWidth - stationHalfZ));
-            BoundsInt stationBounds = new BoundsInt(stationPos - new Vector3Int(stationHalfX, 0, stationHalfZ), new Vector3Int(stationSize.x, 3, stationSize.y));
+            int halfX = stationSize.x / 2, halfZ = stationSize.y / 2;
+            stationPos = new Vector3Int(halfX, (int)transform.position.y, rng.Next(halfZ, mapWidth - halfZ));
+            BoundsInt stationBounds = new BoundsInt(stationPos - new Vector3Int(halfX, 0, halfZ), new Vector3Int(stationSize.x, 3, stationSize.y));
+            // Checkpoint info
+            halfX = checkpointSize.x / 2; halfZ = checkpointSize.y / 2;
+            Vector3Int checkpointPos = new Vector3Int(mapLength - halfX - 1, (int)transform.position.y, rng.Next(halfZ, mapWidth - halfZ));
+            BoundsInt checkpointBounds = new BoundsInt(checkpointPos - new Vector3Int(halfX, 0, halfZ), new Vector3Int(checkpointSize.x, 3, checkpointSize.y));
 
             #region Map Floor
             floorParent = new GameObject("Ground").transform;
@@ -70,13 +74,15 @@ namespace Uncooked.Terrain.Generation
 
                 for (int z = 0; z < mapWidth; z++)
                 {
+                    var current = new Vector3Int(x, (int)transform.position.y, z);
+
                     // Gets tile type based on height map
                     var tile = groundBiome.GetTile(heightMap[x, z]);
-                    var obj = Instantiate(tile, new Vector3(x, transform.position.y, z), Quaternion.identity, rowParent);
+                    var obj = Instantiate(tile, current, Quaternion.identity, rowParent);
                     obj.name = obj.name.Substring(0, obj.name.Length - 7) + " " + z;
 
                     // Adds bridge to liquid tiles under the station
-                    if (obj is LiquidTile liquid && stationBounds.Contains(new Vector3Int(x, (int)transform.position.y, z)))
+                    if (obj is LiquidTile liquid && (stationBounds.Contains(current) || checkpointBounds.Contains(current)))
                     {
                         Instantiate(stationBridge, liquid.transform.position, liquid.transform.rotation, liquid.transform.parent);
                         liquid.GetComponent<BoxCollider>().enabled = false;
@@ -95,8 +101,8 @@ namespace Uncooked.Terrain.Generation
             obstacleParent = new GameObject("Obstacles").transform;
             obstacleParent.parent = transform;
 
-            // Station placement
             Instantiate(stationPrefab, stationPos, Quaternion.identity, obstacleParent);
+            Instantiate(checkpointPrefab, checkpointPos, Quaternion.identity, obstacleParent);
 
             for (int x = 0; x < mapLength; x++)
             {
@@ -105,13 +111,14 @@ namespace Uncooked.Terrain.Generation
 
                 for (int z = 0; z < mapWidth; z++)
                 {
-                    if (stationBounds.Contains(new Vector3Int(x, (int)transform.position.y + 1, z))) continue;
+                    var current = new Vector3Int(x, (int)transform.position.y + 1, z);
+                    if (stationBounds.Contains(current) || checkpointBounds.Contains(current)) continue;
 
                     // Gets tile type based on height map
                     Tile tile = obstacleBiome.GetTile(heightMap[x, z]);
                     if (tile == null) continue;
 
-                    var obj = Instantiate(tile, new Vector3(x, transform.position.y + 1, z), Quaternion.Euler(0, rng.Next(3) * 90, 0), rowParent);
+                    var obj = Instantiate(tile, current, Quaternion.Euler(0, rng.Next(3) * 90, 0), rowParent);
                 }
 
                 if (rowParent.childCount == 0) DestroyImmediate(rowParent.gameObject);
@@ -147,7 +154,7 @@ namespace Uncooked.Terrain.Generation
         {
             Transform obj = (pickup as Tile).transform;
 
-            obj.parent = pickup is RailTile ? railParent : obstacleParent;
+            obj.parent = obstacleParent;
             obj.position = coords;
             obj.localRotation = Quaternion.identity;
 
@@ -155,13 +162,12 @@ namespace Uncooked.Terrain.Generation
             pickup.Drop(coords);
         }
 
-        private void HideObstacles() => SetObstacles(false);
-        private void ShowObstacles() => SetObstacles(true);
+        private void DisableObstacles() => SetObstacleHitboxes(false);
+        private void EnableObstacles() => SetObstacleHitboxes(true);
 
-        private void SetObstacles(bool enabled)
+        private void SetObstacleHitboxes(bool enabled)
         {
-            obstacleParent.gameObject.SetActive(enabled);
-            floorParent.gameObject.SetActive(enabled);
+            foreach (var c in obstacleParent.GetComponentsInChildren<BoxCollider>()) c.enabled = enabled;
         }
 
         void OnValidate()

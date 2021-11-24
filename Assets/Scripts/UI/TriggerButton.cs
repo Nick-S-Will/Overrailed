@@ -26,7 +26,7 @@ namespace Uncooked.UI
             {
                 yield return null;
 
-                percent += Time.deltaTime / 2;
+                percent += Time.deltaTime / loadTime;
                 loadingBar.localScale = new Vector3(Mathf.Lerp(0, buttonSize.x, percent), loadingBar.localScale.y, loadingBar.localScale.z);
             }
 

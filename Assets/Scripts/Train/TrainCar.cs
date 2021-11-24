@@ -143,10 +143,11 @@ namespace Uncooked.Train
         }
 
         /// <summary>
-        /// Places this Wagon on given RailTile
+        /// Places this train car on given rail tile
         /// </summary>
         /// <param name="rail">Rail to be set</param>
-        /// <param name="connectCheck">If placing requires checking for a TrainCar ahead</param>
+        /// <param name="connectCheck">If placing requires checking for a train car ahead</param>
+        /// <returns>True if train car is successfully placed</returns>
         public bool TrySetRail(RailTile rail, bool connectCheck)
         {
             UpdateRail(rail);
@@ -156,6 +157,7 @@ namespace Uncooked.Train
             var dir = pathDir * rail.Path.GetChild(pathIndex).forward;
             if (connectCheck && !TryGetAdjacentCar(pos, dir)) return false;
 
+            transform.parent = rail.transform;
             transform.position = pos;
             transform.forward = dir;
 
@@ -165,7 +167,7 @@ namespace Uncooked.Train
         }
 
         /// <summary>
-        /// Updates previous rail and newRail's wagonCount variables, then sets wagon's pathIndex and pathDir
+        /// Updates previous rail and <paramref name="newRail"/>'s carCount variables, then sets train car's pathIndex and pathDir
         /// </summary>
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)

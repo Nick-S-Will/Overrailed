@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Terrain.Tools;
+
 namespace Uncooked.Player
 {
     [RequireComponent(typeof(CharacterController))]
@@ -40,14 +42,11 @@ namespace Uncooked.Player
             {
                 if (hit)
                 {
-                    if (heldItem == null)
-                    {
-                        if (TryPickup(hitData.transform.GetComponent<IPickupable>())) hit = false;
-                    }
+                    if (heldItem == null) hit = !TryPickup(hitData.transform.GetComponent<IPickupable>());
                     else
                     {
                         var interact = hitData.transform.GetComponent<IInteractable>();
-                        if (interact != null) UseItemOn(interact, hitData);
+                        if (interact != null) TryUseHeldItemOn(interact, hitData);
                     }
                 }
                 else TryDrop();
@@ -81,7 +80,7 @@ namespace Uncooked.Player
         }
 
         /// <summary>
-        /// Tints selected's childrends' meshes by highlightColor until new object is selected
+        /// Tints selected's children's meshes by highlightColor until new object is selected
         /// </summary>
         private IEnumerator HightlightObject(Transform selected)
         {
@@ -139,18 +138,20 @@ namespace Uncooked.Player
         }
 
         /// <summary>
-        /// Uses heldItem on the given Tile
+        /// Uses heldItem on the given Tile if not swinging
         /// </summary>
-        private void UseItemOn(IInteractable interactable, RaycastHit hitInfo)
+        private void TryUseHeldItemOn(IInteractable interactable, RaycastHit hitInfo)
         {
-            if (!heldItem.IsTwoHanded())
+            if (isSwinging) return;
+
+            if (interactable.TryInteractUsing(heldItem, hitInfo))
             {
-                if (!isSwinging && interactable.TryInteractUsing(heldItem, hitInfo)) _ = StartCoroutine(SwingTool());
-            }
-            else if (interactable.TryInteractUsing(heldItem, hitInfo))
-            {
-                LowerArms(true);
-                heldItem = null;
+                if (heldItem is Tool) _ = StartCoroutine(SwingTool());
+                else if (interactable.TryInteractUsing(heldItem, hitInfo))
+                {
+                    LowerArms(heldItem.IsTwoHanded());
+                    heldItem = null;
+                }
             }
         }
         #endregion

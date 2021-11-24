@@ -20,7 +20,7 @@ namespace Uncooked.Terrain.Tiles
         [SerializeField] private bool isCheckpoint, showPath;
 
         private Vector3Int inDirection = Vector3Int.zero, outDirection = Vector3Int.zero;
-        private int connectionCount, wagonCount;
+        private int connectionCount, carCount;
 
         public Transform Path => straightMesh.gameObject.activeSelf ? straightPathParent : bentPathParent;
         public bool IsStraight => straightMesh.activeSelf;
@@ -56,11 +56,11 @@ namespace Uncooked.Terrain.Tiles
             base.Start();
         }
 
-        public void AddWagon() => wagonCount++;
+        public void AddWagon() => carCount++;
 
         private void EndCheckpoint()
         {
-            if (wagonCount > 0)
+            if (carCount > 0)
             {
                 isCheckpoint = false;
                 GameManager.instance.OnEndCheckpoint -= EndCheckpoint;
@@ -74,7 +74,7 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (startsPowered || isCheckpoint || wagonCount > 0 || GameManager.instance.IsSpeed) return null;
+            if (startsPowered || isCheckpoint || carCount > 0 || GameManager.instance.IsSpeed) return null;
             if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
 
             return base.TryPickUp(parent, amount);
@@ -230,9 +230,9 @@ namespace Uncooked.Terrain.Tiles
                 transform.forward = isStraight ? outDir : InOutToForward(inDir, outDir);
 
                 // Tries to connect this to proceeding rail
-                if (tryExtend && !IsFinalCheckpoint)
+                if (tryExtend)
                 {
-                    // Iterates left, forward, right, to find rail to connect to
+                    // Iterates left, forward, then right to find rail to connect to
                     Vector3Int dir = Vector3Int.RoundToInt(Quaternion.AngleAxis(-90, Vector3.up) * outDir);
                     for (int i = 0; i < 3; i++)
                     {
@@ -240,24 +240,22 @@ namespace Uncooked.Terrain.Tiles
                         var nextRail = TryGetAdjacentRail(dir, false);
                         if (nextRail && nextRail.GetStackCount() == 1)
                         {
-                            // If this can connect to nextRail
-                            if (nextRail.isCheckpoint || nextRail.connectionCount < 2)
+                            // Checkpoint rails
+                            if (nextRail.isCheckpoint && nextRail.connectionCount < 2 || (isCheckpoint && nextRail.isCheckpoint))
                             {
-                                if (nextRail.isCheckpoint && nextRail.connectionCount < 2 || (isCheckpoint && nextRail.isCheckpoint))
-                                {
-                                    _ = StartCoroutine(nextRail.DelaySetState(dir, nextRail.outDirection, 2, true));
-                                    GameManager.instance.SpeedUp();
+                                _ = StartCoroutine(nextRail.DelaySetState(dir, nextRail.outDirection, 2, true));
+                                GameManager.instance.SpeedUp();
 
-                                    SetState(inDir, dir, 2, false);
-                                    return;
-                                }
-                                else if (nextRail.connectionCount < 2)
-                                {
-                                    _ = StartCoroutine(nextRail.DelaySetState(dir, dir, 1, true));
+                                SetState(inDir, dir, 2, false);
+                                return;
+                            }
+                            // Other rails
+                            else if (nextRail.connectionCount < 2)
+                            {
+                                _ = StartCoroutine(nextRail.DelaySetState(dir, dir, 1, true));
 
-                                    SetState(inDir, dir, 2, false);
-                                    return;
-                                }
+                                SetState(inDir, dir, 2, false);
+                                return;
                             }
                         }
 
@@ -281,13 +279,10 @@ namespace Uncooked.Terrain.Tiles
         {
             if (!rail.bentMesh.activeSelf) Debug.LogError("Given Rail not bent");
 
-            // No Vector3Int.forward or back in this version wtf?
-            var forward = new Vector3Int(0, 0, 1);
-
-            if ((rail.inDirection == forward && rail.outDirection == Vector3Int.right) ||
-                (rail.inDirection == Vector3Int.right && rail.outDirection == -forward) ||
-                (rail.inDirection == Vector3Int.left && rail.outDirection == forward) ||
-                (rail.inDirection == -forward && rail.outDirection == Vector3Int.left)) return true;
+            if ((rail.inDirection == Vector3Int.forward && rail.outDirection == Vector3Int.right) ||
+                (rail.inDirection == Vector3Int.right && rail.outDirection == Vector3Int.back) ||
+                (rail.inDirection == Vector3Int.left && rail.outDirection == Vector3Int.forward) ||
+                (rail.inDirection == Vector3Int.back && rail.outDirection == Vector3Int.left)) return true;
             else return false;
         }
 
@@ -319,7 +314,7 @@ namespace Uncooked.Terrain.Tiles
             {
                 var pathParent = straightPathParent;
                 if (bentMesh.activeSelf) pathParent = bentPathParent;
-                
+
                 foreach (Transform t in pathParent) Gizmos.DrawSphere(t.position, 0.05f);
                 for (int i = 0; i < pathParent.childCount - 1; i++) Gizmos.DrawLine(pathParent.GetChild(i).position, pathParent.GetChild(i + 1).position);
             }

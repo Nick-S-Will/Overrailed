@@ -11,9 +11,8 @@ namespace Uncooked.Managers
         [Header("Cameras")]
         [SerializeField] private Camera mainCamera;
         [SerializeField] private Camera editCamera;
-        [Space]
-        [SerializeField] private List<Locomotive> followPoints;
 
+        private List<Locomotive> followPoints;
         private float startOffsetX;
         private bool isFollowing = true;
 
@@ -30,6 +29,10 @@ namespace Uncooked.Managers
 
         void Start()
         {
+            followPoints = new List<Locomotive>();
+            foreach (Locomotive l in FindObjectsOfType<Locomotive>()) followPoints.Add(l);
+            if (followPoints.Count == 0) throw new System.Exception("No Locomotive in scene");
+
             startOffsetX = mainCamera.transform.position.x - GetAverageFollowX();
             _ = StartCoroutine(Follow());
         }
@@ -51,6 +54,10 @@ namespace Uncooked.Managers
             }
         }
 
+        /// <summary>
+        /// Transitions to or from edit mode
+        /// </summary>
+        /// <param name="editMode">True for edit mode view, false for normal view</param>
         public void TransitionEditMode(bool editMode)
         {
             // TODO: Make transition smooth

@@ -63,6 +63,9 @@ namespace Uncooked.Managers
             foreach (var car in cars) if (car.HasRail) car.StartDriving();
         }
 
+        /// <summary>
+        /// Gives train temporary speed buff until it reaches the next checkpoint
+        /// </summary>
         public void SpeedUp() => trainSpeed = speedUpMultiplier * (baseTrainSpeed + trainSpeedIncrement * checkpointCount);
         
         public void ReachCheckpoint()
