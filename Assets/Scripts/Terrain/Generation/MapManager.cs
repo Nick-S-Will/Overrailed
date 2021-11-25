@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using Uncooked.Player;
 using Uncooked.Managers;
 using Uncooked.Terrain.Tiles;
 
@@ -35,6 +36,7 @@ namespace Uncooked.Terrain.Generation
         {
             GameManager.instance.OnCheckpoint += DisableObstacles;
             GameManager.instance.OnEndCheckpoint += EnableObstacles;
+            foreach (var p in FindObjectsOfType<PlayerController>()) p.OnPlacePickup += PlacePickup;
 
             HUDManager.instance.UpdateSeedText(seed.ToString());
         }
@@ -174,6 +176,14 @@ namespace Uncooked.Terrain.Generation
         {
             if (stationSize[0] < 1) stationSize[0] = 1;
             if (stationSize[1] < 1) stationSize[1] = 1;
+        }
+
+        void OnDestroy()
+        {
+            if (GameManager.instance == null) return;
+            GameManager.instance.OnCheckpoint -= DisableObstacles;
+            GameManager.instance.OnEndCheckpoint -= EnableObstacles;
+            foreach (var p in FindObjectsOfType<PlayerController>()) p.OnPlacePickup -= PlacePickup;
         }
     }
 }

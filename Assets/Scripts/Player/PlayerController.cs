@@ -9,27 +9,26 @@ namespace Uncooked.Player
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour
     {
+        public event System.Action<IPickupable, Vector3Int> OnPlacePickup;
+
         [SerializeField] private float moveSpeed = 5, armTurnSpeed = 180, armSwingSpeed = 360;
         [SerializeField] private int strength = 1;
-        [SerializeField] private Terrain.Generation.MapManager map;
         [SerializeField] private LayerMask interactMask;
         [SerializeField] private Color highlightColor = Color.white;
 
         [Header("Transforms")] [SerializeField] private Transform armL;
-        [SerializeField] private Transform armR, toolHolder, pickupHolder;
+        [SerializeField] private Transform armR, legL, legR, toolHolder, pickupHolder;
 
-        private CharacterController cc;
+        private CharacterController controller;
         private Transform lastHit;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
+        private Coroutine legSwinging;
         private IPickupable heldItem;
-        private bool isSwinging;
+        private bool isSwinging, wasMoving, isMoving;
 
         void Start()
         {
-            cc = GetComponent<CharacterController>();
-            map = FindObjectOfType<Terrain.Generation.MapManager>();
-
-            transform.position = map.StartPoint;
+            controller = GetComponent<CharacterController>();
         }
 
         void Update()
@@ -42,7 +41,7 @@ namespace Uncooked.Player
             {
                 if (hit)
                 {
-                    if (heldItem == null) hit = !TryPickup(hitData.transform.GetComponent<IPickupable>());
+                    if (heldItem == null) hit = !TryToPickUp(hitData.transform.GetComponent<IPickupable>());
                     else
                     {
                         var interact = hitData.transform.GetComponent<IInteractable>();
@@ -69,14 +68,27 @@ namespace Uncooked.Player
             // Movement Input
             var input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 
-            if (input == Vector3.zero) return;
+            isMoving = input != Vector3.zero;
+            if (!isMoving)
+            {
+                wasMoving = false;
+                return;
+            }
+
+            // Start swinging legs if player wasn't moving before
+            if (!wasMoving)
+            {
+                if (legSwinging != null) StopCoroutine(legSwinging);
+                legSwinging = StartCoroutine(SwingLegs());
+            }
+            wasMoving = isMoving;
 
             transform.forward = input;
 
             var deltaPos = moveSpeed * input * Time.fixedDeltaTime;
             var mask = LayerMask.GetMask("Ground");
             if (Physics.OverlapSphere(transform.position + deltaPos, moveSpeed * Time.fixedDeltaTime, mask).Length > 0) 
-                cc.Move(deltaPos);
+                controller.Move(deltaPos);
         }
 
         /// <summary>
@@ -109,7 +121,7 @@ namespace Uncooked.Player
         /// Tries to pick up given IPickupable
         /// </summary>
         /// <returns>True if given item is picked up</returns>
-        private bool TryPickup(IPickupable pickup)
+        private bool TryToPickUp(IPickupable pickup)
         {
             if (pickup == null) return false;
 
@@ -130,7 +142,7 @@ namespace Uncooked.Player
             if (heldItem == null || isSwinging || !heldItem.OnTryDrop()) return false;
 
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
-            map.PlacePickup(heldItem, coords);
+            OnPlacePickup?.Invoke(heldItem, coords);
             LowerArms(heldItem.IsTwoHanded());
             heldItem = null;
 
@@ -156,7 +168,7 @@ namespace Uncooked.Player
         }
         #endregion
 
-        #region Arm Movement
+        #region Limb Movement
         /// <summary>
         /// Points armR to the local forwards
         /// </summary>
@@ -230,6 +242,34 @@ namespace Uncooked.Player
             currentArmTurns.Clear();
 
             return true;
+        }
+
+        private IEnumerator SwingLegs()
+        {
+            int time = 0;
+
+            // Swing legs back and forth
+            while (isMoving)
+            {
+                float angle = Mathf.PingPong(time, 90) - 45;
+
+                legL.localRotation = Quaternion.Euler(angle, 0, 0);
+                legR.localRotation = Quaternion.Euler(-angle, 0, 0);
+
+                time += Mathf.RoundToInt(moveSpeed);
+                yield return new WaitForFixedUpdate();
+            }
+
+            // Return to base position
+            while (legL.localRotation != Quaternion.identity || legR.localRotation != Quaternion.identity)
+            {
+                float angle = Quaternion.Angle(legL.localRotation, Quaternion.identity);
+                float maxRadians = 2 * moveSpeed * Mathf.Sqrt(angle) * Time.deltaTime;
+                legL.localRotation = Quaternion.RotateTowards(legL.localRotation, Quaternion.identity, maxRadians);
+                legR.localRotation = Quaternion.RotateTowards(legR.localRotation, Quaternion.identity, maxRadians);
+
+                yield return null;
+            }
         }
         #endregion
     }
