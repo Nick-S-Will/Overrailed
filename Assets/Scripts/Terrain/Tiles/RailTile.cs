@@ -74,7 +74,7 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (startsPowered || isCheckpoint || carCount > 0 || GameManager.instance.IsSpeed) return null;
+            if (startsPowered || isCheckpoint || carCount > 0 || GameManager.instance.TrainIsSpeed) return null;
             if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
 
             return base.TryPickUp(parent, amount);

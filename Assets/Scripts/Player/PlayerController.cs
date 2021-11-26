@@ -68,6 +68,7 @@ namespace Uncooked.Player
             // Movement Input
             var input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 
+            // Updates moving states
             isMoving = input != Vector3.zero;
             if (!isMoving)
             {
@@ -75,7 +76,7 @@ namespace Uncooked.Player
                 return;
             }
 
-            // Start swinging legs if player wasn't moving before
+            // Start swinging legs if player wasn't moving last update
             if (!wasMoving)
             {
                 if (legSwinging != null) StopCoroutine(legSwinging);
@@ -85,9 +86,10 @@ namespace Uncooked.Player
 
             transform.forward = input;
 
+            // Moves player
             var deltaPos = moveSpeed * input * Time.fixedDeltaTime;
             var mask = LayerMask.GetMask("Ground");
-            if (Physics.OverlapSphere(transform.position + deltaPos, moveSpeed * Time.fixedDeltaTime, mask).Length > 0) 
+            if (Physics.Raycast(transform.position + deltaPos + Vector3.up, Vector3.down, 2, mask)) 
                 controller.Move(deltaPos);
         }
 

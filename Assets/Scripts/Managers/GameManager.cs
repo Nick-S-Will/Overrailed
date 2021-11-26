@@ -19,7 +19,7 @@ namespace Uncooked.Managers
         public float TrainSpeed => trainSpeed;
         public bool IsEditing => isEditing;
         public bool IsPaused => isPaused || isEditing;
-        public bool IsSpeed => trainSpeed > baseTrainSpeed;
+        public bool TrainIsSpeed => trainSpeed > baseTrainSpeed;
 
         private TrainCar[] cars;
         private float trainSpeed;

@@ -14,6 +14,7 @@ namespace Uncooked.Editors
             GUILayout.Space(15);
 
             if (GUILayout.Button("Generate Map")) ((MapManager)target).GenerateMap();
+            if (GUILayout.Button("Add Chunk")) ((MapManager)target).AddChunk();
         }
     }
 }
