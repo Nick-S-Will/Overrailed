@@ -22,7 +22,7 @@ namespace Uncooked.Terrain.Tools
         private Coroutine fishing;
         private bool isCast, tryCatchFish, isWaiting;
 
-        protected virtual void Start()
+        override protected void Start()
         {
             line = GetComponent<LineRenderer>();
             line.positionCount = 2;

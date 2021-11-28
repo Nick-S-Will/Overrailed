@@ -56,7 +56,7 @@ namespace Uncooked.Terrain.Tiles
             base.Start();
         }
 
-        public void AddWagon() => carCount++;
+        public void AddCar() => carCount++;
 
         private void EndCheckpoint()
         {
@@ -146,10 +146,9 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>Adjacent RailTile if there is one, otherwise null</returns>
         private RailTile TryGetAdjacentRail(Vector3 direction)
         {
-            RaycastHit hitInfo;
             var mask = LayerMask.GetMask("Default", "Rail");
 
-            if (Physics.Raycast(transform.position, direction, out hitInfo, 1, mask))
+            if (Physics.Raycast(transform.position, direction, out RaycastHit hitInfo, 1, mask))
             {
                 return hitInfo.transform.GetComponent<RailTile>();
             }
@@ -163,10 +162,9 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>Adjacent RailTile if there is one that matches criteria, otherwise null</returns>
         private RailTile TryGetAdjacentRail(Vector3 direction, bool isPowered)
         {
-            RaycastHit hitInfo;
             var mask = isPowered ? LayerMask.GetMask("Rail") : LayerMask.GetMask("Default");
 
-            if (Physics.Raycast(transform.position, direction, out hitInfo, 1, mask))
+            if (Physics.Raycast(transform.position, direction, out RaycastHit hitInfo, 1, mask))
             {
                 return hitInfo.transform.GetComponent<RailTile>();
             }

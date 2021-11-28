@@ -15,7 +15,7 @@ namespace Uncooked.Terrain.Tiles
         public Transform Liquid => liquid;
         public Transform SurfacePoint => surfacePoint;
 
-        protected virtual void Start()
+        override protected void Start()
         {
             if (liquid) _ = StartCoroutine(AnimateLiquid());
         }

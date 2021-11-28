@@ -15,7 +15,7 @@ namespace Uncooked.Terrain.Tools
             set => liquid.gameObject.SetActive(value);
         }
 
-        protected virtual void Start()
+        override protected void Start()
         {
             liquid.gameObject.SetActive(isFull);
         }

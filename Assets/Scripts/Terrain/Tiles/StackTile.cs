@@ -20,13 +20,17 @@ namespace Uncooked.Terrain.Tiles
         public float TileHeight => tileHeight;
         public bool IsTwoHanded() => true;
 
-        protected virtual void Start()
+        override protected void Start()
         {
             if (startStackHeight > 1) SelfStack();
         }
 
         public Tile Bridge => bridge;
 
+        /// <summary>
+        /// Counts the size of the stack with this as the base
+        /// </summary>
+        /// <returns>Number of tiles stacked on this plus this</returns>
         public int GetStackCount()
         {
             StackTile top = this;
@@ -66,12 +70,13 @@ namespace Uncooked.Terrain.Tiles
 
             if (amount < stackSize)
             {
+                // If stack is left at 1, base becomes trigger
                 if (stackSize - amount == 1) GetComponent<BoxCollider>().isTrigger = true;
 
                 // Get bottom tile to pick up
                 for (int i = 0; i < stackSize - amount; i++) toPickUp = toPickUp.nextInStack;
                 
-                // Disconnect toPickup from stack
+                // Disconnect toPickup from linked list
                 toPickUp.prevInStack.nextInStack = null;
                 toPickUp.prevInStack = null;
             }
@@ -123,9 +128,7 @@ namespace Uncooked.Terrain.Tiles
         private void SelfStack()
         {
             var newTile = Instantiate(this);
-            var box = newTile.GetComponent<BoxCollider>();
-            box.isTrigger = true;
-            box.enabled = false;
+            newTile.GetComponent<BoxCollider>().enabled = false;
 
             newTile.startStackHeight = startStackHeight - 1;
             newTile.TryStackOn(this);
@@ -137,7 +140,7 @@ namespace Uncooked.Terrain.Tiles
         /// <param name="liquid">Liquid Tile in which bridge is to be placed</param>
         public void BuildBridge(LiquidTile liquid)
         {
-            Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform.parent);
+            Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform);
             Destroy(gameObject);
 
             liquid.GetComponent<BoxCollider>().enabled = false;

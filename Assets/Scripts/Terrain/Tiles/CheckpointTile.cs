@@ -8,7 +8,7 @@ namespace Uncooked.Terrain.Tiles
 {
     public class CheckpointTile : Tile
     {
-        void Start()
+        override protected void Start()
         {
             GameManager.instance.OnCheckpoint += ReachCheckpoint;
         }

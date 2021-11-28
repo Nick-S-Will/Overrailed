@@ -17,7 +17,6 @@ namespace Uncooked.Train
         [SerializeField] private ParticleSystem burningParticlePrefab;
         [SerializeField] private ParticleSystem breakParticlePrefab;
         [Space]
-        [SerializeField] private Transform meshParent;
         [SerializeField] private Transform burnPoint;
         [SerializeField] private RailTile startRail;
         [SerializeField] protected int tier = 1;
@@ -30,10 +29,12 @@ namespace Uncooked.Train
         public bool HasRail => currentRail;
         public bool IsTwoHanded() => true;
 
-        protected virtual void Start()
+        override protected void Start()
         {
             if (startRail) _ = TrySetRail(startRail, false);
             OnDeath += Die;
+
+            base.Start();
         }
 
         public void StartDriving() => _ = StartCoroutine(Drive());
@@ -46,6 +47,7 @@ namespace Uncooked.Train
             var startForward = transform.forward;
             float startDst = (target.position - transform.position).magnitude;
 
+            // TODO: Make car instantly update if track gets bent
             while (currentRail)
             {
                 while (transform.position == target.position)
@@ -83,7 +85,7 @@ namespace Uncooked.Train
         }
 
         /// <summary>
-        /// Picks up this Wagon
+        /// Picks up this car
         /// </summary>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
@@ -172,7 +174,7 @@ namespace Uncooked.Train
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
-            newRail.AddWagon();
+            newRail.AddCar();
 
             currentRail = newRail;
 
@@ -198,16 +200,15 @@ namespace Uncooked.Train
         /// <returns>TrainCar in the given direction from the given point if there is one, otherwise null</returns>
         private TrainCar TryGetAdjacentCar(Vector3 point, Vector3 direction)
         {
-            RaycastHit hitInfo;
             var mask = LayerMask.GetMask("Train");
 
-            if (Physics.Raycast(point, direction, out hitInfo, 1, mask)) return hitInfo.transform.GetComponent<TrainCar>();
+            if (Physics.Raycast(point, direction, out RaycastHit hitInfo, 1, mask)) return hitInfo.transform.GetComponent<TrainCar>();
             else return null;
         }
 
         protected virtual void Die()
         {
-            BreakIntoParticles(breakParticlePrefab, GetMeshColors(meshParent), transform.position);
+            BreakIntoParticles(breakParticlePrefab, MeshColorGradient, transform.position);
 
             Destroy(gameObject, 2 * Time.deltaTime);
         }

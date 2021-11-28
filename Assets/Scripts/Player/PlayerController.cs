@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Uncooked.Terrain.Tools;
+using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Player
 {
@@ -11,20 +12,27 @@ namespace Uncooked.Player
     {
         public event System.Action<IPickupable, Vector3Int> OnPlacePickup;
 
-        [SerializeField] private float moveSpeed = 5, armTurnSpeed = 180, armSwingSpeed = 360;
+        [SerializeField] private float moveSpeed = 5, legTurnMultiplier = 0.1f, legRaiseAngle = 45;
+        [Space]
+        [SerializeField] private float armTurnSpeed = 180;
+        [SerializeField] private float armSwingSpeed = 360;
+        [Space]
+        [SerializeField] private float interactInterval = 0.5f;
         [SerializeField] private int strength = 1;
         [SerializeField] private LayerMask interactMask;
-        [SerializeField] private Color highlightColor = Color.white;
 
         [Header("Transforms")] [SerializeField] private Transform armL;
         [SerializeField] private Transform armR, legL, legR, toolHolder, pickupHolder;
 
         private CharacterController controller;
-        private Transform lastHit;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
         private Coroutine legSwinging;
         private IPickupable heldItem;
+        private float lastInteractTime;
         private bool isSwinging, wasMoving, isMoving;
+
+        public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + transform.forward + Vector3.up);
+        public int InteractMask => interactMask;
 
         void Start()
         {
@@ -33,34 +41,8 @@ namespace Uncooked.Player
 
         void Update()
         {
-            RaycastHit hitData;
-            bool hit = Physics.Raycast(transform.position + Vector3.up, transform.forward, out hitData, 1, interactMask);
-
             // Interact Input
-            if (Input.GetMouseButtonDown(0))
-            {
-                if (hit)
-                {
-                    if (heldItem == null) hit = !TryToPickUp(hitData.transform.GetComponent<IPickupable>());
-                    else
-                    {
-                        var interact = hitData.transform.GetComponent<IInteractable>();
-                        if (interact != null) TryUseHeldItemOn(interact, hitData);
-                    }
-                }
-                else TryDrop();
-            }
-
-            // Highlight
-            if (hit)
-            {
-                if (hitData.transform != lastHit)
-                {
-                    lastHit = hitData.transform;
-                    _ = StartCoroutine(HightlightObject(hitData.transform));
-                }
-            }
-            else lastHit = null;
+            if (Input.GetMouseButton(0) && Time.time >= lastInteractTime + interactInterval) TryInteract();
         }
 
         void FixedUpdate()
@@ -88,37 +70,32 @@ namespace Uncooked.Player
 
             // Moves player
             var deltaPos = moveSpeed * input * Time.fixedDeltaTime;
-            var mask = LayerMask.GetMask("Ground");
-            if (Physics.Raycast(transform.position + deltaPos + Vector3.up, Vector3.down, 2, mask)) 
-                controller.Move(deltaPos);
+            if (PointIsInBounds(transform.position + deltaPos))  controller.Move(deltaPos);
         }
 
-        /// <summary>
-        /// Tints selected's children's meshes by highlightColor until new object is selected
-        /// </summary>
-        private IEnumerator HightlightObject(Transform selected)
+        public static bool PointIsInBounds(Vector3 point)
         {
-            var renderers = selected.GetComponentsInChildren<MeshRenderer>();
-            var originalColors = new Color[renderers.Length];
-
-            // Tint mesh colors
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                originalColors[i] = renderers[i].material.color;
-                renderers[i].material.color = 0.5f * (originalColors[i] + highlightColor);
-            }
-
-            yield return new WaitWhile(() => selected == lastHit);
-
-            // Reset colors
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                if (renderers[i] == null) break;
-                else renderers[i].material.color = originalColors[i];
-            }
+            var mask = LayerMask.GetMask("Ground");
+            return Physics.Raycast(point + Vector3.up, Vector3.down, 3, mask);
         }
 
         #region Interact
+        private void TryInteract()
+        {
+            lastInteractTime = Time.time;
+
+            if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hitData, 1, interactMask))
+            {
+                if (heldItem == null) TryToPickUp(hitData.transform.GetComponent<IPickupable>());
+                else
+                {
+                    var interact = hitData.transform.GetComponent<IInteractable>();
+                    if (interact != null) TryUseHeldItemOn(interact, hitData);
+                }
+            }
+            else TryDrop();
+        }
+
         /// <summary>
         /// Tries to pick up given IPickupable
         /// </summary>
@@ -141,9 +118,10 @@ namespace Uncooked.Player
         /// <returns>True if heldItem was placed</returns>
         private bool TryDrop()
         {
-            if (heldItem == null || isSwinging || !heldItem.OnTryDrop()) return false;
-
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
+            if (heldItem == null || isSwinging || !PointIsInBounds(coords) || !heldItem.OnTryDrop()) return false;
+
+            (heldItem as Tile).transform.parent = null;
             OnPlacePickup?.Invoke(heldItem, coords);
             LowerArms(heldItem.IsTwoHanded());
             heldItem = null;
@@ -161,7 +139,7 @@ namespace Uncooked.Player
             if (interactable.TryInteractUsing(heldItem, hitInfo))
             {
                 if (heldItem is Tool) _ = StartCoroutine(SwingTool());
-                else if (interactable.TryInteractUsing(heldItem, hitInfo))
+                else
                 {
                     LowerArms(heldItem.IsTwoHanded());
                     heldItem = null;
@@ -177,7 +155,7 @@ namespace Uncooked.Player
         /// <param name="both">Makes armL point forwards too</param>
         private void RaiseArms(bool both)
         {
-            TryStopTurnArmRoutines();
+            _ = TryStopTurnArmRoutines();
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, -90, armTurnSpeed)));
             if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, -90, armTurnSpeed)));
         }
@@ -188,7 +166,7 @@ namespace Uncooked.Player
         /// <param name="both">Makes armL point downwards too</param>
         private void LowerArms(bool both)
         {
-            TryStopTurnArmRoutines();
+            _ = TryStopTurnArmRoutines();
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, 0, armTurnSpeed)));
             if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, 0, armTurnSpeed)));
         }
@@ -248,17 +226,17 @@ namespace Uncooked.Player
 
         private IEnumerator SwingLegs()
         {
-            int time = 0;
+            float time = 0;
 
             // Swing legs back and forth
             while (isMoving)
             {
-                float angle = Mathf.PingPong(time, 90) - 45;
+                float angle = legRaiseAngle * Mathf.Sin(time);
 
                 legL.localRotation = Quaternion.Euler(angle, 0, 0);
                 legR.localRotation = Quaternion.Euler(-angle, 0, 0);
 
-                time += Mathf.RoundToInt(moveSpeed);
+                time += legTurnMultiplier * moveSpeed * legRaiseAngle;
                 yield return new WaitForFixedUpdate();
             }
 

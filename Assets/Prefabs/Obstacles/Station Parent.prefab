@@ -293,9 +293,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b826faadbf9569344b38cb6acf80a4b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  meshParent: {fileID: 0}
   burningParticlePrefab: {fileID: 0}
   breakParticlePrefab: {fileID: 0}
-  meshParent: {fileID: 0}
   burnPoint: {fileID: 0}
   startRail: {fileID: 0}
   tier: 1

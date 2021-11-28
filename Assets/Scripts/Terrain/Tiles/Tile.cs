@@ -6,19 +6,24 @@ namespace Uncooked.Terrain.Tiles
 {
     public class Tile : MonoBehaviour
     {
-        public Gradient GetMeshColors(Transform meshParent)
+        public Transform meshParent;
+
+        public Gradient MeshColorGradient { get; private set; }
+
+        protected virtual void Start()
+        {
+            MeshColorGradient = GetMeshGradient();
+        }
+
+        private Gradient GetMeshGradient()
         {
             var mats = new List<Material>();
             var gradientPins = new List<GradientColorKey>();
 
-            foreach (Transform t in meshParent)
+            foreach (var renderer in meshParent.GetComponentsInChildren<MeshRenderer>())
             {
-                var renderer = t.GetComponent<MeshRenderer>();
-                if (renderer)
-                {
-                    mats.Add(renderer.material);
-                    if (mats.Count == 8) break;
-                }
+                mats.Add(renderer.material);
+                if (mats.Count == 8) break;
             }
             for (int i = 0; i < mats.Count; i++)
             {
@@ -32,6 +37,8 @@ namespace Uncooked.Terrain.Tiles
             return meshColors;
         }
 
+        public void SetVisible(bool isVisible) => meshParent.gameObject.SetActive(isVisible);
+        
         protected void BreakIntoParticles(ParticleSystem prefab, Gradient meshColors, Vector3 position)
         {
             var particles = Instantiate(prefab, position, prefab.transform.rotation);

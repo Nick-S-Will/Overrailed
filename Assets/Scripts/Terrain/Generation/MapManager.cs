@@ -18,6 +18,7 @@ namespace Uncooked.Terrain.Generation
 
         [Header("Regions")] [SerializeField] private Biome groundBiome = Biome.Base;
         [SerializeField] private Biome obstacleBiome = Biome.Base;
+        [SerializeField] private Color highlightColor = Color.white;
 
         [Header("Stations")]
         [SerializeField] private GameObject stationPrefab;
@@ -38,20 +39,73 @@ namespace Uncooked.Terrain.Generation
         [SerializeField] [HideInInspector] private Vector3Int stationPos;
         [SerializeField] [HideInInspector] private System.Random rng;
 
+        private PlayerController player;
+        private Transform lastHighlightTile;
+
         public Vector3 StartPoint => stationPos;
 
         public void Start()
         {
             GameManager.instance.OnCheckpoint += AddChunk; // Must be before DisableObstacles
             GameManager.instance.OnCheckpoint += DisableObstacles; // Must be after AddChunk
-            GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
             GameManager.instance.OnEndCheckpoint += EnableObstacles;
+            GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
             foreach (var p in FindObjectsOfType<PlayerController>()) p.OnPlacePickup += PlacePickup;
 
             HUDManager.instance.UpdateSeedText(seed.ToString());
+            player = FindObjectOfType<PlayerController>();
             rng = new System.Random(seed);
         }
 
+        void Update()
+        {
+            // Highlights tile player is looking at
+            var tile = GetTileAt(player.LookPoint);
+            if (tile == null) tile = GetTileAt(player.LookPoint + Vector3Int.down);
+            TryHighlightTile(tile);
+        }
+
+        #region Tile highlighting
+        private void TryHighlightTile(Transform tile)
+        {
+            if (tile == lastHighlightTile) return;
+            else if (tile == null)
+            {
+                lastHighlightTile = null;
+                return;
+            }
+
+            lastHighlightTile = tile;
+            _ = StartCoroutine(HightlightTile(tile));
+        }
+
+        /// <summary>
+        /// Tints selected tile's children's meshes by highlightColor until tile is no longer selected
+        /// </summary>
+        private IEnumerator HightlightTile(Transform tile)
+        {
+            var renderers = tile.GetComponentsInChildren<MeshRenderer>();
+            var originalColors = new Color[renderers.Length];
+
+            // Tint mesh colors
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                originalColors[i] = renderers[i].material.color;
+                renderers[i].material.color = 0.5f * (originalColors[i] + highlightColor);
+            }
+
+            yield return new WaitWhile(() => tile == lastHighlightTile);
+
+            // Reset colors
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                if (renderers[i] == null) break;
+                else renderers[i].material.color = originalColors[i];
+            }
+        }
+        #endregion
+
+        #region Generation
         /// <summary>
         /// Clears current map and generates the first chunk of a new one
         /// </summary>
@@ -109,7 +163,7 @@ namespace Uncooked.Terrain.Generation
             GenerateRow(heightMap, obstacleBiome, obstacleParent, stationBounds, checkpointBounds, false);
 
             // Spawn station and checkpoint
-            if (chunks.Count == 1) _ = Instantiate(stationPrefab, stationPos, Quaternion.identity, obstacleParent);
+            if (chunks.Count == 1) Instantiate(stationPrefab, stationPos, Quaternion.identity, obstacleParent).transform.Find("Bonus").gameObject.SetActive(startBonus);
             _ = Instantiate(checkpointPrefab, checkpointPos, Quaternion.identity, obstacleParent);
 
             newChunk.parent = transform;
@@ -147,10 +201,13 @@ namespace Uncooked.Terrain.Generation
                         else continue;
                     }
 
-
                     var tileObj = Instantiate(tilePrefab, newPos, Quaternion.identity, rowParent);
                     tileObj.name = tileObj.name.Substring(0, tileObj.name.Length - 7) + " " + z;
-                    if (bridge) tileObj.GetComponent<BoxCollider>().enabled = false;
+                    if (bridge)
+                    {
+                        bridge.transform.parent = tileObj.transform;
+                        tileObj.GetComponent<BoxCollider>().enabled = false;
+                    }
                 }
             }
         }
@@ -176,6 +233,41 @@ namespace Uncooked.Terrain.Generation
 
             return heightMap;
         }
+        #endregion
+
+        /// <summary>
+        /// Gets the tile at the given coords
+        /// </summary>
+        /// <param name="pos">Coords of the searched tile</param>
+        /// <returns>The transform of the tile at <paramref name="pos"/> if there is one, otherwise null</returns>
+        public Transform GetTileAt(Vector3Int pos)
+        {
+            if (!PlayerController.PointIsInBounds(pos)) return null;
+
+            if (pos.y == transform.position.y)
+            {
+                var row = GetParentAt(pos);
+                return row.GetChild(pos.z);
+            }
+            else
+            {
+                _ = Physics.Raycast(new Vector3(pos.x, transform.position.y - 0.5f, pos.z), Vector3.up, out RaycastHit hitData, 1, player.InteractMask);
+
+                return hitData.transform;
+            }
+        }
+
+        private Transform GetParentAt(Vector3Int position)
+        {
+            try
+            {
+                var chunk = transform.GetChild(position.x / chunkLength + 1);
+                var section = chunk.GetChild(position.y == transform.position.y ? 0 : 1); // Ground or Obstacles
+                var row = section.GetChild(position.x % chunkLength);
+                return row;
+            }
+            catch (UnityException) { return null; }
+        }
 
         /// <summary>
         /// Places given Tile at coords, sets obstacleParent as its parent, and enables its BoxCollider
@@ -184,7 +276,7 @@ namespace Uncooked.Terrain.Generation
         {
             Transform obj = (pickup as Tile).transform;
 
-            obj.parent = obstacleParent;
+            obj.parent = GetParentAt(coords);
             obj.position = coords;
             obj.localRotation = Quaternion.identity;
 
@@ -198,8 +290,12 @@ namespace Uncooked.Terrain.Generation
         private void SetObstacleHitboxes(bool enabled)
         {
             for (int i = 1; i < transform.childCount; i++)
-                foreach (var c in transform.GetChild(i).GetComponentsInChildren<BoxCollider>()) 
-                    c.enabled = enabled;
+            {
+                foreach (var collider in transform.GetChild(i).GetChild(1).GetComponentsInChildren<BoxCollider>())
+                {
+                    if (collider.gameObject.layer == LayerMask.NameToLayer("Default")) collider.enabled = enabled;
+                }
+            }
         }
 
         #region Spawning animation
@@ -218,7 +314,9 @@ namespace Uncooked.Terrain.Generation
             {
                 extraStartPos.Add(obj.localPosition);
                 obj.localPosition -= spawnDelta;
-                obj.gameObject.SetActive(false);
+
+                obj.GetChild(0).gameObject.SetActive(false);
+                foreach (var tile in obj.GetComponentsInChildren<Tile>()) tile.SetVisible(false);
             }
 
             // Moving and hiding each row
@@ -228,7 +326,8 @@ namespace Uncooked.Terrain.Generation
                 obstacles.GetChild(i).localPosition -= spawnDelta;
 
                 ground.GetChild(i).gameObject.SetActive(false);
-                obstacles.GetChild(i).gameObject.SetActive(false);
+                // Hides obstacle graphics without affecting colliders
+                foreach (var tile in obstacles.GetChild(i).GetComponentsInChildren<Tile>()) tile.SetVisible(false);
             }
 
             // Turning on and sliding each row into place
@@ -236,7 +335,8 @@ namespace Uncooked.Terrain.Generation
             {
                 Transform groundRow = ground.GetChild(i), obstacleRow = obstacles.GetChild(i);
                 groundRow.gameObject.SetActive(true);
-                obstacleRow.gameObject.SetActive(true);
+                // Shows obstacle graphics without affecting colliders
+                foreach (var tile in obstacleRow.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
 
                 _ = StartCoroutine(AnimateSpawnSlide(groundRow, Vector3.zero));
                 _ = StartCoroutine(AnimateSpawnSlide(obstacleRow, Vector3.zero));
@@ -245,13 +345,13 @@ namespace Uncooked.Terrain.Generation
             }
 
             // Turning on and sliding station and checkpoint into place
-            foreach (var obj in extras) obj.gameObject.SetActive(true);
-            _ = StartCoroutine(AnimateSpawnSlide(extras[0], extraStartPos[0]));
-            if (extras.Count > 1)
+            foreach (var obj in extras)
             {
-                extras[0].Find("Bonus").gameObject.SetActive(startBonus);
-                _ = StartCoroutine(AnimateSpawnSlide(extras[1], extraStartPos[1]));
+                obj.GetChild(0).gameObject.SetActive(true);
+                foreach (var tile in obj.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
             }
+            _ = StartCoroutine(AnimateSpawnSlide(extras[0], extraStartPos[0]));
+            if (extras.Count > 1) _ = StartCoroutine(AnimateSpawnSlide(extras[1], extraStartPos[1]));
         }
 
         private IEnumerator AnimateSpawnSlide(Transform t, Vector3 destination)
@@ -277,8 +377,8 @@ namespace Uncooked.Terrain.Generation
 
             GameManager.instance.OnCheckpoint -= AddChunk;
             GameManager.instance.OnCheckpoint -= DisableObstacles;
-            GameManager.instance.OnEndCheckpoint -= AnimateNewChunk;
             GameManager.instance.OnEndCheckpoint -= EnableObstacles;
+            GameManager.instance.OnEndCheckpoint -= AnimateNewChunk;
             foreach (var p in FindObjectsOfType<PlayerController>()) p.OnPlacePickup -= PlacePickup;
         }
     }

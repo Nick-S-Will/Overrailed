@@ -10,12 +10,11 @@ namespace Uncooked.Terrain.Tiles
     {
         [SerializeField] private Tile lowerTier;
         [SerializeField] private ParticleSystem breakParticlePrefab;
-        [SerializeField] private bool IsUnmineable;
 
+        protected override void Start() => base.Start();
+        
         public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (IsUnmineable) return false;
-
             if (item is BreakTool breaker && name.Contains(breaker.BreakTileCode)) TakeHit(breaker.Tier, hitInfo);
             else return false;
 
@@ -35,7 +34,7 @@ namespace Uncooked.Terrain.Tiles
             {
                 if (toSpawn is BreakableTile t)
                 {
-                    BreakIntoParticles(breakParticlePrefab, toSpawn.GetMeshColors(toSpawn.transform), hit.transform.position);
+                    BreakIntoParticles(breakParticlePrefab, toSpawn.MeshColorGradient, hit.transform.position);
                     
                     toSpawn = t.lowerTier;
                 }
