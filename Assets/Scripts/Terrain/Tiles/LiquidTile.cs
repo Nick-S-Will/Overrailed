@@ -43,7 +43,7 @@ namespace Uncooked.Terrain.Tiles
 
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (item is StackTile stack && stack.Bridge) stack.BuildBridge(this);
+            if (item is StackTile stack && stack.HasBridge) stack.BuildBridge(this);
             else if (item is Rod rod) rod.Use(this);
             else if (item is Bucket bucket) bucket.isFull = true;
             else return false;

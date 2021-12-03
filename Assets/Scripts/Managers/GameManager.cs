@@ -19,7 +19,7 @@ namespace Uncooked.Managers
         public float TrainSpeed => trainSpeed;
         public bool IsEditing => isEditing;
         public bool IsPaused => isPaused || isEditing;
-        public bool TrainIsSpeed => trainSpeed > baseTrainSpeed;
+        public bool TrainIsSpeed => trainSpeed - (baseTrainSpeed + trainSpeedIncrement * checkpointCount) > 0.0001f; // > operator is inconsistent
 
         private TrainCar[] cars;
         private float trainSpeed;
@@ -30,12 +30,12 @@ namespace Uncooked.Managers
         void Awake()
         {
             if (instance == null) instance = this;
-            else Debug.LogError("Multiple GameManagers Exist");
+            else throw new System.Exception("Multiple GameManagers Exist");
 
             checkpointContinueButton.OnClick += ContinueFromCheckpoint;
             checkpointContinueButton.GetComponent<BoxCollider>().enabled = IsEditing;
         }
-        
+
         void Start()
         {
             cars = FindObjectsOfType<TrainCar>();
@@ -47,7 +47,7 @@ namespace Uncooked.Managers
         }
 
         public void StartTrainWithDelay(float delayTime) => _ = StartCoroutine(StartTrain(delayTime));
-        
+
         private IEnumerator StartTrain(float delay)
         {
             yield return new WaitForSeconds(delay - 5);
@@ -67,7 +67,7 @@ namespace Uncooked.Managers
         /// Gives train temporary speed buff until it reaches the next checkpoint
         /// </summary>
         public void SpeedUp() => trainSpeed = speedUpMultiplier * (baseTrainSpeed + trainSpeedIncrement * checkpointCount);
-        
+
         public void ReachCheckpoint()
         {
             isEditing = true;

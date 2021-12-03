@@ -32,6 +32,8 @@ namespace Uncooked.UI
 
             barLoading = null;
             OnClick?.Invoke();
+
+            loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
         }
 
         private void OnTriggerEnter(Collider other)

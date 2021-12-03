@@ -30,6 +30,7 @@ namespace Uncooked.Terrain.Tiles
 
         private void Awake()
         {
+            // Must use method for edit cam to see tracks
             if (startsPowered) GameManager.MoveToLayer(transform, LayerMask.NameToLayer("Rail"));
         }
 
@@ -43,28 +44,31 @@ namespace Uncooked.Terrain.Tiles
                 outDirection = Vector3Int.RoundToInt(straightMesh.transform.forward);
 
                 if (startsPowered) connectionCount = Physics.Raycast(transform.position, outDirection, 1, LayerMask.GetMask("Rail")) ? 2 : 1;
-                else
-                {
-                    int count = 0;
-                    if (Physics.Raycast(transform.position, outDirection, 1, LayerMask.GetMask("Default"))) count++;
-                    if (Physics.Raycast(transform.position, -outDirection, 1, LayerMask.GetMask("Default"))) count++;
-                    connectionCount = count;
-                }
+                else UpdateConnectionCount();
             }
 
-            if (isCheckpoint) GameManager.instance.OnEndCheckpoint += EndCheckpoint;
+            if (isCheckpoint) GameManager.instance.OnCheckpoint += ReachCheckpoint;
             base.Start();
         }
 
         public void AddCar() => carCount++;
 
-        private void EndCheckpoint()
+        private void ReachCheckpoint()
         {
             if (carCount > 0)
             {
                 isCheckpoint = false;
-                GameManager.instance.OnEndCheckpoint -= EndCheckpoint;
+                UpdateConnectionCount();
+                GameManager.instance.OnEndCheckpoint -= ReachCheckpoint;
             }
+        }
+
+        private void UpdateConnectionCount()
+        {
+            int count = 0;
+            if (Physics.Raycast(transform.position, outDirection, 1, LayerMask.GetMask("Default", "Rail"))) count++;
+            if (Physics.Raycast(transform.position, -inDirection, 1, LayerMask.GetMask("Default", "Rail"))) count++;
+            connectionCount = count;
         }
 
         #region IInteractable Overrides
@@ -74,6 +78,7 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
+            print(GameManager.instance.TrainIsSpeed);
             if (startsPowered || isCheckpoint || carCount > 0 || GameManager.instance.TrainIsSpeed) return null;
             if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
 
@@ -97,23 +102,23 @@ namespace Uncooked.Terrain.Tiles
         }
 
         /// <summary>
-        /// Updates rail connectivity if necessary
+        /// Updates rail connectivity
         /// </summary>
         public override void Drop(Vector3Int coords)
         {
             // Doesn't connect to tracks if in a stack
             if (NextInStack) return;
 
-            List<RailTile> connectableRails = new List<RailTile>();
+            RailTile connectableRail = null;
             Vector3 dir = Vector3.forward;
 
-            // Adds adjacent powered rails to list
+            // Looks for adjacent powered rail to connect to
             for (int i = 0; i < 4; i++)
             {
                 var rail = TryGetAdjacentRail(dir, true);
                 if (rail && rail.connectionCount < 2)
                 {
-                    connectableRails.Add(rail);
+                    connectableRail = rail;
                     break;
                 }
 
@@ -121,19 +126,19 @@ namespace Uncooked.Terrain.Tiles
             }
 
             // Updates affected rails' states
-            if (connectableRails.Count == 1)
+            if (connectableRail)
             {
-                RailTile inRail = connectableRails[0];
-                Vector3Int dirToThis = coords - Vector3Int.FloorToInt(inRail.transform.position);
+                Vector3Int dirToThis = coords - Vector3Int.FloorToInt(connectableRail.transform.position);
 
-                if (inRail.outDirection != dirToThis) inRail.SetState(inRail.inDirection, dirToThis, 2, false);
-                else inRail.connectionCount++;
+                if (connectableRail.outDirection != dirToThis) connectableRail.SetState(connectableRail.inDirection, dirToThis, 2, false);
+                else connectableRail.connectionCount++;
 
                 SetState(dirToThis, dirToThis, 1, true);
             }
         }
         #endregion
 
+        #region Find Rails
         /// <summary>
         /// Gets next powered rail in the track after this
         /// </summary>
@@ -144,34 +149,28 @@ namespace Uncooked.Terrain.Tiles
         /// Gets adjacent rail in the given direction from this transform
         /// </summary>
         /// <returns>Adjacent RailTile if there is one, otherwise null</returns>
-        private RailTile TryGetAdjacentRail(Vector3 direction)
-        {
-            var mask = LayerMask.GetMask("Default", "Rail");
+        private RailTile TryGetAdjacentRail(Vector3 direction) => TryFindRail(direction, LayerMask.GetMask("Default", "Rail"));
 
-            if (Physics.Raycast(transform.position, direction, out RaycastHit hitInfo, 1, mask))
-            {
-                return hitInfo.transform.GetComponent<RailTile>();
-            }
-
-            return null;
-        }
         /// <summary>
         /// Gets adjacent rail in the given direction from this transform if it's IsPowered (property) is equal to isPowered (parameter)
         /// </summary>
         /// <param name="isPowered">True to search only for powered rails, false to search only for normal rails</param>
         /// <returns>Adjacent RailTile if there is one that matches criteria, otherwise null</returns>
-        private RailTile TryGetAdjacentRail(Vector3 direction, bool isPowered)
+        private RailTile TryGetAdjacentRail(Vector3 direction, bool isPowered) => TryFindRail(direction, isPowered ? LayerMask.GetMask("Rail") : LayerMask.GetMask("Default"));
+
+        /// <summary>
+        /// Used by the <see cref="TryGetAdjacentRail"/> methods, which are more straightforward
+        /// </summary>
+        /// <param name="layerMask">Physics layer mask used to find rail</param>
+        /// <returns>Adjacent RailTile if there is one that matches criteria, otherwise null</returns>
+        private RailTile TryFindRail(Vector3 direction, int layerMask)
         {
-            var mask = isPowered ? LayerMask.GetMask("Rail") : LayerMask.GetMask("Default");
-
-            if (Physics.Raycast(transform.position, direction, out RaycastHit hitInfo, 1, mask))
-            {
-                return hitInfo.transform.GetComponent<RailTile>();
-            }
-
+            if (Physics.Raycast(transform.position, direction.normalized, out RaycastHit hitInfo, 1, layerMask)) return hitInfo.transform.GetComponent<RailTile>();
             return null;
         }
+        #endregion
 
+        #region Update State
         // For preventing StackOverflow when rails connect consecutively
         /// <summary>
         /// Waits a frame, then does SetState
@@ -268,6 +267,7 @@ namespace Uncooked.Terrain.Tiles
 
             GameManager.MoveToLayer(transform, connectionCount > 0 ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default"));
         }
+        #endregion
 
         /// <summary>
         /// Jank way to determines which way the given bent rail turn
@@ -290,20 +290,18 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The forward direction for the bent rail with these in and out directions</returns>
         private static Vector3Int InOutToForward(Vector3Int inDir, Vector3Int outDir)
         {
-            // No Vector3Int.forward or back in this version wtf?
-            var forward = new Vector3Int(0, 0, 1);
+            bool leftTurn = Vector3.Cross(inDir, outDir).y > 0;
 
-            if ((inDir == Vector3Int.left && outDir == -forward) ||       // (-1, -1)
-                (inDir == forward && outDir == Vector3Int.right))         // (1, 1)
-                forward = Vector3Int.right;
-            else if ((inDir == Vector3Int.right && outDir == -forward) || // (1, -1)
-                     (inDir == forward && outDir == Vector3Int.left))     // (-1, 1)
-                forward = -forward;
-            else if ((inDir == Vector3Int.right && outDir == forward) ||  // (1, 1)
-                     (inDir == -forward && outDir == Vector3Int.left))    // (-1, -1)
-                forward = Vector3Int.left;
-
-            return forward;
+            if ((inDir == Vector3Int.left && outDir == Vector3Int.back) ||          // (-1, -1)
+                (inDir == Vector3Int.forward && outDir == Vector3Int.right))        // (1, 1)
+                return Vector3Int.right;
+            else if ((inDir == Vector3Int.right && outDir == Vector3Int.back) ||    // (1, -1)
+                     (inDir == Vector3Int.forward && outDir == Vector3Int.left))    // (-1, 1)
+                return Vector3Int.back;
+            else if ((inDir == Vector3Int.right && outDir == Vector3Int.forward) || // (1, 1)
+                     (inDir == Vector3Int.back && outDir == Vector3Int.left))       // (-1, -1)
+                return Vector3Int.left;
+            else return Vector3Int.forward;
         }
 
         private void OnDrawGizmos()

@@ -144,7 +144,7 @@ namespace Uncooked.Terrain.Generation
             // Ground tiles
             groundParent = new GameObject("Ground").transform;
             groundParent.parent = newChunk;
-            GenerateRow(heightMap, groundBiome, groundParent, stationBounds, checkpointBounds, true);
+            GenerateSection(heightMap, groundBiome, groundParent, stationBounds, checkpointBounds, true);
 
             // Ground collider
             if (groundCollider == null)
@@ -160,7 +160,7 @@ namespace Uncooked.Terrain.Generation
             // Obstacle tiles
             obstacleParent = new GameObject("Obstacles").transform;
             obstacleParent.parent = newChunk;
-            GenerateRow(heightMap, obstacleBiome, obstacleParent, stationBounds, checkpointBounds, false);
+            GenerateSection(heightMap, obstacleBiome, obstacleParent, stationBounds, checkpointBounds, false);
 
             // Spawn station and checkpoint
             if (chunks.Count == 1) Instantiate(stationPrefab, stationPos, Quaternion.identity, obstacleParent).transform.Find("Bonus").gameObject.SetActive(startBonus);
@@ -169,7 +169,7 @@ namespace Uncooked.Terrain.Generation
             newChunk.parent = transform;
         }
 
-        private void GenerateRow(float[,] heightMap, Biome biome, Transform parent, BoundsInt station, BoundsInt checkpoint, bool isGround)
+        private void GenerateSection(float[,] heightMap, Biome biome, Transform parent, BoundsInt station, BoundsInt checkpoint, bool isGround)
         {
             int mapLength = chunks.Count * chunkLength;
 

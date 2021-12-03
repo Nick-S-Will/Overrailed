@@ -37,7 +37,7 @@ namespace Uncooked.Train
         protected override void Die()
         {
             CameraManager.instance.StopFollowing();
-            GameManager.instance.SpeedUp();
+            GameManager.instance.SpeedUp(); 
             base.Die();
         }
     }

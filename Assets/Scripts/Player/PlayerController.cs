@@ -87,11 +87,7 @@ namespace Uncooked.Player
             if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hitData, 1, interactMask))
             {
                 if (heldItem == null) TryToPickUp(hitData.transform.GetComponent<IPickupable>());
-                else
-                {
-                    var interact = hitData.transform.GetComponent<IInteractable>();
-                    if (interact != null) TryUseHeldItemOn(interact, hitData);
-                }
+                else TryUseHeldItemOn(hitData.transform.GetComponent<IInteractable>(), hitData);
             }
             else TryDrop();
         }

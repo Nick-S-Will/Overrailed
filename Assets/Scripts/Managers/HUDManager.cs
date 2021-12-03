@@ -53,7 +53,7 @@ namespace Uncooked.Managers
 
         private IEnumerator UpdateHUD()
         {
-            while (this)
+            while (instance == this)
             {
                 foreach (var toolHUD in tools)
                 {

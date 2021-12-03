@@ -25,7 +25,7 @@ namespace Uncooked.Terrain.Tiles
             if (startStackHeight > 1) SelfStack();
         }
 
-        public Tile Bridge => bridge;
+        public bool HasBridge => bridge;
 
         /// <summary>
         /// Counts the size of the stack with this as the base

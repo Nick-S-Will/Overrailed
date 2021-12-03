@@ -13,7 +13,7 @@ namespace Uncooked.Terrain.Tiles
             GameManager.instance.OnCheckpoint += ReachCheckpoint;
         }
 
-        private void ReachCheckpoint()
+        protected virtual void ReachCheckpoint()
         {
             gameObject.SetActive(false);
         }
