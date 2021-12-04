@@ -19,8 +19,9 @@ namespace Uncooked.Terrain.Tiles
         [SerializeField] protected bool startsPowered;
         [SerializeField] private bool isCheckpoint, showPath;
 
+        private TrainCar lastPassenger;
         private Vector3Int inDirection = Vector3Int.zero, outDirection = Vector3Int.zero;
-        private int connectionCount, carCount;
+        private int connectionCount;
 
         public Transform Path => straightMesh.gameObject.activeSelf ? straightPathParent : bentPathParent;
         public bool IsStraight => straightMesh.activeSelf;
@@ -51,11 +52,11 @@ namespace Uncooked.Terrain.Tiles
             base.Start();
         }
 
-        public void AddCar() => carCount++;
+        public void NewPassenger(TrainCar newCar) => lastPassenger = newCar;
 
         private void ReachCheckpoint()
         {
-            if (carCount > 0)
+            if (lastPassenger)
             {
                 isCheckpoint = false;
                 UpdateConnectionCount();
@@ -78,16 +79,17 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            print(GameManager.instance.TrainIsSpeed);
-            if (startsPowered || isCheckpoint || carCount > 0 || GameManager.instance.TrainIsSpeed) return null;
-            if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
+            if (startsPowered || isCheckpoint || GameManager.instance.TrainIsSpeed) return null;
+            else if (lastPassenger) return lastPassenger.TryPickUp(parent, amount);
+            else if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
 
             return base.TryPickUp(parent, amount);
         }
 
         public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (item is TrainCar car) return car.TrySetRail(this, true);
+            if (lastPassenger && lastPassenger.TryInteractUsing(item, hitInfo)) return true;
+            else if (item is TrainCar car) return car.TrySetRail(this, true);
             else return base.TryInteractUsing(item, hitInfo);
         }
 

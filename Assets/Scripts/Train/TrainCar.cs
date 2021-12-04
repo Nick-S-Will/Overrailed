@@ -174,7 +174,7 @@ namespace Uncooked.Train
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
-            newRail.AddCar();
+            newRail.NewPassenger(this);
 
             currentRail = newRail;
 

@@ -11,6 +11,7 @@ namespace Uncooked.Terrain.Generation
 {
     public class MapManager : MonoBehaviour
     {
+        #region Inspector Variables
         [Header("Generation")] [SerializeField] private int seed = 0;
         [SerializeField] [Min(1)] private float noiseScale = 10;
         [SerializeField] private Vector2 noiseOffset;
@@ -38,6 +39,7 @@ namespace Uncooked.Terrain.Generation
         [SerializeField] [HideInInspector] private Transform groundParent, groundCollider, obstacleParent;
         [SerializeField] [HideInInspector] private Vector3Int stationPos;
         [SerializeField] [HideInInspector] private System.Random rng;
+        #endregion
 
         private PlayerController player;
         private Transform lastHighlightTile;

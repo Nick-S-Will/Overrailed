@@ -12,24 +12,41 @@ namespace Uncooked.Player
     {
         public event System.Action<IPickupable, Vector3Int> OnPlacePickup;
 
-        [SerializeField] private float moveSpeed = 5, legTurnMultiplier = 0.1f, legRaiseAngle = 45;
-        [Space]
+        #region Inspector Variables
+        [Header("Walk")]
+        [SerializeField] private float moveSpeed = 5;
+        [SerializeField] private float legSwingCoefficient = 0.1f, legRaiseAngle = 45;
+
+        [Header("Dash")]
+        [SerializeField] [Range(1, 10)] private float dashSpeedMultiplier = 2;
+        [SerializeField] [Range(0, 1)] private float dashDuration = 1;
+
+        [Header("Arms")]
         [SerializeField] private float armTurnSpeed = 180;
         [SerializeField] private float armSwingSpeed = 360;
-        [Space]
+
+        [Header("Interact")]
         [SerializeField] private float interactInterval = 0.5f;
         [SerializeField] private int strength = 1;
         [SerializeField] private LayerMask interactMask;
 
         [Header("Transforms")] [SerializeField] private Transform armL;
-        [SerializeField] private Transform armR, legL, legR, toolHolder, pickupHolder;
+        [SerializeField] private Transform armR, legL, legR, calfL, calfR, toolHolder, pickupHolder;
+        #endregion
 
         private CharacterController controller;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
-        private Coroutine legSwinging;
+        private Coroutine toolSwinging, legSwinging;
         private IPickupable heldItem;
-        private float lastInteractTime;
-        private bool isSwinging, wasMoving, isMoving;
+        private float lastDashTime, lastInteractTime;
+        /// <summary>
+        /// True if player was moving in the previous update, used to start leg swinging
+        /// </summary>
+        private bool wasMoving;
+        /// <summary>
+        /// True if player is moving in the current update, used to keep legs swinging
+        /// </summary>
+        private bool isMoving;
 
         public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + transform.forward + Vector3.up);
         public int InteractMask => interactMask;
@@ -37,27 +54,55 @@ namespace Uncooked.Player
         void Start()
         {
             controller = GetComponent<CharacterController>();
+
+            lastDashTime = -dashDuration;
         }
 
         void Update()
         {
+            HandleMovement();
+
             // Interact Input
             if (Input.GetMouseButton(0) && Time.time >= lastInteractTime + interactInterval) TryInteract();
         }
 
-        void FixedUpdate()
+        public static bool PointIsInBounds(Vector3 point)
+        {
+            var mask = LayerMask.GetMask("Ground");
+            return Physics.Raycast(point + Vector3.up, Vector3.down, 3, mask);
+        }
+
+        #region Movement
+        private void HandleMovement()
         {
             // Movement Input
             var input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
 
-            // Updates moving states
-            isMoving = input != Vector3.zero;
-            if (!isMoving)
-            {
-                wasMoving = false;
-                return;
-            }
+            if (!UpdateMovingStates(input)) return;
 
+            if (input != Vector3.zero) transform.forward = input;
+            var deltaPos = moveSpeed * transform.forward * Time.deltaTime;
+            
+            /// Updates <see cref="lastDashTime"/> if dash key was pressed
+            if (Input.GetKeyDown(KeyCode.LeftShift)) lastDashTime = Time.time;
+            /// Multiplies <see cref="deltaPos"/> if dashing
+            if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
+            
+            // Moves player
+            if (PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
+        }
+
+        /// <summary>
+        /// Updates <see cref="isMoving"/> and <see cref="wasMoving"/>
+        /// </summary>
+        /// <param name="input">Player XZ plane input</param>
+        /// <returns>True if player is moving</returns>
+        private bool UpdateMovingStates(Vector3 input)
+        {
+            // Gets current moving state
+            isMoving = input != Vector3.zero || Input.GetKeyDown(KeyCode.LeftShift) || Time.time < lastDashTime + dashDuration;
+            if (!isMoving) return wasMoving = false;
+            
             // Start swinging legs if player wasn't moving last update
             if (!wasMoving)
             {
@@ -66,18 +111,15 @@ namespace Uncooked.Player
             }
             wasMoving = isMoving;
 
-            transform.forward = input;
-
-            // Moves player
-            var deltaPos = moveSpeed * input * Time.fixedDeltaTime;
-            if (PointIsInBounds(transform.position + deltaPos))  controller.Move(deltaPos);
+            return true;
         }
 
-        public static bool PointIsInBounds(Vector3 point)
+        private float DashMultiplier()
         {
-            var mask = LayerMask.GetMask("Ground");
-            return Physics.Raycast(point + Vector3.up, Vector3.down, 3, mask);
+            /// Parabola that goes from <see cref="dashSpeedMultiplier"/> to 1 over the <see cref="dashDuration"/> seconds
+            return (dashSpeedMultiplier - 1) * (-Mathf.Pow(Mathf.InverseLerp(lastDashTime, lastDashTime + dashDuration, Time.time), 4) + 1) + 1;
         }
+        #endregion
 
         #region Interact
         private void TryInteract()
@@ -101,7 +143,6 @@ namespace Uncooked.Player
             if (pickup == null) return false;
 
             bool bothHands = pickup.IsTwoHanded();
-
             heldItem = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, strength);
             if (heldItem != null) RaiseArms(bothHands);
 
@@ -115,7 +156,7 @@ namespace Uncooked.Player
         private bool TryDrop()
         {
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
-            if (heldItem == null || isSwinging || !PointIsInBounds(coords) || !heldItem.OnTryDrop()) return false;
+            if (heldItem == null || toolSwinging != null || !PointIsInBounds(coords) || !heldItem.OnTryDrop()) return false;
 
             (heldItem as Tile).transform.parent = null;
             OnPlacePickup?.Invoke(heldItem, coords);
@@ -130,11 +171,11 @@ namespace Uncooked.Player
         /// </summary>
         private void TryUseHeldItemOn(IInteractable interactable, RaycastHit hitInfo)
         {
-            if (isSwinging) return;
+            if (toolSwinging != null) return;
 
             if (interactable.TryInteractUsing(heldItem, hitInfo))
             {
-                if (heldItem is Tool) _ = StartCoroutine(SwingTool());
+                if (heldItem is Tool) toolSwinging = StartCoroutine(SwingTool());
                 else
                 {
                     LowerArms(heldItem.IsTwoHanded());
@@ -172,15 +213,13 @@ namespace Uncooked.Player
         /// </summary>
         private IEnumerator SwingTool()
         {
-            isSwinging = true;
-
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, 0, armSwingSpeed)));
             yield return currentArmTurns[currentArmTurns.Count - 1];
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.05f);
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, -90, armTurnSpeed)));
             yield return currentArmTurns[currentArmTurns.Count - 1];
 
-            isSwinging = false;
+            toolSwinging = null;
         }
 
         /// <summary>
@@ -231,18 +270,30 @@ namespace Uncooked.Player
 
                 legL.localRotation = Quaternion.Euler(angle, 0, 0);
                 legR.localRotation = Quaternion.Euler(-angle, 0, 0);
+                if (angle < 0) // Left leg forward
+                {
+                    calfL.localRotation = Quaternion.Inverse(legL.localRotation);
+                    calfR.localRotation = legR.localRotation;
+                }
+                else if (angle > 0) // Right leg forward
+                {
+                    calfL.localRotation = legL.localRotation;
+                    calfR.localRotation = Quaternion.Inverse(legR.localRotation);
+                }
 
-                time += legTurnMultiplier * moveSpeed * legRaiseAngle;
-                yield return new WaitForFixedUpdate();
+                time += legSwingCoefficient * moveSpeed * legRaiseAngle * Time.deltaTime;
+                yield return null;
             }
 
             // Return to base position
             while (legL.localRotation != Quaternion.identity || legR.localRotation != Quaternion.identity)
             {
                 float angle = Quaternion.Angle(legL.localRotation, Quaternion.identity);
-                float maxRadians = 2 * moveSpeed * Mathf.Sqrt(angle) * Time.deltaTime;
+                float maxRadians = moveSpeed * legRaiseAngle * Mathf.Sqrt(angle) * Time.deltaTime;
                 legL.localRotation = Quaternion.RotateTowards(legL.localRotation, Quaternion.identity, maxRadians);
                 legR.localRotation = Quaternion.RotateTowards(legR.localRotation, Quaternion.identity, maxRadians);
+                calfL.localRotation = Quaternion.RotateTowards(calfL.localRotation, Quaternion.identity, maxRadians);
+                calfR.localRotation = Quaternion.RotateTowards(calfR.localRotation, Quaternion.identity, maxRadians);
 
                 yield return null;
             }
