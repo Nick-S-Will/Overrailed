@@ -44,17 +44,22 @@ namespace Uncooked.Train
             OnStartDriving?.Invoke();
 
             var target = currentRail.Path.GetChild(pathIndex);
-            var startForward = transform.forward;
+            var startForward = currentRail.InDirection;
             float startDst = (target.position - transform.position).magnitude;
 
-            // TODO: Make car instantly update if track gets bent
+            // TODO: Make car instantly update if track gets bent or straightened
             while (currentRail)
             {
                 while (transform.position == target.position)
                 {
                     pathIndex += pathDir;
-                    if (pathIndex == currentRail.Path.childCount / 2 + 1 && currentRail.IsFinalCheckpoint) 
+
+                    // At middle of final checkpoint rail
+                    if (currentRail.IsFinalCheckpoint && pathIndex == currentRail.Path.childCount / 2 + 1)
+                    {
                         GameManager.instance.ReachCheckpoint();
+                    }
+                    // Reached end of rail
                     else if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
                     {
                         var nextRail = currentRail.TryGetNextPoweredRail();
@@ -65,8 +70,9 @@ namespace Uncooked.Train
                         }
                         else UpdateRail(nextRail);
                     }
+
                     target = currentRail.Path.GetChild(pathIndex);
-                    startForward = transform.forward;
+                    startForward = currentRail.InDirection;
                     startDst = (target.position - transform.position).magnitude;
                 }
 
@@ -85,7 +91,7 @@ namespace Uncooked.Train
         }
 
         /// <summary>
-        /// Picks up this car
+        /// Picks up this car if in edit mode
         /// </summary>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
@@ -144,6 +150,7 @@ namespace Uncooked.Train
             if (carB && !carB.burningParticles && carB.currentRail) _ = StartCoroutine(carB.Ignite());
         }
 
+        // TODO: Clean up how these work
         /// <summary>
         /// Places this train car on given rail tile
         /// </summary>
@@ -159,7 +166,6 @@ namespace Uncooked.Train
             var dir = pathDir * rail.Path.GetChild(pathIndex).forward;
             if (connectCheck && !TryGetAdjacentCar(pos, dir)) return false;
 
-            transform.parent = rail.transform;
             transform.position = pos;
             transform.forward = dir;
 
@@ -169,13 +175,12 @@ namespace Uncooked.Train
         }
 
         /// <summary>
-        /// Updates previous rail and <paramref name="newRail"/>'s carCount variables, then sets train car's pathIndex and pathDir
+        /// Updates <paramref name="newRail"/>'s last passenger variable, then sets train car's pathIndex and pathDir
         /// </summary>
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
             newRail.NewPassenger(this);
-
             currentRail = newRail;
 
             if (newRail.IsStraight)
@@ -190,6 +195,8 @@ namespace Uncooked.Train
                 pathIndex = turnsRight ? newRail.Path.childCount - 1 : 0;
                 pathDir = turnsRight ? -1 : 1;
             }
+
+            transform.parent = newRail.transform;
         }
 
         /// <summary>

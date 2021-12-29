@@ -23,7 +23,9 @@ namespace Uncooked.Terrain.Tiles
         private Vector3Int inDirection = Vector3Int.zero, outDirection = Vector3Int.zero;
         private int connectionCount;
 
-        public Transform Path => straightMesh.gameObject.activeSelf ? straightPathParent : bentPathParent;
+        public Transform Path => IsStraight ? straightPathParent : bentPathParent;
+        public Vector3Int InDirection => inDirection;
+        public Vector3Int OutDirection => outDirection;
         public bool IsStraight => straightMesh.activeSelf;
         public bool IsPowered => connectionCount > 0;
         public bool IsCheckpoint => isCheckpoint;
@@ -79,8 +81,8 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (startsPowered || isCheckpoint || GameManager.instance.TrainIsSpeed) return null;
-            else if (lastPassenger) return lastPassenger.TryPickUp(parent, amount);
+            if (lastPassenger) return lastPassenger.TryPickUp(parent, amount);
+            else if (startsPowered || isCheckpoint || GameManager.instance.TrainIsSpeeding) return null;
             else if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
 
             return base.TryPickUp(parent, amount);
@@ -167,7 +169,7 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>Adjacent RailTile if there is one that matches criteria, otherwise null</returns>
         private RailTile TryFindRail(Vector3 direction, int layerMask)
         {
-            if (Physics.Raycast(transform.position, direction.normalized, out RaycastHit hitInfo, 1, layerMask)) return hitInfo.transform.GetComponent<RailTile>();
+            if (Physics.Raycast(transform.position, direction, out RaycastHit hitInfo, 1, layerMask)) return hitInfo.transform.GetComponent<RailTile>();
             return null;
         }
         #endregion
@@ -270,6 +272,18 @@ namespace Uncooked.Terrain.Tiles
             GameManager.MoveToLayer(transform, connectionCount > 0 ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default"));
         }
         #endregion
+
+        /// <summary>
+        /// Calculates the linear distance of the path
+        /// </summary>
+        /// <returns>The linear distance of the path</returns>
+        public float GetPathLength()
+        {
+            float length = 0;
+            for (int i = 0; i < Path.childCount - 1; i++) length += Vector3.Distance(Path.GetChild(i).position, Path.GetChild(i + 1).position);
+
+            return length;
+        }
 
         /// <summary>
         /// Jank way to determines which way the given bent rail turn

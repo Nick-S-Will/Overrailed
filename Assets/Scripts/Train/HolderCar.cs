@@ -12,6 +12,7 @@ namespace Uncooked.Train
         [SerializeField] private Transform holderSpawnPoint;
 
         public Transform SpawnPoint => holderSpawnPoint;
+        // TODO: Be able to pickup rails while crafting
         public bool CanPickup => holderSpawnPoint.childCount == 1 && holderSpawnPoint.GetChild(0).GetComponent<BoxCollider>().enabled;
 
         public override IPickupable TryPickUp(Transform parent, int amount)

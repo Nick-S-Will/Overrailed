@@ -1,0 +1,10 @@
+﻿[*.{cs,vb}]
+
+# IDE0044: Add readonly modifier
+dotnet_diagnostic.IDE0044.severity = none
+
+# CS0649: Field 'BoilerCar.liquid' is never assigned to, and will always have its default value null
+dotnet_diagnostic.CS0649.severity = none
+
+# IDE0051: Remove unused private members
+dotnet_diagnostic.IDE0051.severity = none

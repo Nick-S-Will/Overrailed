@@ -11,11 +11,23 @@ namespace Uncooked.Terrain.Tiles
         override protected void Start()
         {
             GameManager.instance.OnCheckpoint += ReachCheckpoint;
+            GameManager.instance.OnEndCheckpoint += EndCheckpoint;
         }
 
         protected virtual void ReachCheckpoint()
         {
             gameObject.SetActive(false);
+        }
+
+        protected virtual void EndCheckpoint() { }
+
+        protected virtual void OnDestroy()
+        {
+            if (GameManager.instance)
+            {
+                GameManager.instance.OnCheckpoint -= ReachCheckpoint;
+                GameManager.instance.OnEndCheckpoint -= EndCheckpoint;
+            }
         }
     }
 }

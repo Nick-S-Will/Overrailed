@@ -11,15 +11,17 @@ namespace Uncooked.Managers
     {
         public event System.Action OnCheckpoint, OnEndCheckpoint;
 
+        [SerializeField] private LayerMask interactMask;
         [SerializeField] [Min(0)] private float baseTrainSpeed = 0.05f, trainSpeedIncrement = 0.05f, speedUpMultiplier = 2, trainInitialDelay = 8;
         [SerializeField] private bool isEditing, isPaused;
         [Header("Buttons")]
         [SerializeField] private TriggerButton checkpointContinueButton;
 
+        public LayerMask InteractMask => interactMask;
         public float TrainSpeed => trainSpeed;
         public bool IsEditing => isEditing;
         public bool IsPaused => isPaused || isEditing;
-        public bool TrainIsSpeed => trainSpeed - (baseTrainSpeed + trainSpeedIncrement * checkpointCount) > 0.0001f; // > operator is inconsistent
+        public bool TrainIsSpeeding => trainSpeed - (baseTrainSpeed + trainSpeedIncrement * checkpointCount) > 0.0001f; // > operator is inconsistent
 
         private TrainCar[] cars;
         private float trainSpeed;
@@ -97,7 +99,9 @@ namespace Uncooked.Managers
 
         public static void MoveToLayer(Transform root, int layer)
         {
+#pragma warning disable IDE0090 // Use 'new(...)'
             Stack<Transform> moveTargets = new Stack<Transform>();
+#pragma warning restore IDE0090 // Use 'new(...)'
             moveTargets.Push(root);
 
             Transform currentTarget;
@@ -112,8 +116,9 @@ namespace Uncooked.Managers
 
         private void OnDestroy()
         {
-            checkpointContinueButton.OnClick -= ContinueFromCheckpoint;
             instance = null;
+            
+            checkpointContinueButton.OnClick -= ContinueFromCheckpoint;
         }
     }
 }

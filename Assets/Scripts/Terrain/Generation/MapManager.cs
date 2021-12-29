@@ -11,6 +11,8 @@ namespace Uncooked.Terrain.Generation
 {
     public class MapManager : MonoBehaviour
     {
+        public event System.Action<string> OnGenerate;
+
         #region Inspector Variables
         [Header("Generation")] [SerializeField] private int seed = 0;
         [SerializeField] [Min(1)] private float noiseScale = 10;
@@ -34,15 +36,14 @@ namespace Uncooked.Terrain.Generation
         [SerializeField] private Vector3 spawnDelta = 10 * Vector3.up;
         [SerializeField] [Min(1)] private float spawnSpeed = 100;
         [SerializeField] [Min(0)] private float spawnTimeOffset = 0.2f;
+        #endregion
 
         [SerializeField] [HideInInspector] private List<Transform> chunks = new List<Transform>();
         [SerializeField] [HideInInspector] private Transform groundParent, groundCollider, obstacleParent;
         [SerializeField] [HideInInspector] private Vector3Int stationPos;
         [SerializeField] [HideInInspector] private System.Random rng;
-        #endregion
 
-        private PlayerController player;
-        private Transform lastHighlightTile;
+        private List<Transform> newHighlights = new List<Transform>(), highlights = new List<Transform>();
 
         public Vector3 StartPoint => stationPos;
 
@@ -52,33 +53,36 @@ namespace Uncooked.Terrain.Generation
             GameManager.instance.OnCheckpoint += DisableObstacles; // Must be after AddChunk
             GameManager.instance.OnEndCheckpoint += EnableObstacles;
             GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
-            foreach (var p in FindObjectsOfType<PlayerController>()) p.OnPlacePickup += PlacePickup;
 
-            HUDManager.instance.UpdateSeedText(seed.ToString());
-            player = FindObjectOfType<PlayerController>();
+            OnGenerate?.Invoke(seed.ToString());
             rng = new System.Random(seed);
         }
 
-        void Update()
+        void LateUpdate()
         {
-            // Highlights tile player is looking at
-            var tile = GetTileAt(player.LookPoint);
-            if (tile == null) tile = GetTileAt(player.LookPoint + Vector3Int.down);
-            TryHighlightTile(tile);
+            // Removes highlights on tiles that are no longer selected
+            foreach (var tile in highlights.ToArray())
+                if (!newHighlights.Contains(tile))
+                    highlights.Remove(tile);
+            
+            // Adds highlight to newly selected tiles
+            foreach (var tile in newHighlights)
+            {
+                if (!highlights.Contains(tile))
+                {
+                    highlights.Add(tile);
+                    _ = StartCoroutine(HightlightTile(tile));
+                }
+            }
+
+            newHighlights.Clear();
         }
 
         #region Tile highlighting
-        private void TryHighlightTile(Transform tile)
+        public void TryHighlightTile(Transform tile)
         {
-            if (tile == lastHighlightTile) return;
-            else if (tile == null)
-            {
-                lastHighlightTile = null;
-                return;
-            }
-
-            lastHighlightTile = tile;
-            _ = StartCoroutine(HightlightTile(tile));
+            if (newHighlights.Contains(tile)) return;
+            else if (tile) newHighlights.Add(tile);
         }
 
         /// <summary>
@@ -96,7 +100,7 @@ namespace Uncooked.Terrain.Generation
                 renderers[i].material.color = 0.5f * (originalColors[i] + highlightColor);
             }
 
-            yield return new WaitWhile(() => tile == lastHighlightTile);
+            yield return new WaitWhile(() => highlights.Contains(tile));
 
             // Reset colors
             for (int i = 0; i < renderers.Length; i++)
@@ -127,7 +131,7 @@ namespace Uncooked.Terrain.Generation
         /// </summary>
         public void AddChunk()
         {
-            if (Application.isPlaying) HUDManager.instance.UpdateSeedText(seed.ToString());
+            if (Application.isPlaying) OnGenerate?.Invoke(seed.ToString());
             var heightMap = GenerateHeightMap();
 
             var newChunk = new GameObject("Chunk " + chunks.Count).transform;
@@ -156,7 +160,7 @@ namespace Uncooked.Terrain.Generation
                 groundCollider.gameObject.layer = LayerMask.NameToLayer("Ground");
                 groundCollider.gameObject.AddComponent<BoxCollider>();
             }
-            groundCollider.gameObject.GetComponent<BoxCollider>().size = new Vector3(mapLength, 1, mapWidth);
+            groundCollider.GetComponent<BoxCollider>().size = new Vector3(mapLength, 1, mapWidth);
             groundCollider.position = new Vector3(mapLength / 2f - 0.5f, transform.position.y - 0.5f, mapWidth / 2f - 0.5f);
 
             // Obstacle tiles
@@ -171,6 +175,15 @@ namespace Uncooked.Terrain.Generation
             newChunk.parent = transform;
         }
 
+        /// <summary>
+        /// Generates the ground or obstacles of a chunk
+        /// </summary>
+        /// <param name="heightMap">Height info to differentiate sections of the map</param>
+        /// <param name="biome">Gradient that determines which tile corresponds to which height on the <paramref name="heightMap"/></param>
+        /// <param name="parent">Object the rows of the chunk are parented to</param>
+        /// <param name="station">Bounds where the station resides if there is one in the chunk</param>
+        /// <param name="checkpoint">Bounds where the checkpoint of the chunk resides</param>
+        /// <param name="isGround">True if the desired section is ground tiles</param>
         private void GenerateSection(float[,] heightMap, Biome biome, Transform parent, BoundsInt station, BoundsInt checkpoint, bool isGround)
         {
             int mapLength = chunks.Count * chunkLength;
@@ -244,7 +257,7 @@ namespace Uncooked.Terrain.Generation
         /// <returns>The transform of the tile at <paramref name="pos"/> if there is one, otherwise null</returns>
         public Transform GetTileAt(Vector3Int pos)
         {
-            if (!PlayerController.PointIsInBounds(pos)) return null;
+            if (!PointIsInBounds(pos)) return null;
 
             if (pos.y == transform.position.y)
             {
@@ -253,7 +266,7 @@ namespace Uncooked.Terrain.Generation
             }
             else
             {
-                _ = Physics.Raycast(new Vector3(pos.x, transform.position.y - 0.5f, pos.z), Vector3.up, out RaycastHit hitData, 1, player.InteractMask);
+                _ = Physics.Raycast(new Vector3(pos.x, transform.position.y - 0.5f, pos.z), Vector3.up, out RaycastHit hitData, 1, GameManager.instance.InteractMask);
 
                 return hitData.transform;
             }
@@ -284,6 +297,16 @@ namespace Uncooked.Terrain.Generation
 
             obj.GetComponent<BoxCollider>().enabled = true;
             pickup.Drop(coords);
+        }
+
+        public bool PointIsInBounds(Vector3 point)
+        {
+            var groundCollider = transform.GetChild(0);
+            var center = groundCollider.position;
+            var size = groundCollider.GetComponent<BoxCollider>().size;
+            var bounds = new Bounds(new Vector3(center.x, 1, center.z), new Vector3(size.x, 3, size.z));
+
+            return bounds.Contains(point);
         }
 
         private void DisableObstacles() => SetObstacleHitboxes(false);
@@ -381,7 +404,6 @@ namespace Uncooked.Terrain.Generation
             GameManager.instance.OnCheckpoint -= DisableObstacles;
             GameManager.instance.OnEndCheckpoint -= EnableObstacles;
             GameManager.instance.OnEndCheckpoint -= AnimateNewChunk;
-            foreach (var p in FindObjectsOfType<PlayerController>()) p.OnPlacePickup -= PlacePickup;
         }
     }
 }

@@ -2,17 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Managers;
+using Uncooked.Terrain.Generation;
 using Uncooked.Terrain.Tools;
 using Uncooked.Terrain.Tiles;
+using Uncooked.Train;
 
 namespace Uncooked.Player
 {
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour
     {
-        public event System.Action<IPickupable, Vector3Int> OnPlacePickup;
-
         #region Inspector Variables
+        [SerializeField] private MapManager map;
+
+        [Header("Controls")]
+        [SerializeField] private KeyCode forwards = KeyCode.W;
+        [SerializeField] private KeyCode backwards = KeyCode.S, left = KeyCode.A, right = KeyCode.D;
+
         [Header("Walk")]
         [SerializeField] private float moveSpeed = 5;
         [SerializeField] private float legSwingCoefficient = 0.1f, legRaiseAngle = 45;
@@ -28,7 +35,6 @@ namespace Uncooked.Player
         [Header("Interact")]
         [SerializeField] private float interactInterval = 0.5f;
         [SerializeField] private int strength = 1;
-        [SerializeField] private LayerMask interactMask;
 
         [Header("Transforms")] [SerializeField] private Transform armL;
         [SerializeField] private Transform armR, legL, legR, calfL, calfR, toolHolder, pickupHolder;
@@ -49,7 +55,6 @@ namespace Uncooked.Player
         private bool isMoving;
 
         public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + transform.forward + Vector3.up);
-        public int InteractMask => interactMask;
 
         void Start()
         {
@@ -64,19 +69,20 @@ namespace Uncooked.Player
 
             // Interact Input
             if (Input.GetMouseButton(0) && Time.time >= lastInteractTime + interactInterval) TryInteract();
-        }
 
-        public static bool PointIsInBounds(Vector3 point)
-        {
-            var mask = LayerMask.GetMask("Ground");
-            return Physics.Raycast(point + Vector3.up, Vector3.down, 3, mask);
+            // Tile highlight
+            var tile = map.GetTileAt(LookPoint);
+            if (tile == null) tile = map.GetTileAt(LookPoint + Vector3Int.down);
+            map.TryHighlightTile(tile);
         }
 
         #region Movement
         private void HandleMovement()
         {
             // Movement Input
-            var input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")).normalized;
+            var hori = (Input.GetKey(left) ? -1 : 0) + (Input.GetKey(right) ? 1 : 0);
+            var vert = (Input.GetKey(forwards) ? 1 : 0) + (Input.GetKey(backwards) ? -1 : 0);
+            var input = new Vector3(hori, 0, vert).normalized;
 
             if (!UpdateMovingStates(input)) return;
 
@@ -89,7 +95,7 @@ namespace Uncooked.Player
             if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
             
             // Moves player
-            if (PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
+            if (map.PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
         }
 
         /// <summary>
@@ -126,7 +132,7 @@ namespace Uncooked.Player
         {
             lastInteractTime = Time.time;
 
-            if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hitData, 1, interactMask))
+            if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hitData, 1, GameManager.instance.InteractMask))
             {
                 if (heldItem == null) TryToPickUp(hitData.transform.GetComponent<IPickupable>());
                 else TryUseHeldItemOn(hitData.transform.GetComponent<IInteractable>(), hitData);
@@ -156,10 +162,10 @@ namespace Uncooked.Player
         private bool TryDrop()
         {
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
-            if (heldItem == null || toolSwinging != null || !PointIsInBounds(coords) || !heldItem.OnTryDrop()) return false;
+            if (heldItem == null || toolSwinging != null || !map.PointIsInBounds(coords) || !heldItem.OnTryDrop()) return false;
 
             (heldItem as Tile).transform.parent = null;
-            OnPlacePickup?.Invoke(heldItem, coords);
+            map.PlacePickup(heldItem, coords);
             LowerArms(heldItem.IsTwoHanded());
             heldItem = null;
 

@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+using Uncooked.Terrain.Generation;
 using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Managers
 {
     public class HUDManager : MonoBehaviour
     {
-        [Space]
+        [SerializeField] private MapManager map;
+        [Header("Tools")]
         [SerializeField] private GameObject toolHUDPrefab;
         [SerializeField] [Range(0, 1)] private float warningScreenPercentage = 0.1f;
         [SerializeField] private ToolHUD[] tools;
@@ -28,6 +30,8 @@ namespace Uncooked.Managers
         {
             if (instance == null) instance = this;
             else Debug.LogError("Multiple HUDManagers Exist");
+
+            map.OnGenerate += UpdateSeedText;
 
             seedStartLength = seedText.text.Length;
             speedStartLength = speedText.text.Length;
@@ -126,6 +130,8 @@ namespace Uncooked.Managers
         private void OnDestroy()
         {
             instance = null;
+
+            map.OnGenerate -= UpdateSeedText;
         }
 
         [System.Serializable]
