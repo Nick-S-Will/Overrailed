@@ -74,7 +74,7 @@ namespace Uncooked.Managers
         {
             isEditing = true;
             checkpointCount++;
-            CameraManager.instance.TransitionEditMode(true);
+            CameraManager.instance.TransitionEditMode();
             HUDManager.instance.isUpdating = false;
 
             Vector3 pos = checkpointContinueButton.transform.position;
@@ -88,7 +88,7 @@ namespace Uncooked.Managers
         {
             isEditing = false;
             trainSpeed = baseTrainSpeed + trainSpeedIncrement * checkpointCount;
-            CameraManager.instance.TransitionEditMode(false);
+            CameraManager.instance.TransitionGameMode();
             HUDManager.instance.UpdateSpeedText(trainSpeed.ToString());
             HUDManager.instance.isUpdating = true;
 
@@ -99,9 +99,7 @@ namespace Uncooked.Managers
 
         public static void MoveToLayer(Transform root, int layer)
         {
-#pragma warning disable IDE0090 // Use 'new(...)'
             Stack<Transform> moveTargets = new Stack<Transform>();
-#pragma warning restore IDE0090 // Use 'new(...)'
             moveTargets.Push(root);
 
             Transform currentTarget;

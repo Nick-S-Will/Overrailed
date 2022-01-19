@@ -177,7 +177,7 @@ namespace Uncooked.Player
         /// </summary>
         private void TryUseHeldItemOn(IInteractable interactable, RaycastHit hitInfo)
         {
-            if (toolSwinging != null) return;
+            if (toolSwinging != null || interactable == null) return;
 
             if (interactable.TryInteractUsing(heldItem, hitInfo))
             {

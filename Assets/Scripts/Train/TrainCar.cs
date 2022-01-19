@@ -44,7 +44,7 @@ namespace Uncooked.Train
             OnStartDriving?.Invoke();
 
             var target = currentRail.Path.GetChild(pathIndex);
-            var startForward = currentRail.InDirection;
+            var startForward = target.forward;
             float startDst = (target.position - transform.position).magnitude;
 
             // TODO: Make car instantly update if track gets bent or straightened
@@ -71,8 +71,8 @@ namespace Uncooked.Train
                         else UpdateRail(nextRail);
                     }
 
+                    startForward = pathDir * target.forward;
                     target = currentRail.Path.GetChild(pathIndex);
-                    startForward = currentRail.InDirection;
                     startDst = (target.position - transform.position).magnitude;
                 }
 

@@ -306,8 +306,6 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The forward direction for the bent rail with these in and out directions</returns>
         private static Vector3Int InOutToForward(Vector3Int inDir, Vector3Int outDir)
         {
-            bool leftTurn = Vector3.Cross(inDir, outDir).y > 0;
-
             if ((inDir == Vector3Int.left && outDir == Vector3Int.back) ||          // (-1, -1)
                 (inDir == Vector3Int.forward && outDir == Vector3Int.right))        // (1, 1)
                 return Vector3Int.right;

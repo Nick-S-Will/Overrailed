@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 using Uncooked.Train;
 
@@ -11,6 +13,11 @@ namespace Uncooked.Managers
         [Header("Cameras")]
         [SerializeField] private Camera mainCamera;
         [SerializeField] private Camera editCamera;
+        [Header("Transition")]
+        [SerializeField] private RenderTexture fadeRenderTexture;
+        [SerializeField] private RawImage fadeMask;
+        [SerializeField] private Vector2 endSize;
+        [SerializeField] private float fadeDuration;
 
         private List<Locomotive> followPoints;
         private float startOffsetX;
@@ -54,16 +61,39 @@ namespace Uncooked.Managers
             }
         }
 
-        /// <summary>
-        /// Transitions to or from edit mode
-        /// </summary>
-        /// <param name="editMode">True for edit mode view, false for normal view</param>
-        public void TransitionEditMode(bool editMode)
+        private static async void TransitionWipe(Camera startCam, Camera endCam, RenderTexture fadeTexture, RawImage fadeShape, Vector2 shapeEndSize, float duration)
         {
-            // TODO: Make transition smooth
-            mainCamera.enabled = !editMode;
-            editCamera.enabled = editMode;
+            if (!startCam.enabled) throw new System.Exception("Start camera not enabled");
+            if (endCam.enabled) throw new System.Exception("End camera already enabled");
+
+            // Starts rendering final texture
+            endCam.targetTexture = fadeTexture;
+            endCam.enabled = true;
+            // Starts displaying final texture
+            fadeShape.rectTransform.sizeDelta = Vector2.one;
+            fadeShape.gameObject.SetActive(true);
+
+            // Grow the part of final texture that is visible
+            float completion = 0;
+            while (completion < 1)
+            {
+                fadeShape.rectTransform.sizeDelta = Vector2.Lerp(Vector2.one, shapeEndSize, completion);
+                completion += Time.deltaTime / duration;
+                await Task.Yield();
+            }
+
+            // Transfer active cam to end cam
+            endCam.targetTexture = null;
+            startCam.enabled = false;
+            // Hide final texture
+            fadeShape.gameObject.SetActive(false);
+
+            fadeTexture.Release();
         }
+
+        private void TransitionWipe(Camera startCam, Camera endCam) => TransitionWipe(startCam, endCam, fadeRenderTexture, fadeMask, endSize, fadeDuration);
+        public void TransitionEditMode() => TransitionWipe(mainCamera, editCamera);
+        public void TransitionGameMode() => TransitionWipe(editCamera, mainCamera);
 
         /// <summary>
         /// Calculates the averages transform.position.x in followPoints (field)
