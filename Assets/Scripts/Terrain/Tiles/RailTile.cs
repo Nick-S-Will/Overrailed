@@ -115,12 +115,12 @@ namespace Uncooked.Terrain.Tiles
 
             RailTile connectableRail = null;
             Vector3 dir = Vector3.forward;
-
-            // Looks for adjacent powered rail to connect to
+            // Looks for adjacent rails that are powered to connect to
             for (int i = 0; i < 4; i++)
             {
                 var rail = TryGetAdjacentRail(dir, true);
-                if (rail && rail.connectionCount < 2)
+                // rail found, has a connection available, has no passenger, rail already pointing at this
+                if (rail && rail.connectionCount < 2 && (rail.lastPassenger == null || rail.outDirection == (transform.position - rail.transform.position)))
                 {
                     connectableRail = rail;
                     break;
@@ -272,18 +272,6 @@ namespace Uncooked.Terrain.Tiles
             GameManager.MoveToLayer(transform, connectionCount > 0 ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default"));
         }
         #endregion
-
-        /// <summary>
-        /// Calculates the linear distance of the path
-        /// </summary>
-        /// <returns>The linear distance of the path</returns>
-        public float GetPathLength()
-        {
-            float length = 0;
-            for (int i = 0; i < Path.childCount - 1; i++) length += Vector3.Distance(Path.GetChild(i).position, Path.GetChild(i + 1).position);
-
-            return length;
-        }
 
         /// <summary>
         /// Jank way to determines which way the given bent rail turn

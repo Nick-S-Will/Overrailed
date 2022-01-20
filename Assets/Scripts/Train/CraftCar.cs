@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +10,6 @@ namespace Uncooked.Train
     public class CraftCar : TrainCar
     {
         [Space]
-        [SerializeField] [Min(0.05f)] private float craftSpeed = 0.25f;
         [SerializeField] private HolderCar craftResultHolder;
         [SerializeField] private StackTile craftResultPrefab;
         [SerializeField] private StackPoint[] craftPoints;
@@ -26,9 +26,15 @@ namespace Uncooked.Train
             }
         }
 
-        protected IEnumerator Craft()
+        protected async void TryCraft()
+        {
+            while (CanCraft) await Craft();
+        }
+
+        protected async Task Craft()
         {
             isCrafting = true;
+            craftResultHolder.AddPartTile();
 
             // Variables for crafting animation
             var craftResult = Instantiate(craftResultPrefab);
@@ -38,8 +44,6 @@ namespace Uncooked.Train
 
             // Disable craft's hitboxes
             craftResult.GetComponent<BoxCollider>().enabled = false;
-            if (craftResultHolder.SpawnPoint.childCount == 1)
-                craftResultHolder.SpawnPoint.GetChild(0).GetComponent<BoxCollider>().enabled = false;
 
             // Parent craftResult to stack if there is one, otherwise parent it to craft spawnpoint
             if (craftResultHolder.SpawnPoint.childCount == 0) ParentAToB(craftResult.transform, craftResultHolder.SpawnPoint);
@@ -53,8 +57,9 @@ namespace Uncooked.Train
             while (percent < 1)
             {
                 float oldPercent = percent;
-                percent += craftSpeed * tier * Time.deltaTime;
+                percent += 0.25f * tier * Time.deltaTime;
 
+                // Disables ingredient meshes
                 int onCount;
                 foreach (var renderers in ingredientMeshes)
                 {
@@ -63,13 +68,14 @@ namespace Uncooked.Train
                     if (onCount - (int)(oldPercent * renderers.Length) == 1) renderers[onCount - 1].enabled = false;
                 }
 
+                // Enables result meshes
                 onCount = (int)(percent * craftMeshes.Length);
                 if (onCount - (int)(oldPercent * craftMeshes.Length) == 1) craftMeshes[onCount - 1].enabled = true;
 
-                yield return null;
+                await Task.Yield();
             }
 
-            // Destroy top object of craftoint stacks
+            // Destroy top object of craft point stacks
             foreach (var cp in craftPoints)
             {
                 var newStackTop = cp.stackTop.PrevInStack;
@@ -77,13 +83,10 @@ namespace Uncooked.Train
                 cp.stackTop = newStackTop;
             }
 
-            // Re-enable hitbox for HolderCar.CanPickup
-            craftResultHolder.SpawnPoint.GetChild(0).GetComponent<BoxCollider>().enabled = true;
+            craftResultHolder.AddPartTile();
             isCrafting = false;
 
-            // See if another can be crafted
-            yield return null; // Required for destroy cleanup
-            if (CanCraft) _ = StartCoroutine(Craft());
+            await Task.Yield(); // Required for destroy cleanup
         }
 
         public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
@@ -110,13 +113,12 @@ namespace Uncooked.Train
             // Add stack to point
             ParentAToB(stack.transform, craftPoint.Transform);
 
-            // Stack point's previous stack on given stack
+            // Stack point's previous stack on given stack. Must be added beneath for when new tiles are added during craft, the top one is always the one being used
             if (craftPoint.Transform.childCount == 2)
                 craftPoint.Transform.GetChild(0).GetComponent<StackTile>().TryStackOn(stack);
             else craftPoint.stackTop = stack.GetStackTop();
 
-            // Try start crafting
-            if (CanCraft) _ = StartCoroutine(Craft());
+            TryCraft();
 
             return true;
         }

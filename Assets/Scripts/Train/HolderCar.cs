@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Managers;
 using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Train
@@ -12,20 +13,39 @@ namespace Uncooked.Train
         [SerializeField] private Transform holderSpawnPoint;
 
         public Transform SpawnPoint => holderSpawnPoint;
-        // TODO: Be able to pickup rails while crafting
-        public bool CanPickup => holderSpawnPoint.childCount == 1 && holderSpawnPoint.GetChild(0).GetComponent<BoxCollider>().enabled;
+
+        /// <summary>
+        /// Adds 0.5 to the holder car's count of tiles which represent the beginning and end of a craft
+        /// </summary>
+        public void AddPartTile() => holdCount += 0.5f;
+
+        private float holdCount;
 
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (CanPickup) return TryPickupCraft(parent, amount);
-            else return base.TryPickUp(parent, amount);
+            if (GameManager.instance.IsEditing) return base.TryPickUp(parent, amount);
+            else return TryPickupCraft(parent, amount);
         }
 
         private StackTile TryPickupCraft(Transform parent, int amount)
         {
-            if (holderSpawnPoint.childCount == 0) return null;
+            if (holdCount < 1) return null;
 
-            return (StackTile)holderSpawnPoint.GetChild(0).GetComponent<StackTile>().TryPickUp(parent, amount);
+            // Gets whole stack
+            var holdersContent = (StackTile)holderSpawnPoint.GetChild(0).GetComponent<StackTile>().TryPickUp(parent, int.MaxValue);
+
+            // Puts back extra if there's too much to pick up
+            if (amount < holdCount || holdCount % 1 != 0)
+            {
+                int extraCount = Mathf.Max(Mathf.CeilToInt(holdCount) - amount, 1);
+
+                var extraStack = (StackTile)holdersContent.TryPickUp(holderSpawnPoint, extraCount);
+                extraStack.transform.localPosition = Vector3.zero;
+            }
+
+            holdCount = Mathf.Max(holdCount - amount, holdCount % 1);
+
+            return holdersContent;
         }
     }
 }

@@ -21972,7 +21972,7 @@ Transform:
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.6999999}
   m_Children: []
   m_Father: {fileID: 1158812499}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!23 &607294529
 MeshRenderer:
@@ -37548,7 +37548,7 @@ Transform:
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.6999999}
   m_Children: []
   m_Father: {fileID: 1158812499}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!23 &1018844078
 MeshRenderer:
@@ -42667,10 +42667,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 1782577040}
-  - {fileID: 1797430414}
-  - {fileID: 1018844077}
   - {fileID: 607294528}
+  - {fileID: 1018844077}
+  - {fileID: 1797430414}
+  - {fileID: 1782577040}
   m_Father: {fileID: 1667100725}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -58393,7 +58393,6 @@ MonoBehaviour:
   startRail: {fileID: 0}
   tier: 1
   isPermeable: 0
-  craftSpeed: 0.25
   craftResultHolder: {fileID: 0}
   craftResultPrefab: {fileID: 0}
   craftPoints: []
@@ -65082,7 +65081,7 @@ Transform:
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.7}
   m_Children: []
   m_Father: {fileID: 1158812499}
-  m_RootOrder: 0
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1782577041
 MeshRenderer:
@@ -65649,7 +65648,7 @@ Transform:
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.7}
   m_Children: []
   m_Father: {fileID: 1158812499}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1797430415
 MeshRenderer:
@@ -72823,7 +72822,6 @@ MonoBehaviour:
   startRail: {fileID: 1816606108}
   tier: 1
   isPermeable: 0
-  craftSpeed: 0.25
   craftResultHolder: {fileID: 757196616}
   craftResultPrefab: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
   craftPoints:

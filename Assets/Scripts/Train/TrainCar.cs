@@ -47,7 +47,6 @@ namespace Uncooked.Train
             var startForward = target.forward;
             float startDst = (target.position - transform.position).magnitude;
 
-            // TODO: Make car instantly update if track gets bent or straightened
             while (currentRail)
             {
                 while (transform.position == target.position)
@@ -164,7 +163,7 @@ namespace Uncooked.Train
 
             var pos = rail.Path.GetChild(pathIndex).position;
             var dir = pathDir * rail.Path.GetChild(pathIndex).forward;
-            if (connectCheck && !TryGetAdjacentCar(pos, dir)) return false;
+            if (connectCheck && !TryGetAdjacentCar(pos, rail.OutDirection)) return false;
 
             transform.position = pos;
             transform.forward = dir;
@@ -200,7 +199,7 @@ namespace Uncooked.Train
         }
 
         /// <summary>
-        /// Gets TrainCar in the given direction from the given point
+        /// Looks for TrainCar in the given direction from the given point
         /// </summary>
         /// <param name="point">Point from where the raycast is sent</param>
         /// <param name="direction">Direction where the raycast is sent to</param>

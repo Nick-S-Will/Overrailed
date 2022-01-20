@@ -269,6 +269,7 @@ namespace Uncooked.Player
         {
             float time = 0;
 
+            // TODO: swing arms too
             // Swing legs back and forth
             while (isMoving)
             {

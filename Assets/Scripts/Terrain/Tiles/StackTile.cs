@@ -107,13 +107,11 @@ namespace Uncooked.Terrain.Tiles
             if (!stackBase.prevInStack) stackBase.GetComponent<BoxCollider>().isTrigger = false;
 
             // Get top of stack
-            StackTile top = stackBase;
-            while (top.nextInStack) top = top.nextInStack;
+            StackTile top = stackBase.GetStackTop();
 
             // Place and orient this on stack
             prevInStack = top;
             top.nextInStack = this;
-            // stackIndex = (top.stackIndex + 1);
             transform.parent = top.transform;
             transform.localPosition = top.tileHeight * Vector3.up;
             transform.rotation = stackBase.transform.parent.rotation;
