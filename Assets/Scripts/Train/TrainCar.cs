@@ -26,6 +26,7 @@ namespace Uncooked.Train
         protected RailTile currentRail;
         private int pathIndex, pathDir;
 
+        public int Tier => tier;
         public bool HasRail => currentRail;
         public bool IsTwoHanded() => true;
 
@@ -92,6 +93,7 @@ namespace Uncooked.Train
         /// <summary>
         /// Picks up this car if in edit mode
         /// </summary>
+        /// <returns>This train car if in edit mode, otherwise null</returns>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
             if (!GameManager.instance.IsEditing) return null;

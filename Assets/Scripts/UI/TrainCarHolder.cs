@@ -9,18 +9,25 @@ namespace Uncooked.UI
     public class TrainCarHolder : MonoBehaviour, IInteractable, IPickupable
     {
         private TrainCar heldCar;
-        
+
         public bool IsTwoHanded() => heldCar ? heldCar.IsTwoHanded() : false;
         public bool IsHolding => heldCar && heldCar.transform.parent == transform;
+
 
         public IPickupable TryPickUp(Transform parent, int amount)
         {
             if (IsHolding)
             {
-                heldCar.GetComponent<BoxCollider>().enabled = true;
-                return heldCar.TryPickUp(parent, 1);
+                var car = heldCar.TryPickUp(parent, 1) as TrainCar;
+                if (car != null && TrainCarStore.Coins >= car.Tier)
+                {
+                    heldCar.GetComponent<BoxCollider>().enabled = true;
+                    TrainCarStore.Coins -= car.Tier;
+                    return car;
+                }
             }
-            else return null; 
+
+            return null;
         }
 
         public bool OnTryDrop() => false;
@@ -29,13 +36,22 @@ namespace Uncooked.UI
 
         public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (item is TrainCar car) return TryPlaceCar(car);
-            else return false;
+            if (item is TrainCar car)
+            {
+                if (car == heldCar && TryPlaceCar(car))
+                {
+                    TrainCarStore.Coins += car.Tier;
+                    return true;
+                }
+            }
+            
+            return false;
         }
 
-        private bool TryPlaceCar(TrainCar car)
+        public bool TryPlaceCar(TrainCar car)
         {
-            if (!IsHolding)
+            if (IsHolding) return false;
+            else
             {
                 car.transform.parent = transform;
                 car.transform.localPosition = 1.1f * Vector3.up;
@@ -44,7 +60,6 @@ namespace Uncooked.UI
                 heldCar = car;
                 return true;
             }
-            else return false;
         }
     }
 }

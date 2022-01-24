@@ -13,12 +13,11 @@ namespace Uncooked.UI
         [SerializeField] private TrainCarHolder holderPrefab;
         [SerializeField] private SellPoint[] carTypes;
 
-        private TrainCarHolder[] holders;
         private float panelWidth;
 
         private static int coins;
 
-        public static int coinCount
+        public static int Coins
         {
             get { return coins; }
             set
@@ -30,39 +29,67 @@ namespace Uncooked.UI
 
         void Start()
         {
-            holders = new TrainCarHolder[carTypes.Length];
             panelWidth = GetComponent<SpriteRenderer>().size.x;
-            coinCount = 0;
+            float panelInterval = panelWidth / (carTypes.Length + 1);
+            Coins = 10;
 
+            // Spawns in holders
             for (int i = 0; i < carTypes.Length; i++)
             {
-                holders[i] = Instantiate(holderPrefab, transform);
-                var car = Instantiate(carTypes[i].tierPrefabs[0]);
+                carTypes[i].holder = Instantiate(holderPrefab, transform);
 
-                float panelInterval = panelWidth / (carTypes.Length + 1);
                 float xOffset = (i + 1) * panelInterval - panelWidth / 2f;
-                holders[i].transform.position = transform.position + xOffset * Vector3.right;
-                holders[i].transform.rotation = Quaternion.identity;
+                carTypes[i].holder.transform.position = transform.position + xOffset * Vector3.right;
+                carTypes[i].holder.transform.localRotation = Quaternion.identity;
 
-                _ = holders[i].TryInteractUsing(car, new RaycastHit());
-                holders[i].gameObject.SetActive(GameManager.instance.IsEditing);
-
-                car.GetComponent<BoxCollider>().enabled = false;
+                carTypes[i].holder.gameObject.SetActive(GameManager.instance.IsEditing);
             }
 
-            GameManager.instance.OnCheckpoint += SetHolderVisibility;
+            GameManager.instance.OnCheckpoint += UpdateHoldersCars;
             GameManager.instance.OnEndCheckpoint += SetHolderVisibility;
+        }
+
+        private void UpdateHoldersCars()
+        {
+            foreach (var type in carTypes) _ = type.TrySetNextCar();
+
+            SetHolderVisibility();
         }
 
         private void SetHolderVisibility()
         {
-            foreach (var h in holders) h.gameObject.SetActive(GameManager.instance.IsEditing);
+            foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.instance.IsEditing);
+        }
+
+        void OnDestroy()
+        {
+            if (GameManager.instance)
+            {
+                GameManager.instance.OnCheckpoint -= UpdateHoldersCars;
+                GameManager.instance.OnEndCheckpoint -= SetHolderVisibility;
+            }
         }
 
         [System.Serializable]
         private class SellPoint
         {
-            public TrainCar[] tierPrefabs;
+            [SerializeField] private TrainCar[] tierPrefabs;
+
+            [HideInInspector] public TrainCarHolder holder;
+            private int nextIndex = 0;
+
+            public TrainCar[] TierPrefabs => tierPrefabs;
+
+            public bool TrySetNextCar()
+            {
+                if (nextIndex == tierPrefabs.Length - 1) return false;
+
+                var car = Instantiate(tierPrefabs[nextIndex]);
+                car.GetComponent<BoxCollider>().enabled = false;
+
+                nextIndex++;
+                return holder.TryPlaceCar(car);
+            }
         }
     }
 }

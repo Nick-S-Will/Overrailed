@@ -43263,10 +43263,23 @@ MonoBehaviour:
   baseTrainSpeed: 0.03
   trainSpeedIncrement: 0.02
   speedUpMultiplier: 40
-  trainInitialDelay: 15
+  trainInitialDelay: 6
   isEditing: 0
   isPaused: 0
   checkpointContinueButton: {fileID: 705346361}
+  numbersPrefabs:
+  - {fileID: 7693936741897243366, guid: 1e79d1022ab56b7439f7e1fb226d0ca7, type: 3}
+  - {fileID: 7285955767927605312, guid: bd11511afb9eb7a4cbad0ef9e50ba7fa, type: 3}
+  - {fileID: 8667427594643505294, guid: a0d69732020721940ae11a692817cf7c, type: 3}
+  - {fileID: 5771875474173664867, guid: 3fe2bec68e4bb7a458b9c6ffbadfef70, type: 3}
+  - {fileID: 3010475242544491362, guid: f28335e7839bc89438cf183403311962, type: 3}
+  - {fileID: 7647173562185414811, guid: fb9e96cdc76b08b489e8bcf9fb452d23, type: 3}
+  - {fileID: 3114211949839003434, guid: f1b0bb5c09d3c5343aa4b38103784262, type: 3}
+  - {fileID: 342189838494076471, guid: d33b5aa1e41161a469e699c6f335f909, type: 3}
+  - {fileID: 7709156031300599165, guid: 04ab067ce63eb924daf3d88acd02f22b, type: 3}
+  - {fileID: 1827330582974965809, guid: ef9536ca46006eb4fad9b775acb26296, type: 3}
+  numberFadeSpeed: 0.3
+  numberFadeDuration: 1.1
 --- !u!4 &1157615707
 Transform:
   m_ObjectHideFlags: 0
@@ -81158,10 +81171,13 @@ MonoBehaviour:
   carTypes:
   - tierPrefabs:
     - {fileID: 712608436525509803, guid: af4f03287f2c00e4eae9e2d25766d86e, type: 3}
+    holder: {fileID: 0}
   - tierPrefabs:
     - {fileID: 2777479365639713912, guid: 7e0e32ac8256e944aa1fe1ebbde45d85, type: 3}
+    holder: {fileID: 0}
   - tierPrefabs:
     - {fileID: 2439802911480396491, guid: 83baaa37c7ebb454994708716c5dbfde, type: 3}
+    holder: {fileID: 0}
 --- !u!212 &7164010559301638586
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -81222,7 +81238,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7164010559301638584}
   m_LocalRotation: {x: 0.7071068, y: -0.0000000037252903, z: 0.000000004656613, w: 0.70710677}
-  m_LocalPosition: {x: 24, y: 0.01, z: 13}
+  m_LocalPosition: {x: 24, y: 0, z: 13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7164010560589456892}
