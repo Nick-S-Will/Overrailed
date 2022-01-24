@@ -300,7 +300,6 @@ MonoBehaviour:
   startRail: {fileID: 0}
   tier: 1
   isPermeable: 0
-  craftSpeed: 0.25
   craftResultHolder: {fileID: 0}
   craftResultPrefab: {fileID: 0}
   craftPoints: []
@@ -2038,7 +2037,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7158609533083191635, guid: c21e954c8b9596e458dc36b692944754, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c21e954c8b9596e458dc36b692944754, type: 3}

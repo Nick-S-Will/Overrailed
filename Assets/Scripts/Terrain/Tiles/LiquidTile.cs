@@ -6,7 +6,6 @@ using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Terrain.Tiles
 {
-    [RequireComponent(typeof(BoxCollider))]
     public class LiquidTile : Tile, IInteractable
     {
         [SerializeField] protected Transform liquid, surfacePoint;

@@ -188,6 +188,8 @@ namespace Uncooked.Terrain.Generation
         {
             int mapLength = chunks.Count * chunkLength;
 
+            System.Action<Object> destroyType = DestroyImmediate;
+            if (Application.isPlaying) destroyType = Destroy;
             for (int x = mapLength - chunkLength; x < mapLength; x++)
             {
                 var rowParent = new GameObject("Row " + x).transform;
@@ -221,7 +223,7 @@ namespace Uncooked.Terrain.Generation
                     if (bridge)
                     {
                         bridge.transform.parent = tileObj.transform;
-                        tileObj.GetComponent<BoxCollider>().enabled = false;
+                        destroyType(tileObj.GetComponent<BoxCollider>());
                     }
                 }
             }
@@ -314,6 +316,16 @@ namespace Uncooked.Terrain.Generation
 
         private void SetObstacleHitboxes(bool enabled)
         {
+            // Water
+            for (int i = 1; i < transform.childCount; i++)
+            {
+                foreach (var collider in transform.GetChild(i).GetChild(0).GetComponentsInChildren<BoxCollider>())
+                {
+                    if (collider.gameObject.layer == LayerMask.NameToLayer("Water")) collider.enabled = enabled;
+                }
+            }
+
+            // Obstacles
             for (int i = 1; i < transform.childCount; i++)
             {
                 foreach (var collider in transform.GetChild(i).GetChild(1).GetComponentsInChildren<BoxCollider>())

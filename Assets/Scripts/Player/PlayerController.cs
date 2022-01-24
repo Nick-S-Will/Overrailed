@@ -25,6 +25,7 @@ namespace Uncooked.Player
         [SerializeField] private float legSwingCoefficient = 0.1f, legRaiseAngle = 45;
 
         [Header("Dash")]
+        [SerializeField] private KeyCode dash = KeyCode.LeftShift;
         [SerializeField] [Range(1, 10)] private float dashSpeedMultiplier = 2;
         [SerializeField] [Range(0, 1)] private float dashDuration = 1;
 
@@ -90,7 +91,7 @@ namespace Uncooked.Player
             var deltaPos = moveSpeed * transform.forward * Time.deltaTime;
             
             /// Updates <see cref="lastDashTime"/> if dash key was pressed
-            if (Input.GetKeyDown(KeyCode.LeftShift)) lastDashTime = Time.time;
+            if (Input.GetKeyDown(dash)) lastDashTime = Time.time;
             /// Multiplies <see cref="deltaPos"/> if dashing
             if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
             
@@ -106,7 +107,7 @@ namespace Uncooked.Player
         private bool UpdateMovingStates(Vector3 input)
         {
             // Gets current moving state
-            isMoving = input != Vector3.zero || Input.GetKeyDown(KeyCode.LeftShift) || Time.time < lastDashTime + dashDuration;
+            isMoving = input != Vector3.zero || Input.GetKeyDown(dash) || Time.time < lastDashTime + dashDuration;
             if (!isMoving) return wasMoving = false;
             
             // Start swinging legs if player wasn't moving last update

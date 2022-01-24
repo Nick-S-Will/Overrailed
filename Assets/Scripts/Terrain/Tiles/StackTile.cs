@@ -141,7 +141,7 @@ namespace Uncooked.Terrain.Tiles
             Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform);
             Destroy(gameObject);
 
-            liquid.GetComponent<BoxCollider>().enabled = false;
+            Destroy(liquid.GetComponent<BoxCollider>());
         }
     }
 }
