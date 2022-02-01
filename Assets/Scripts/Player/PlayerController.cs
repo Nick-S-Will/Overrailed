@@ -5,8 +5,6 @@ using UnityEngine;
 using Uncooked.Managers;
 using Uncooked.Terrain.Generation;
 using Uncooked.Terrain.Tools;
-using Uncooked.Terrain.Tiles;
-using Uncooked.Train;
 
 namespace Uncooked.Player
 {
@@ -69,7 +67,7 @@ namespace Uncooked.Player
             HandleMovement();
 
             // Interact Input
-            if (Input.GetMouseButton(0) && Time.time >= lastInteractTime + interactInterval) TryInteract();
+            if (Input.GetMouseButton(0)) TryInteract();
 
             // Tile highlight
             var tile = map.GetTileAt(LookPoint);
@@ -131,6 +129,7 @@ namespace Uncooked.Player
         #region Interact
         private void TryInteract()
         {
+            if (Time.time < lastInteractTime + interactInterval) return;
             lastInteractTime = Time.time;
 
             if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hitData, 1, GameManager.instance.InteractMask))
@@ -165,12 +164,20 @@ namespace Uncooked.Player
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
             if (heldItem == null || toolSwinging != null || !map.PointIsInBounds(coords) || !heldItem.OnTryDrop()) return false;
 
-            (heldItem as Tile).transform.parent = null;
             map.PlacePickup(heldItem, coords);
             LowerArms(heldItem.IsTwoHanded());
             heldItem = null;
 
             return true;
+        }
+
+        public void ForceDrop()
+        {
+            if (heldItem == null) return;
+
+            map.PlacePickup(heldItem, Vector3Int.RoundToInt(transform.position + Vector3.up));
+            LowerArms(heldItem.IsTwoHanded());
+            heldItem = null;
         }
 
         /// <summary>
@@ -199,7 +206,7 @@ namespace Uncooked.Player
         /// <param name="both">Makes armL point forwards too</param>
         private void RaiseArms(bool both)
         {
-            _ = TryStopTurnArmRoutines();
+            _ = StopTurnArmRoutines();
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, -90, armTurnSpeed)));
             if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, -90, armTurnSpeed)));
         }
@@ -210,7 +217,7 @@ namespace Uncooked.Player
         /// <param name="both">Makes armL point downwards too</param>
         private void LowerArms(bool both)
         {
-            _ = TryStopTurnArmRoutines();
+            _ = StopTurnArmRoutines();
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, 0, armTurnSpeed)));
             if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, 0, armTurnSpeed)));
         }
@@ -220,6 +227,7 @@ namespace Uncooked.Player
         /// </summary>
         private IEnumerator SwingTool()
         {
+            _ = StopTurnArmRoutines();
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, 0, armSwingSpeed)));
             yield return currentArmTurns[currentArmTurns.Count - 1];
             yield return new WaitForSeconds(0.05f);
@@ -232,7 +240,7 @@ namespace Uncooked.Player
         /// <summary>
         /// Animates arm turning around it's local x
         /// </summary>
-        /// <param name="arm">Selected arm</param>
+        /// <param name="arm">Selected arm pivot</param>
         /// <param name="rotation">Final x value on arm.eulerAngles.x</param>
         /// <param name="speed">Speed of rotation in degrees per second</param>
         private IEnumerator TurnArm(Transform arm, float rotation, float speed)
@@ -256,7 +264,7 @@ namespace Uncooked.Player
         /// Cancels all ongoing TurnArm routines
         /// </summary>
         /// <returns>True if there were any TurnArm routines in progress</returns>
-        private bool TryStopTurnArmRoutines()
+        private bool StopTurnArmRoutines()
         {
             if (currentArmTurns.Count == 0) return false;
 

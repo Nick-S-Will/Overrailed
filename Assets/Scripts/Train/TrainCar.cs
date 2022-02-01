@@ -42,6 +42,9 @@ namespace Uncooked.Train
 
         private IEnumerator Drive()
         {
+            GameManager.instance.OnStartGame -= StartDriving;
+            GameManager.instance.OnEndCheckpoint -= StartDriving;
+
             OnStartDriving?.Invoke();
 
             var target = currentRail.Path.GetChild(pathIndex);
@@ -81,10 +84,10 @@ namespace Uncooked.Train
                 transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
                 yield return null;
-                if (GameManager.instance.IsPaused)
+                if (GameManager.instance.CurrentState == GameState.Pause || GameManager.instance.CurrentState == GameState.Edit)
                 {
                     OnPauseDriving?.Invoke();
-                    yield return new WaitWhile(() => GameManager.instance.IsPaused);
+                    yield return new WaitUntil(() => GameManager.instance.CurrentState == GameState.Play);
                     OnStartDriving?.Invoke();
                 }
             }
@@ -96,7 +99,7 @@ namespace Uncooked.Train
         /// <returns>This train car if in edit mode, otherwise null</returns>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (!GameManager.instance.IsEditing) return null;
+            if (GameManager.instance.CurrentState != GameState.Edit) return null;
 
             GetComponent<BoxCollider>().enabled = false;
             transform.parent = parent;
@@ -112,9 +115,18 @@ namespace Uncooked.Train
 
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (GameManager.instance.IsEditing) return false;
+            if (GameManager.instance.CurrentState == GameState.Edit && item is TrainCar car) return TryUpgradeCar(car);
             else if (item is Bucket bucket) return TryExtinguish(bucket);
             else return false;
+        }
+
+        protected virtual bool TryUpgradeCar(TrainCar newCar)
+        {
+            if (newCar.GetType() != GetType() || newCar.tier <= tier) return false;
+
+            _ = newCar.TrySetRail(currentRail, false);
+            OnDeath?.Invoke();
+            return true;
         }
 
         /// <summary>
@@ -124,12 +136,13 @@ namespace Uncooked.Train
         /// <returns>True if fire was put out, otherwise null</returns>
         private bool TryExtinguish(Bucket bucket)
         {
-            if (burningParticles && bucket.TryUse())
+            if (burningParticles && bucket.IsFull)
             {
                 Destroy(burningParticles.gameObject, burningParticles.main.duration);
                 var emissionSettings = burningParticles.emission;
                 emissionSettings.enabled = false;
                 burningParticles = null;
+                bucket.IsFull = false;
 
                 return true;
             }
@@ -171,6 +184,9 @@ namespace Uncooked.Train
             transform.forward = dir;
 
             GetComponent<BoxCollider>().enabled = !isPermeable;
+
+            GameManager.instance.OnStartGame += StartDriving;
+            GameManager.instance.OnEndCheckpoint += StartDriving;
 
             return true;
         }
@@ -218,7 +234,7 @@ namespace Uncooked.Train
         {
             BreakIntoParticles(breakParticlePrefab, MeshColorGradient, transform.position);
 
-            Destroy(gameObject, 2 * Time.deltaTime);
+            Destroy(gameObject);
         }
 
         [System.Serializable]
@@ -231,7 +247,10 @@ namespace Uncooked.Train
 
             public Transform Transform => transform;
             public string StackType => stackType;
-            public bool CanCraft => transform.childCount == 1;
+            /// <summary>
+            /// True if the crafting point has at least one of its stack tiles
+            /// </summary>
+            public bool IsHolding => transform.childCount == 1;
         }
     }
 }

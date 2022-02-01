@@ -59,12 +59,36 @@ namespace Uncooked.Terrain.Generation
 
         void LateUpdate()
         {
-            // Removes highlights on tiles that are no longer selected
+            RemoveOldHighlights();
+            AddHighlights();
+
+            newHighlights.Clear();
+        }
+
+        #region Tile highlighting
+        public void TryHighlightTile(Transform tile)
+        {
+            if (tile == null) return;
+            
+            if (newHighlights.Contains(tile)) return;
+            else newHighlights.Add(tile);
+        }
+
+        /// <summary>
+        /// Removes the highlight on tiles that are no longer selected
+        /// </summary>
+        private void RemoveOldHighlights()
+        {
             foreach (var tile in highlights.ToArray())
                 if (!newHighlights.Contains(tile))
                     highlights.Remove(tile);
-            
-            // Adds highlight to newly selected tiles
+        }
+
+        /// <summary>
+        /// Highlights the tiles in <see cref="newHighlights"/> that aren't already highlited
+        /// </summary>
+        private void AddHighlights()
+        {
             foreach (var tile in newHighlights)
             {
                 if (!highlights.Contains(tile))
@@ -73,15 +97,6 @@ namespace Uncooked.Terrain.Generation
                     _ = StartCoroutine(HightlightTile(tile));
                 }
             }
-
-            newHighlights.Clear();
-        }
-
-        #region Tile highlighting
-        public void TryHighlightTile(Transform tile)
-        {
-            if (newHighlights.Contains(tile)) return;
-            else if (tile) newHighlights.Add(tile);
         }
 
         /// <summary>
@@ -290,14 +305,45 @@ namespace Uncooked.Terrain.Generation
         /// </summary>
         public void PlacePickup(IPickupable pickup, Vector3Int coords)
         {
-            Transform obj = (pickup as Tile).transform;
+            LayerMask mask = LayerMask.GetMask("Default", "Water", "Rail", "Train");
+            coords = FindClosestEmptyCoord(coords, mask);
 
+            Transform obj = (pickup as Tile).transform;
             obj.parent = GetParentAt(coords);
             obj.position = coords;
             obj.localRotation = Quaternion.identity;
 
             obj.GetComponent<BoxCollider>().enabled = true;
             pickup.Drop(coords);
+        }
+
+        /// <summary>
+        /// Finds the closest coord on the XZ plane that isn't occupied
+        /// </summary>
+        /// <param name="startCoord">Starting point of the search which must be in the map bounds</param>
+        /// <param name="mask">Mask of layers to be aware of</param>
+        /// <returns>The position of the closest empty coord on the map</returns>
+        private Vector3Int FindClosestEmptyCoord(Vector3Int startCoord, LayerMask mask) 
+        {
+            if (!PointIsInBounds(startCoord)) throw new System.Exception("Starting coord isn't in the bounds of the map");
+
+            var flags = new HashSet<Vector3Int>();
+            var toCheck = new Queue<Vector3Int>();
+            toCheck.Enqueue(startCoord);
+            while (toCheck.Count > 0)
+            {
+                var coord = toCheck.Dequeue();
+                if (Physics.OverlapBox(coord, 0.1f * Vector3.one, Quaternion.identity, mask).Length > 0)
+                {
+                    flags.Add(coord);
+
+                    var points = new Vector3Int[] { coord + Vector3Int.forward, coord + Vector3Int.right, coord + Vector3Int.back, coord + Vector3Int.left };
+                    foreach (var point in points) if (!flags.Contains(point) && PointIsInBounds(point)) toCheck.Enqueue(point);
+                }
+                else return coord;
+            }
+
+            throw new System.Exception("No empty coord found somehow");
         }
 
         public bool PointIsInBounds(Vector3 point)

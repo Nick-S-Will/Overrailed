@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Managers;
 using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Train
@@ -21,17 +22,44 @@ namespace Uncooked.Train
             get
             {
                 if (isCrafting) return false;
-                foreach (StackPoint cp in craftPoints) if (!cp.CanCraft) return false;
-                return true;
+                foreach (StackPoint cp in craftPoints) if (!cp.IsHolding) return false;
+                return craftResultHolder.HasSpace();
             }
         }
 
-        protected async void TryCraft()
+        override protected void Start()
         {
-            while (CanCraft) await Craft();
+            if (craftResultHolder) craftResultHolder.OnTaken += ProductTaken;
+
+            base.Start();
         }
 
-        protected async Task Craft()
+        protected override bool TryUpgradeCar(TrainCar newCar)
+        {
+            if (base.TryUpgradeCar(newCar))
+            {
+                ((CraftCar)newCar).craftResultHolder = craftResultHolder;
+                craftResultHolder.OnTaken += ((CraftCar)newCar).ProductTaken;
+                return true;
+            }
+            else return false;
+        }
+
+        private void ProductTaken()
+        {
+            if (CanCraft) _ = StartCoroutine(TryCraft());
+        }
+
+        protected IEnumerator TryCraft()
+        {
+            while (CanCraft)
+            {
+                yield return StartCoroutine(Craft());
+                yield return new WaitUntil(() => GameManager.instance.CurrentState == GameState.Play);
+            }
+        }
+
+        protected IEnumerator Craft()
         {
             isCrafting = true;
             craftResultHolder.AddPartTile();
@@ -57,7 +85,7 @@ namespace Uncooked.Train
             while (percent < 1)
             {
                 float oldPercent = percent;
-                percent += 0.25f * tier * Time.deltaTime;
+                percent += (0.2f + 0.05f * tier) * Time.deltaTime;
 
                 // Disables ingredient meshes
                 int onCount;
@@ -68,11 +96,16 @@ namespace Uncooked.Train
                     if (onCount - (int)(oldPercent * renderers.Length) == 1) renderers[onCount - 1].enabled = false;
                 }
 
-                // Enables result meshes
+                // Enables product meshes
                 onCount = (int)(percent * craftMeshes.Length);
                 if (onCount - (int)(oldPercent * craftMeshes.Length) == 1) craftMeshes[onCount - 1].enabled = true;
 
-                await Task.Yield();
+                yield return null;
+                if (GameManager.instance.CurrentState == GameState.Edit)
+                {
+                    foreach (var mesh in craftMeshes) mesh.enabled = true;
+                    break;
+                }
             }
 
             // Destroy top object of craft point stacks
@@ -86,7 +119,7 @@ namespace Uncooked.Train
             craftResultHolder.AddPartTile();
             isCrafting = false;
 
-            await Task.Yield(); // Required for destroy cleanup
+            yield return null; // Required for destroy cleanup
         }
 
         public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
@@ -118,7 +151,7 @@ namespace Uncooked.Train
                 craftPoint.Transform.GetChild(0).GetComponent<StackTile>().TryStackOn(stack);
             else craftPoint.stackTop = stack.GetStackTop();
 
-            TryCraft();
+            _ = StartCoroutine(TryCraft());
 
             return true;
         }
@@ -133,6 +166,11 @@ namespace Uncooked.Train
             a.parent = b;
             a.localPosition = Vector3.zero;
             a.localRotation = Quaternion.identity;
+        }
+
+        private void OnDestroy()
+        {
+            if (craftResultHolder) craftResultHolder.OnTaken -= ProductTaken;
         }
     }
 }

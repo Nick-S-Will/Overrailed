@@ -3,19 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Player;
 using Uncooked.Train;
 using Uncooked.UI;
 
 namespace Uncooked.Managers
 {
+    public enum GameState { Play, Pause, Edit }
+
     public class GameManager : MonoBehaviour
     {
-        public event System.Action OnCheckpoint, OnEndCheckpoint;
+        public event System.Action OnStartGame, OnCheckpoint, OnEndCheckpoint;
 
+        public GameState CurrentState { get; private set; }
         [SerializeField] private LayerMask interactMask;
         [SerializeField] [Min(0)] private float baseTrainSpeed = 0.05f, trainSpeedIncrement = 0.05f, speedUpMultiplier = 2;
         [SerializeField] [Min(5)] private float trainInitialDelay = 10;
-        [SerializeField] private bool isEditing, isPaused;
         [Header("Buttons")]
         [SerializeField] private TriggerButton checkpointContinueButton;
         [Space]
@@ -23,13 +26,9 @@ namespace Uncooked.Managers
         [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
 
         public LayerMask InteractMask => interactMask;
-        public float TrainSpeed => trainSpeed;
-        public bool IsEditing => isEditing;
-        public bool IsPaused => isPaused || isEditing;
-        public bool TrainIsSpeeding => trainSpeed - (baseTrainSpeed + trainSpeedIncrement * checkpointCount) > 0.0001f; // > operator is inconsistent
+        public float TrainSpeed { get; private set; }
+        public bool TrainIsSpeeding => TrainSpeed - (baseTrainSpeed + trainSpeedIncrement * checkpointCount) > 0.0001f; // > operator is inconsistent
 
-        private TrainCar[] cars;
-        private float trainSpeed;
         private int checkpointCount;
 
         public static GameManager instance;
@@ -40,15 +39,15 @@ namespace Uncooked.Managers
             else throw new System.Exception("Multiple GameManagers Exist");
 
             checkpointContinueButton.OnClick += ContinueFromCheckpoint;
-            checkpointContinueButton.GetComponent<BoxCollider>().enabled = IsEditing;
+            checkpointContinueButton.GetComponent<BoxCollider>().enabled = CurrentState == GameState.Edit;
         }
 
         void Start()
         {
-            cars = FindObjectsOfType<TrainCar>();
-            trainSpeed = baseTrainSpeed;
+            TrainSpeed = baseTrainSpeed;
+            CurrentState = GameState.Play;
 
-            HUDManager.instance.UpdateSpeedText(trainSpeed.ToString());
+            HUDManager.instance.UpdateSpeedText(TrainSpeed.ToString());
 
             StartTrainWithDelay(trainInitialDelay);
         }
@@ -63,13 +62,13 @@ namespace Uncooked.Managers
 
             for (int countDown = 5; countDown > 0; countDown--)
             {
-                yield return new WaitWhile(() => isPaused);
+                yield return new WaitUntil(() => CurrentState == GameState.Play);
 
                 foreach (var l in locomotives) FadeNumber(countDown, l.transform.position + Vector3.up, instance.numberFadeDuration);
                 yield return new WaitForSeconds(1);
             }
 
-            foreach (var car in cars) if (car.HasRail) car.StartDriving();
+            OnStartGame?.Invoke();
         }
 
         /// <summary>
@@ -102,15 +101,19 @@ namespace Uncooked.Managers
         /// <summary>
         /// Gives train temporary speed buff until it reaches the next checkpoint
         /// </summary>
-        public void SpeedUp() => trainSpeed = speedUpMultiplier * (baseTrainSpeed + trainSpeedIncrement * checkpointCount);
+        public void SpeedUp() => TrainSpeed = speedUpMultiplier * (baseTrainSpeed + trainSpeedIncrement * checkpointCount);
 
         public void ReachCheckpoint()
         {
-            isEditing = true;
+            foreach (var player in FindObjectsOfType<PlayerController>()) player.ForceDrop();
+
+            // Managers
+            CurrentState = GameState.Edit;
             checkpointCount++;
             CameraManager.instance.TransitionEditMode();
             HUDManager.instance.isUpdating = false;
 
+            // Edit mode UI
             Vector3 pos = checkpointContinueButton.transform.position;
             checkpointContinueButton.GetComponent<BoxCollider>().enabled = true;
             checkpointContinueButton.transform.position = new Vector3(pos.x, pos.y, CameraManager.instance.FirstTarget.transform.position.z - 1);
@@ -120,12 +123,14 @@ namespace Uncooked.Managers
 
         public void ContinueFromCheckpoint()
         {
-            isEditing = false;
-            trainSpeed = baseTrainSpeed + trainSpeedIncrement * checkpointCount;
+            // Managers
+            CurrentState = GameState.Play;
+            TrainSpeed = baseTrainSpeed + trainSpeedIncrement * checkpointCount;
             CameraManager.instance.TransitionGameMode();
-            HUDManager.instance.UpdateSpeedText(trainSpeed.ToString());
+            HUDManager.instance.UpdateSpeedText(TrainSpeed.ToString());
             HUDManager.instance.isUpdating = true;
 
+            // Edit mode UI
             checkpointContinueButton.GetComponent<BoxCollider>().enabled = false;
 
             OnEndCheckpoint?.Invoke();

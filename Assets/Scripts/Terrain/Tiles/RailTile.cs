@@ -19,11 +19,11 @@ namespace Uncooked.Terrain.Tiles
         [SerializeField] protected bool startsPowered;
         [SerializeField] private bool isCheckpoint, showPath;
 
-        private TrainCar lastPassenger;
         private Vector3Int inDirection = Vector3Int.zero, outDirection = Vector3Int.zero;
         private int connectionCount;
 
         public Transform Path => IsStraight ? straightPathParent : bentPathParent;
+        [HideInInspector] public TrainCar LastPassenger { get; private set; }
         public Vector3Int InDirection => inDirection;
         public Vector3Int OutDirection => outDirection;
         public bool IsStraight => straightMesh.activeSelf;
@@ -54,11 +54,11 @@ namespace Uncooked.Terrain.Tiles
             base.Start();
         }
 
-        public void NewPassenger(TrainCar newCar) => lastPassenger = newCar;
-
+        public void NewPassenger(TrainCar newCar) => LastPassenger = newCar;
+        
         private void ReachCheckpoint()
         {
-            if (lastPassenger)
+            if (LastPassenger)
             {
                 isCheckpoint = false;
                 UpdateConnectionCount();
@@ -81,7 +81,7 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>The tile to be picked up, if it can be</returns>
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (lastPassenger) return lastPassenger.TryPickUp(parent, amount);
+            if (LastPassenger) return LastPassenger.TryPickUp(parent, amount);
             else if (startsPowered || isCheckpoint || GameManager.instance.TrainIsSpeeding) return null;
             else if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, 0, true);
 
@@ -90,7 +90,7 @@ namespace Uncooked.Terrain.Tiles
 
         public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (lastPassenger && lastPassenger.TryInteractUsing(item, hitInfo)) return true;
+            if (LastPassenger && LastPassenger.TryInteractUsing(item, hitInfo)) return true;
             else if (item is TrainCar car) return car.TrySetRail(this, true);
             else return base.TryInteractUsing(item, hitInfo);
         }
@@ -120,7 +120,7 @@ namespace Uncooked.Terrain.Tiles
             {
                 var rail = TryGetAdjacentRail(dir, true);
                 // rail found, has a connection available, has no passenger, rail already pointing at this
-                if (rail && rail.connectionCount < 2 && (rail.lastPassenger == null || rail.outDirection == (transform.position - rail.transform.position)))
+                if (rail && rail.connectionCount < 2 && (rail.LastPassenger == null || rail.outDirection == (transform.position - rail.transform.position)))
                 {
                     connectableRail = rail;
                     break;

@@ -9,7 +9,7 @@ namespace Uncooked.Terrain.Tools
         [Space]
         [SerializeField] private Transform liquid;
 
-        public bool isFull
+        public bool IsFull
         {
             get => liquid.gameObject.activeSelf;
             set => liquid.gameObject.SetActive(value);
@@ -17,17 +17,7 @@ namespace Uncooked.Terrain.Tools
 
         override protected void Start()
         {
-            liquid.gameObject.SetActive(isFull);
-        }
-
-        public bool TryUse()
-        {
-            if (isFull)
-            {
-                isFull = false;
-                return true;
-            }
-            else return false;
+            liquid.gameObject.SetActive(IsFull);
         }
     }
 }

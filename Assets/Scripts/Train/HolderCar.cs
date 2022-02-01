@@ -9,6 +9,10 @@ namespace Uncooked.Train
 {
     public class HolderCar : TrainCar
     {
+        /// <summary>
+        /// Invoked when a player takes a tile from the stack
+        /// </summary>
+        public event System.Action OnTaken;
         [Space]
         [SerializeField] private Transform holderSpawnPoint;
 
@@ -19,15 +23,17 @@ namespace Uncooked.Train
         /// </summary>
         public void AddPartTile() => holdCount += 0.5f;
 
-        private float holdCount;
+        public float holdCount { get; private set; }
+
+        public bool HasSpace() => Mathf.CeilToInt(holdCount) < 2 + 2 * tier;
 
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (GameManager.instance.IsEditing) return base.TryPickUp(parent, amount);
-            else return TryPickupCraft(parent, amount);
+            if (GameManager.instance.CurrentState == GameState.Edit) return base.TryPickUp(parent, amount);
+            else return TryPickupCraftedTile(parent, amount);
         }
 
-        private StackTile TryPickupCraft(Transform parent, int amount)
+        private StackTile TryPickupCraftedTile(Transform parent, int amount)
         {
             if (holdCount < 1) return null;
 
@@ -45,6 +51,7 @@ namespace Uncooked.Train
 
             holdCount = Mathf.Max(holdCount - amount, holdCount % 1);
 
+            OnTaken?.Invoke();
             return holdersContent;
         }
     }

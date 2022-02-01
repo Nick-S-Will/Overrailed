@@ -14,6 +14,8 @@ namespace Uncooked.Train
 
         protected ParticleSystem smokeParticles;
 
+        public int MaxCarCount() => 5 + tier;
+
         protected override void Start()
         {
             OnStartDriving += StartEmittingSmoke;

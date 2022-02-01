@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Managers;
 using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Train
@@ -25,7 +26,7 @@ namespace Uncooked.Train
         {
             while (liquid)
             {
-                if (liquidPercent > 0) liquidPercent -= Time.fixedDeltaTime / tier;
+                if (liquidPercent > 0) liquidPercent -= Time.fixedDeltaTime * (1 - 0.2f * tier);
                 else
                 {
                     liquidPercent = 0;
@@ -39,18 +40,18 @@ namespace Uncooked.Train
                     yield return new WaitWhile(() => liquidPercent == 0);
                     liquid.gameObject.SetActive(true);
                 }
+
                 yield return new WaitForSeconds(liquidUsageInterval);
+                yield return new WaitUntil(() => GameManager.instance.CurrentState == GameState.Play);
             }
         }
 
         public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (item is Bucket bucket && bucket.TryUse())
+            if (item is Bucket bucket && bucket.IsFull)
             {
                 liquidPercent = 1;
-                bucket.isFull = true;
                 _ = base.TryInteractUsing(item, hitInfo);
-                bucket.isFull = false;
             }
             else return false;
 

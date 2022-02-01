@@ -8,7 +8,7 @@ namespace Uncooked.Terrain.Tools
 {
     public abstract class Tool : Tile, IPickupable
     {
-        public event System.Action<Tool> OnPickup, OnDrop;
+        public event System.Action<Tool> OnPickup, OnDropTool;
 
         [SerializeField] private Transform handOffset;
         [SerializeField] private int tier = 1;
@@ -37,6 +37,6 @@ namespace Uncooked.Terrain.Tools
 
         public virtual bool OnTryDrop() => true;
 
-        public virtual void Drop(Vector3Int position) => OnDrop?.Invoke(this);
+        public virtual void Drop(Vector3Int position) => OnDropTool?.Invoke(this);
     }
 }

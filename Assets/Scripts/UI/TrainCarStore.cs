@@ -40,9 +40,9 @@ namespace Uncooked.UI
 
                 float xOffset = (i + 1) * panelInterval - panelWidth / 2f;
                 carTypes[i].holder.transform.position = transform.position + xOffset * Vector3.right;
-                carTypes[i].holder.transform.localRotation = Quaternion.identity;
+                carTypes[i].holder.transform.rotation = Quaternion.identity;
 
-                carTypes[i].holder.gameObject.SetActive(GameManager.instance.IsEditing);
+                carTypes[i].holder.gameObject.SetActive(GameManager.instance.CurrentState == GameState.Edit);
             }
 
             GameManager.instance.OnCheckpoint += UpdateHoldersCars;
@@ -58,7 +58,7 @@ namespace Uncooked.UI
 
         private void SetHolderVisibility()
         {
-            foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.instance.IsEditing);
+            foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.instance.CurrentState == GameState.Edit);
         }
 
         void OnDestroy()

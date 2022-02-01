@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Managers;
 using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Terrain.Tiles
@@ -35,6 +36,7 @@ namespace Uncooked.Terrain.Tiles
                     time += Time.deltaTime;
                 }
                 yield return null;
+                yield return new WaitUntil(() => GameManager.instance.CurrentState == GameState.Play);
             }
 
             liquid.localScale = Vector3.one;
@@ -44,7 +46,7 @@ namespace Uncooked.Terrain.Tiles
         {
             if (item is StackTile stack && stack.HasBridge) stack.BuildBridge(this);
             else if (item is Rod rod) rod.Use(this);
-            else if (item is Bucket bucket) bucket.isFull = true;
+            else if (item is Bucket bucket) bucket.IsFull = true;
             else return false;
 
             return true;
