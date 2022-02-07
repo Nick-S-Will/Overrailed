@@ -293,11 +293,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b826faadbf9569344b38cb6acf80a4b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meshParent: {fileID: 0}
-  burningParticlePrefab: {fileID: 0}
-  breakParticlePrefab: {fileID: 0}
-  burnPoint: {fileID: 0}
-  startRail: {fileID: 0}
+  meshParent: {fileID: 2293133988917488064}
+  leaderLocomotive: {fileID: 6227083247989688238}
+  burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
+  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
+  burnPoint: {fileID: 6531640283523576025}
+  startRail: {fileID: 9060819590924108547}
   tier: 1
   isPermeable: 0
   craftResultHolder: {fileID: 0}
@@ -1812,7 +1813,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
       propertyPath: startStackHeight
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
@@ -1836,6 +1837,10 @@ PrefabInstance:
       propertyPath: startRail
       value: 
       objectReference: {fileID: 8410586572686255840}
+    - target: {fileID: 6428763152999123889, guid: 44cd0c6b865d7a449952a9bce7a7f45c, type: 3}
+      propertyPath: leaderLocomotive
+      value: 
+      objectReference: {fileID: 6227083247989688238}
     - target: {fileID: 6428763152999123890, guid: 44cd0c6b865d7a449952a9bce7a7f45c, type: 3}
       propertyPath: m_Name
       value: Locomotive
@@ -1890,6 +1895,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 44cd0c6b865d7a449952a9bce7a7f45c, type: 3}
+--- !u!114 &6227083247989688238 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6428763152999123889, guid: 44cd0c6b865d7a449952a9bce7a7f45c, type: 3}
+  m_PrefabInstance: {fileID: 1106906111783734303}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23d14663a4782a04785b8ec6bf1b2407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6227083247989688236 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6428763152999123891, guid: 44cd0c6b865d7a449952a9bce7a7f45c, type: 3}
@@ -2113,6 +2129,10 @@ PrefabInstance:
       propertyPath: startRail
       value: 
       objectReference: {fileID: 9060819590828550613}
+    - target: {fileID: 2439802911480396491, guid: 83baaa37c7ebb454994708716c5dbfde, type: 3}
+      propertyPath: leaderLocomotive
+      value: 
+      objectReference: {fileID: 6227083247989688238}
     - target: {fileID: 2439802911480396491, guid: 83baaa37c7ebb454994708716c5dbfde, type: 3}
       propertyPath: liquidUsageInterval
       value: 10
@@ -2495,6 +2515,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+--- !u!4 &1891814196061235503 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+  m_PrefabInstance: {fileID: 4279397725237007675}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &9060819590828550613 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
@@ -2506,11 +2531,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10bb171e6027c674990e6f1414314d3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &1891814196061235503 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-  m_PrefabInstance: {fileID: 4279397725237007675}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4279397725249452922
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2526,6 +2546,10 @@ PrefabInstance:
       propertyPath: startRail
       value: 
       objectReference: {fileID: 9060819590368390252}
+    - target: {fileID: 712608436525509803, guid: af4f03287f2c00e4eae9e2d25766d86e, type: 3}
+      propertyPath: leaderLocomotive
+      value: 
+      objectReference: {fileID: 6227083247989688238}
     - target: {fileID: 712608436525509803, guid: af4f03287f2c00e4eae9e2d25766d86e, type: 3}
       propertyPath: craftResultHolder
       value: 
@@ -2670,6 +2694,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+--- !u!114 &9060819590924108547 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+  m_PrefabInstance: {fileID: 4279397725726785517}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10bb171e6027c674990e6f1414314d3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1891814195479413753 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
@@ -2690,6 +2725,10 @@ PrefabInstance:
       propertyPath: startRail
       value: 
       objectReference: {fileID: 9060819590472957760}
+    - target: {fileID: 2777479365639713912, guid: 7e0e32ac8256e944aa1fe1ebbde45d85, type: 3}
+      propertyPath: leaderLocomotive
+      value: 
+      objectReference: {fileID: 6227083247989688238}
     - target: {fileID: 2777479365639713918, guid: 7e0e32ac8256e944aa1fe1ebbde45d85, type: 3}
       propertyPath: m_RootOrder
       value: 7
@@ -2875,7 +2914,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
       propertyPath: startStackHeight
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8691942379203556193, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
       propertyPath: m_Name

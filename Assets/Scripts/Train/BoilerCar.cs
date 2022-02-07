@@ -42,7 +42,7 @@ namespace Uncooked.Train
                 }
 
                 yield return new WaitForSeconds(liquidUsageInterval);
-                yield return new WaitUntil(() => GameManager.instance.CurrentState == GameState.Play);
+                yield return new WaitUntil(() => GameManager.instance.IsPlaying());
             }
         }
 
@@ -51,7 +51,7 @@ namespace Uncooked.Train
             if (item is Bucket bucket && bucket.IsFull)
             {
                 liquidPercent = 1;
-                _ = base.TryInteractUsing(item, hitInfo);
+                if (!base.TryInteractUsing(item, hitInfo)) bucket.IsFull = false;
             }
             else return false;
 

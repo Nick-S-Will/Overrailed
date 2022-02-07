@@ -2,27 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Managers;
 using Uncooked.Train;
 
 namespace Uncooked.UI
 {
     public class TrainCarHolder : MonoBehaviour, IInteractable, IPickupable
     {
+        private TrainStoreManager manager;
         private TrainCar heldCar;
 
         public bool IsTwoHanded() => heldCar ? heldCar.IsTwoHanded() : false;
         public bool IsHolding => heldCar && heldCar.transform.parent == transform;
-
 
         public IPickupable TryPickUp(Transform parent, int amount)
         {
             if (IsHolding)
             {
                 var car = heldCar.TryPickUp(parent, 1) as TrainCar;
-                if (car != null && TrainCarStore.Coins >= car.Tier)
+                if (car && manager.Coins >= car.Tier)
                 {
                     heldCar.GetComponent<BoxCollider>().enabled = true;
-                    TrainCarStore.Coins -= car.Tier;
+                    manager.Coins -= car.Tier;
                     return car;
                 }
             }
@@ -31,22 +32,9 @@ namespace Uncooked.UI
         }
 
         public bool OnTryDrop() => false;
-
         public void Drop(Vector3Int position) { }
 
-        public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
-        {
-            if (item is TrainCar car)
-            {
-                if (car == heldCar && TryPlaceCar(car))
-                {
-                    TrainCarStore.Coins += car.Tier;
-                    return true;
-                }
-            }
-            
-            return false;
-        }
+        public void SetManager(TrainStoreManager newManager) => manager = newManager;
 
         public bool TryPlaceCar(TrainCar car)
         {
@@ -60,6 +48,20 @@ namespace Uncooked.UI
                 heldCar = car;
                 return true;
             }
+        }
+
+        public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        {
+            if (item is TrainCar car)
+            {
+                if (car == heldCar && TryPlaceCar(car))
+                {
+                    manager.Coins += car.Tier;
+                    return true;
+                }
+            }
+            
+            return false;
         }
     }
 }

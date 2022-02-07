@@ -31,7 +31,9 @@ namespace Uncooked.Managers
             if (instance == null) instance = this;
             else Debug.LogError("Multiple HUDManagers Exist");
 
+            FindObjectOfType<GameManager>().OnSpeedChange += UpdateSpeedText;
             map.OnGenerate += UpdateSeedText;
+            foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
 
             seedStartLength = seedText.text.Length;
             speedStartLength = speedText.text.Length;
@@ -69,11 +71,11 @@ namespace Uncooked.Managers
                 }
 
                 yield return null;
-                if (!isUpdating)
+                if (!GameManager.instance.IsPlaying())
                 {
                     foreach (var toolHUD in tools) SetToolHUD(toolHUD.Tool, false);
 
-                    yield return new WaitUntil(() => isUpdating);
+                    yield return new WaitUntil(() => GameManager.instance.IsPlaying());
 
                     foreach (var toolHUD in tools) SetToolHUD(toolHUD.Tool, true);
                 }
@@ -131,7 +133,9 @@ namespace Uncooked.Managers
         {
             instance = null;
 
-            map.OnGenerate -= UpdateSeedText;
+            if (GameManager.instance) GameManager.instance.OnSpeedChange -= UpdateSpeedText;
+            if (map) map.OnGenerate -= UpdateSeedText;
+            foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange -= UpdateCoinsText;
         }
 
         [System.Serializable]

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Uncooked.Player;
+using Uncooked.Terrain.Generation;
+
 namespace Uncooked.Terrain.Tiles
 {
     public class StackTile : Tile, IPickupable, IInteractable
@@ -18,6 +21,7 @@ namespace Uncooked.Terrain.Tiles
         public StackTile PrevInStack => prevInStack;
         public string StackType => stackType;
         public float TileHeight => tileHeight;
+        public virtual bool CanPickUp => true;
         public bool IsTwoHanded() => true;
 
         override protected void Start()
@@ -47,7 +51,7 @@ namespace Uncooked.Terrain.Tiles
         {
             var top = this;
             while (top.nextInStack) top = top.nextInStack;
-            
+
             return top;
         }
 
@@ -65,6 +69,8 @@ namespace Uncooked.Terrain.Tiles
         /// <returns>Bottom StackTile of the stack to be picked up</returns>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
+            if (!CanPickUp) return null;
+
             StackTile toPickUp = this;
             int stackSize = GetStackCount();
 
@@ -75,7 +81,7 @@ namespace Uncooked.Terrain.Tiles
 
                 // Get bottom tile to pick up
                 for (int i = 0; i < stackSize - amount; i++) toPickUp = toPickUp.nextInStack;
-                
+
                 // Disconnect toPickup from linked list
                 toPickUp.prevInStack.nextInStack = null;
                 toPickUp.prevInStack = null;
@@ -102,7 +108,6 @@ namespace Uncooked.Terrain.Tiles
         public virtual bool TryStackOn(StackTile stackBase)
         {
             if (stackType != stackBase.stackType) return false;
-            if (transform == stackBase.transform) throw new System.Exception("Potentially Recursive Hierarchy");
 
             if (!stackBase.prevInStack) stackBase.GetComponent<BoxCollider>().isTrigger = false;
 
@@ -126,6 +131,7 @@ namespace Uncooked.Terrain.Tiles
         private void SelfStack()
         {
             var newTile = Instantiate(this);
+            newTile.name = newTile.name.Substring(0, newTile.name.Length - 7);
             newTile.GetComponent<BoxCollider>().enabled = false;
 
             newTile.startStackHeight = startStackHeight - 1;

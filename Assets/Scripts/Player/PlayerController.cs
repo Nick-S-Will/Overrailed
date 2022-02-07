@@ -5,6 +5,7 @@ using UnityEngine;
 using Uncooked.Managers;
 using Uncooked.Terrain.Generation;
 using Uncooked.Terrain.Tools;
+using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Player
 {
@@ -33,7 +34,6 @@ namespace Uncooked.Player
 
         [Header("Interact")]
         [SerializeField] private float interactInterval = 0.5f;
-        [SerializeField] private int strength = 1;
 
         [Header("Transforms")] [SerializeField] private Transform armL;
         [SerializeField] private Transform armR, legL, legR, calfL, calfR, toolHolder, pickupHolder;
@@ -54,6 +54,8 @@ namespace Uncooked.Player
         private bool isMoving;
 
         public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + transform.forward + Vector3.up);
+        public int Strength { get; private set; } = 1;
+        public bool IsHoldingItem => heldItem != null;
 
         void Start()
         {
@@ -87,12 +89,12 @@ namespace Uncooked.Player
 
             if (input != Vector3.zero) transform.forward = input;
             var deltaPos = moveSpeed * transform.forward * Time.deltaTime;
-            
+
             /// Updates <see cref="lastDashTime"/> if dash key was pressed
             if (Input.GetKeyDown(dash)) lastDashTime = Time.time;
             /// Multiplies <see cref="deltaPos"/> if dashing
             if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
-            
+
             // Moves player
             if (map.PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
         }
@@ -107,7 +109,7 @@ namespace Uncooked.Player
             // Gets current moving state
             isMoving = input != Vector3.zero || Input.GetKeyDown(dash) || Time.time < lastDashTime + dashDuration;
             if (!isMoving) return wasMoving = false;
-            
+
             // Start swinging legs if player wasn't moving last update
             if (!wasMoving)
             {
@@ -143,16 +145,49 @@ namespace Uncooked.Player
         /// <summary>
         /// Tries to pick up given IPickupable
         /// </summary>
-        /// <returns>True if given item is picked up</returns>
+        /// <returns>True if given pickup isn't null and is picked up</returns>
         private bool TryToPickUp(IPickupable pickup)
         {
             if (pickup == null) return false;
 
             bool bothHands = pickup.IsTwoHanded();
-            heldItem = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, strength);
+            heldItem = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, Strength);
             if (heldItem != null) RaiseArms(bothHands);
 
             return heldItem != null;
+        }
+
+        /// <summary>
+        /// Uses heldItem on the given Tile if not swinging
+        /// </summary>
+        private void TryUseHeldItemOn(IInteractable interactable, RaycastHit hitInfo)
+        {
+            if (toolSwinging != null || interactable == null) return;
+
+            if (interactable.TryInteractUsing(heldItem, hitInfo))
+            {
+                if (heldItem is Tool) toolSwinging = StartCoroutine(SwingTool());
+                else
+                {
+                    LowerArms(heldItem.IsTwoHanded());
+                    heldItem = null;
+                }
+            }
+            else if (heldItem is StackTile && interactable is StackTile stack) TrySwapHeldWith(stack);
+        }
+
+        private bool TrySwapHeldWith(StackTile stackBaseOnGround)
+        {
+            if ((heldItem as StackTile).StackType == stackBaseOnGround.StackType || !stackBaseOnGround.CanPickUp || stackBaseOnGround.GetStackCount() > Strength) return false;
+
+            var stackPos = Vector3Int.RoundToInt(stackBaseOnGround.transform.position);
+
+            stackBaseOnGround.TryPickUp(stackBaseOnGround.IsTwoHanded() ? pickupHolder : toolHolder, Strength);
+            map.PlacePickup(heldItem, stackPos);
+
+            heldItem = stackBaseOnGround;
+
+            return true;
         }
 
         /// <summary>
@@ -179,24 +214,6 @@ namespace Uncooked.Player
             LowerArms(heldItem.IsTwoHanded());
             heldItem = null;
         }
-
-        /// <summary>
-        /// Uses heldItem on the given Tile if not swinging
-        /// </summary>
-        private void TryUseHeldItemOn(IInteractable interactable, RaycastHit hitInfo)
-        {
-            if (toolSwinging != null || interactable == null) return;
-
-            if (interactable.TryInteractUsing(heldItem, hitInfo))
-            {
-                if (heldItem is Tool) toolSwinging = StartCoroutine(SwingTool());
-                else
-                {
-                    LowerArms(heldItem.IsTwoHanded());
-                    heldItem = null;
-                }
-            }
-        }
         #endregion
 
         #region Limb Movement
@@ -212,7 +229,7 @@ namespace Uncooked.Player
         }
 
         /// <summary>
-        /// Points armR to the local downwards
+        /// Points armR or both arms to the local downwards
         /// </summary>
         /// <param name="both">Makes armL point downwards too</param>
         private void LowerArms(bool both)

@@ -2021,6 +2021,7 @@ Transform:
   - {fileID: 28157771}
   - {fileID: 1812546657}
   - {fileID: 150834843}
+  - {fileID: 2088210151}
   - {fileID: 1122864374}
   m_Father: {fileID: 2008014907}
   m_RootOrder: 7
@@ -19712,6 +19713,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 135214054}
+  leaderLocomotive: {fileID: 1720504294}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
   breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   burnPoint: {fileID: 1564682234}
@@ -26186,7 +26188,7 @@ MonoBehaviour:
   bridge: {fileID: 8000788900880814408, guid: 38de585089c892f4d93cb9f74028c9a4, type: 3}
   stackType: Wood
   tileHeight: 0.2
-  startStackHeight: 10
+  startStackHeight: 5
 --- !u!1 &737380093
 GameObject:
   m_ObjectHideFlags: 0
@@ -35392,6 +35394,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 0}
+  leaderLocomotive: {fileID: 0}
   burningParticlePrefab: {fileID: 0}
   breakParticlePrefab: {fileID: 0}
   burnPoint: {fileID: 0}
@@ -37058,6 +37061,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1601105886}
+  leaderLocomotive: {fileID: 1720504294}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
   breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   burnPoint: {fileID: 1448032562}
@@ -40183,13 +40187,12 @@ MonoBehaviour:
   moveSpeed: 7
   legSwingCoefficient: 0.04
   legRaiseAngle: 45
-  dash: 91
+  dash: 303
   dashSpeedMultiplier: 2.25
   dashDuration: 0.2
   armTurnSpeed: 180
   armSwingSpeed: 2000
   interactInterval: 0.3
-  strength: 1
   armL: {fileID: 2118503858}
   armR: {fileID: 1066150003}
   legL: {fileID: 1279222225}
@@ -40557,7 +40560,7 @@ Transform:
   m_Children:
   - {fileID: 1265984632}
   m_Father: {fileID: 56409204}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1122864375
 BoxCollider:
@@ -41875,7 +41878,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactMask:
     serializedVersion: 2
-    m_Bits: 2577
+    m_Bits: 2833
   baseTrainSpeed: 0.03
   trainSpeedIncrement: 0.02
   speedUpMultiplier: 40
@@ -44284,6 +44287,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2011672676}
+  leaderLocomotive: {fileID: 1720504294}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
   breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   burnPoint: {fileID: 471455602}
@@ -56574,7 +56578,7 @@ MonoBehaviour:
   bridge: {fileID: 0}
   stackType: Rock
   tileHeight: 0.4
-  startStackHeight: 10
+  startStackHeight: 5
 --- !u!1 &1581448754
 GameObject:
   m_ObjectHideFlags: 0
@@ -62224,6 +62228,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 253253078}
+  leaderLocomotive: {fileID: 1720504294}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
   breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   burnPoint: {fileID: 116703983}
@@ -76709,6 +76714,72 @@ MonoBehaviour:
   meshParent: {fileID: 1288011619}
   lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+--- !u!1001 &2088210150
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 56409204}
+    m_Modifications:
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: startStackHeight
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 6142629535676016274, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+      propertyPath: m_Name
+      value: Rail
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+--- !u!4 &2088210151 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+  m_PrefabInstance: {fileID: 2088210150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2092425290
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,6 +13,7 @@ namespace Uncooked.Train
         /// Invoked when a player takes a tile from the stack
         /// </summary>
         public event System.Action OnTaken;
+        public event System.Action<HolderCar> OnUpgrade;
         [Space]
         [SerializeField] private Transform holderSpawnPoint;
 
@@ -29,7 +30,7 @@ namespace Uncooked.Train
 
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (GameManager.instance.CurrentState == GameState.Edit) return base.TryPickUp(parent, amount);
+            if (GameManager.instance.IsEditing()) return base.TryPickUp(parent, amount);
             else return TryPickupCraftedTile(parent, amount);
         }
 
@@ -53,6 +54,16 @@ namespace Uncooked.Train
 
             OnTaken?.Invoke();
             return holdersContent;
+        }
+
+        protected override bool TryUpgradeCar(TrainCar newCar)
+        {
+            if (base.TryUpgradeCar(newCar))
+            {
+                OnUpgrade?.Invoke(newCar as HolderCar);
+                return true;
+            }
+            else return false;
         }
     }
 }

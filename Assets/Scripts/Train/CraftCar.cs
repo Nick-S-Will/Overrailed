@@ -29,21 +29,34 @@ namespace Uncooked.Train
 
         override protected void Start()
         {
-            if (craftResultHolder) craftResultHolder.OnTaken += ProductTaken;
+            if (craftResultHolder) AddToHolderEvents();
 
             base.Start();
         }
 
+        #region Car Upgrading
         protected override bool TryUpgradeCar(TrainCar newCar)
         {
             if (base.TryUpgradeCar(newCar))
             {
                 ((CraftCar)newCar).craftResultHolder = craftResultHolder;
                 craftResultHolder.OnTaken += ((CraftCar)newCar).ProductTaken;
+                craftResultHolder.OnUpgrade += ((CraftCar)newCar).UpdateHolder;
                 return true;
             }
             else return false;
         }
+        private void UpdateHolder(HolderCar newHolder) 
+        { 
+            craftResultHolder = newHolder;
+            AddToHolderEvents();
+        }
+        private void AddToHolderEvents()
+        {
+            craftResultHolder.OnTaken += ProductTaken;
+            craftResultHolder.OnUpgrade += UpdateHolder;
+        }
+        #endregion
 
         private void ProductTaken()
         {
@@ -55,7 +68,7 @@ namespace Uncooked.Train
             while (CanCraft)
             {
                 yield return StartCoroutine(Craft());
-                yield return new WaitUntil(() => GameManager.instance.CurrentState == GameState.Play);
+                yield return new WaitUntil(() => GameManager.instance.IsPlaying());
             }
         }
 
@@ -101,7 +114,7 @@ namespace Uncooked.Train
                 if (onCount - (int)(oldPercent * craftMeshes.Length) == 1) craftMeshes[onCount - 1].enabled = true;
 
                 yield return null;
-                if (GameManager.instance.CurrentState == GameState.Edit)
+                if (GameManager.instance.IsEditing())
                 {
                     foreach (var mesh in craftMeshes) mesh.enabled = true;
                     break;
@@ -170,7 +183,11 @@ namespace Uncooked.Train
 
         private void OnDestroy()
         {
-            if (craftResultHolder) craftResultHolder.OnTaken -= ProductTaken;
+            if (craftResultHolder)
+            {
+                craftResultHolder.OnTaken -= ProductTaken;
+                craftResultHolder.OnUpgrade -= UpdateHolder;
+            }
         }
     }
 }

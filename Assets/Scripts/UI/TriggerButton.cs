@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Managers;
+using Uncooked.Player;
 
 namespace Uncooked.UI
 {
@@ -38,7 +38,7 @@ namespace Uncooked.UI
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.tag.Equals("Player")) barLoading = StartCoroutine(LoadAction());
+            if (other.tag.Equals("Player") && !other.GetComponent<PlayerController>().IsHoldingItem) barLoading = StartCoroutine(LoadAction());
         }
 
         private void OnTriggerExit(Collider other)
@@ -49,9 +49,9 @@ namespace Uncooked.UI
                 {
                     StopCoroutine(barLoading);
                     barLoading = null;
-                }
 
-                loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
+                    loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
+                }
             }
         }
 

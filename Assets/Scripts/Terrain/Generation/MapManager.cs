@@ -45,6 +45,15 @@ namespace Uncooked.Terrain.Generation
         private List<Transform> newHighlights = new List<Transform>(), highlights = new List<Transform>();
 
         public Vector3 StartPoint => stationPos;
+        public int Seed
+        {
+            get { return seed; }
+            private set
+            {
+                seed = value;
+                OnGenerate?.Invoke(seed.ToString());
+            }
+        }
 
         public void Start()
         {
@@ -303,49 +312,48 @@ namespace Uncooked.Terrain.Generation
         /// <summary>
         /// Places given Tile at coords, sets obstacleParent as its parent, and enables its BoxCollider
         /// </summary>
-        public void PlacePickup(IPickupable pickup, Vector3Int coords)
+        public void PlacePickup(IPickupable pickup, Vector3Int startCoords)
         {
+            if (!PointIsInBounds(startCoords)) throw new System.Exception("Starting coord isn't in the bounds of the map");
+            
             LayerMask mask = LayerMask.GetMask("Default", "Water", "Rail", "Train");
-            coords = FindClosestEmptyCoord(coords, mask);
-
-            Transform obj = (pickup as Tile).transform;
-            obj.parent = GetParentAt(coords);
-            obj.position = coords;
-            obj.localRotation = Quaternion.identity;
-
-            obj.GetComponent<BoxCollider>().enabled = true;
-            pickup.Drop(coords);
-        }
-
-        /// <summary>
-        /// Finds the closest coord on the XZ plane that isn't occupied
-        /// </summary>
-        /// <param name="startCoord">Starting point of the search which must be in the map bounds</param>
-        /// <param name="mask">Mask of layers to be aware of</param>
-        /// <returns>The position of the closest empty coord on the map</returns>
-        private Vector3Int FindClosestEmptyCoord(Vector3Int startCoord, LayerMask mask) 
-        {
-            if (!PointIsInBounds(startCoord)) throw new System.Exception("Starting coord isn't in the bounds of the map");
-
             var flags = new HashSet<Vector3Int>();
             var toCheck = new Queue<Vector3Int>();
-            toCheck.Enqueue(startCoord);
+            toCheck.Enqueue(startCoords);
             while (toCheck.Count > 0)
             {
                 var coord = toCheck.Dequeue();
-                if (Physics.OverlapBox(coord, 0.1f * Vector3.one, Quaternion.identity, mask).Length > 0)
+                Collider[] colliders = Physics.OverlapBox(coord, 0.1f * Vector3.one, Quaternion.identity, mask);
+                if (colliders.Length > 0)
                 {
+                    // Tries to stack pickup if possible
+                    var stack = colliders[0].GetComponent<StackTile>();
+                    if (pickup is StackTile toStack && stack != null && toStack.TryStackOn(stack)) return;
+
+                    // Prevents from checking same coord twice
                     flags.Add(coord);
 
-                    var points = new Vector3Int[] { coord + Vector3Int.forward, coord + Vector3Int.right, coord + Vector3Int.back, coord + Vector3Int.left };
-                    foreach (var point in points) if (!flags.Contains(point) && PointIsInBounds(point)) toCheck.Enqueue(point);
+                    // Adds adjacent points to list of points to check
+                    foreach (var point in GetAdjacentCoords(coord)) if (!flags.Contains(point) && PointIsInBounds(point)) toCheck.Enqueue(point);
                 }
-                else return coord;
+                else
+                {
+                    // Places pickup in empty space
+                    var t = (pickup as MonoBehaviour).transform;
+                    t.parent = GetParentAt(coord);
+                    t.position = coord;
+                    t.localRotation = Quaternion.identity;
+
+                    t.GetComponent<BoxCollider>().enabled = true;
+                    pickup.Drop(coord);
+                    return;
+                }
             }
 
-            throw new System.Exception("No empty coord found somehow");
+            throw new System.Exception("No viable coord found on map");
         }
-
+        private Vector3Int[] GetAdjacentCoords(Vector3Int coord) => new Vector3Int[] { coord + Vector3Int.forward, coord + Vector3Int.right, coord + Vector3Int.back, coord + Vector3Int.left };
+        
         public bool PointIsInBounds(Vector3 point)
         {
             var groundCollider = transform.GetChild(0);
@@ -366,7 +374,7 @@ namespace Uncooked.Terrain.Generation
             {
                 foreach (var collider in transform.GetChild(i).GetChild(0).GetComponentsInChildren<BoxCollider>())
                 {
-                    if (collider.gameObject.layer == LayerMask.NameToLayer("Water")) collider.enabled = enabled;
+                    collider.enabled = enabled;
                 }
             }
 
@@ -375,6 +383,10 @@ namespace Uncooked.Terrain.Generation
             {
                 foreach (var collider in transform.GetChild(i).GetChild(1).GetComponentsInChildren<BoxCollider>())
                 {
+                    // Prevents tiles in a stack to all enable their hitboxes
+                    var stack = collider.GetComponent<StackTile>();
+                    if (stack && stack.PrevInStack) continue;
+
                     if (collider.gameObject.layer == LayerMask.NameToLayer("Default")) collider.enabled = enabled;
                 }
             }

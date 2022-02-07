@@ -11,8 +11,10 @@ namespace Uncooked.Train
 {
     public abstract class TrainCar : Tile, IPickupable, IInteractable
     {
-        public event System.Action OnDeath, OnStartDriving, OnPauseDriving;
+        public event System.Action OnDeath;
+        protected event System.Action OnStartDriving, OnPauseDriving;
 
+        [SerializeField] private Locomotive leaderLocomotive;
         [Space]
         [SerializeField] private ParticleSystem burningParticlePrefab;
         [SerializeField] private ParticleSystem breakParticlePrefab;
@@ -33,6 +35,7 @@ namespace Uncooked.Train
         override protected void Start()
         {
             if (startRail) _ = TrySetRail(startRail, false);
+            if (leaderLocomotive) leaderLocomotive.OnStartTrain += StartDriving;
             OnDeath += Die;
 
             base.Start();
@@ -42,11 +45,9 @@ namespace Uncooked.Train
 
         private IEnumerator Drive()
         {
-            GameManager.instance.OnStartGame -= StartDriving;
-            GameManager.instance.OnEndCheckpoint -= StartDriving;
-
             OnStartDriving?.Invoke();
 
+            // Sets initial start values
             var target = currentRail.Path.GetChild(pathIndex);
             var startForward = target.forward;
             float startDst = (target.position - transform.position).magnitude;
@@ -74,6 +75,7 @@ namespace Uncooked.Train
                         else UpdateRail(nextRail);
                     }
 
+                    // Sets new start values
                     startForward = pathDir * target.forward;
                     target = currentRail.Path.GetChild(pathIndex);
                     startDst = (target.position - transform.position).magnitude;
@@ -84,14 +86,17 @@ namespace Uncooked.Train
                 transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
                 yield return null;
-                if (GameManager.instance.CurrentState == GameState.Pause || GameManager.instance.CurrentState == GameState.Edit)
+                if (GameManager.instance.IsEditing())
                 {
                     OnPauseDriving?.Invoke();
-                    yield return new WaitUntil(() => GameManager.instance.CurrentState == GameState.Play);
+                    yield return DriveWait();
                     OnStartDriving?.Invoke();
                 }
+                else if (GameManager.instance.IsPaused()) yield return DriveWait();
             }
         }
+
+        private WaitUntil DriveWait() => new WaitUntil(() => this is Locomotive ? GameManager.instance.IsPlaying() : leaderLocomotive.IsDriving);
 
         /// <summary>
         /// Picks up this car if in edit mode
@@ -99,7 +104,7 @@ namespace Uncooked.Train
         /// <returns>This train car if in edit mode, otherwise null</returns>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (GameManager.instance.CurrentState != GameState.Edit) return null;
+            if (GameManager.instance.CurrentState != GameState.Edit || this is Locomotive || currentRail) return null;
 
             GetComponent<BoxCollider>().enabled = false;
             transform.parent = parent;
@@ -115,7 +120,7 @@ namespace Uncooked.Train
 
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (GameManager.instance.CurrentState == GameState.Edit && item is TrainCar car) return TryUpgradeCar(car);
+            if (GameManager.instance.IsEditing() && item is TrainCar car) return TryUpgradeCar(car);
             else if (item is Bucket bucket) return TryExtinguish(bucket);
             else return false;
         }
@@ -124,7 +129,11 @@ namespace Uncooked.Train
         {
             if (newCar.GetType() != GetType() || newCar.tier <= tier) return false;
 
-            _ = newCar.TrySetRail(currentRail, false);
+            if (newCar.TrySetRail(currentRail, false))
+            {
+                newCar.leaderLocomotive = leaderLocomotive;
+                newCar.StartDriving();
+            }
             OnDeath?.Invoke();
             return true;
         }
@@ -185,9 +194,6 @@ namespace Uncooked.Train
 
             GetComponent<BoxCollider>().enabled = !isPermeable;
 
-            GameManager.instance.OnStartGame += StartDriving;
-            GameManager.instance.OnEndCheckpoint += StartDriving;
-
             return true;
         }
 
@@ -197,7 +203,7 @@ namespace Uncooked.Train
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
-            newRail.NewPassenger(this);
+            newRail.Embark();
             currentRail = newRail;
 
             if (newRail.IsStraight)

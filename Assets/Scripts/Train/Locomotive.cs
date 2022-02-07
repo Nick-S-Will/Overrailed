@@ -8,13 +8,17 @@ namespace Uncooked.Train
 {
     public class Locomotive : TrainCar
     {
+        public System.Action OnStartTrain;
+
         [Space]
         [SerializeField] private ParticleSystem smokeParticlePrefab;
         [SerializeField] private Transform smokePoint;
 
         protected ParticleSystem smokeParticles;
 
-        public int MaxCarCount() => 5 + tier;
+        public int MaxCarCount => 4 + 2 * tier;
+        public int CarCount { get; private set; } = 4;
+        public bool IsDriving => smokeParticles.emission.enabled;
 
         protected override void Start()
         {
@@ -35,6 +39,18 @@ namespace Uncooked.Train
             var emissionSettings = smokeParticles.emission;
             emissionSettings.enabled = emit;
         }
+
+        public bool TryAddCar()
+        {
+            if (CarCount < MaxCarCount)
+            {
+                CarCount++;
+                return true;
+            }
+            else return false;
+        }
+
+        public void RemoveCar() => CarCount--;
 
         protected override void Die()
         {

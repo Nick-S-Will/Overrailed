@@ -2,34 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Managers;
 using Uncooked.Train;
+using Uncooked.UI;
 
-namespace Uncooked.UI
+namespace Uncooked.Managers
 {
     [RequireComponent(typeof(SpriteRenderer))]
-    public class TrainCarStore : MonoBehaviour
+    public class TrainStoreManager : MonoBehaviour
     {
+        public System.Action<string> OnCoinsChange;
+
         [SerializeField] private TrainCarHolder holderPrefab;
         [SerializeField] private SellPoint[] carTypes;
 
-        private float panelWidth;
+        private int coins;
 
-        private static int coins;
-
-        public static int Coins
+        public int Coins
         {
             get { return coins; }
             set
             {
-                HUDManager.instance.UpdateCoinsText(value.ToString());
                 coins = value;
+                OnCoinsChange(coins.ToString());
             }
         }
 
         void Start()
         {
-            panelWidth = GetComponent<SpriteRenderer>().size.x;
+            float panelWidth = GetComponent<SpriteRenderer>().size.x;
             float panelInterval = panelWidth / (carTypes.Length + 1);
             Coins = 10;
 
@@ -37,12 +37,13 @@ namespace Uncooked.UI
             for (int i = 0; i < carTypes.Length; i++)
             {
                 carTypes[i].holder = Instantiate(holderPrefab, transform);
+                carTypes[i].holder.SetManager(this);
 
                 float xOffset = (i + 1) * panelInterval - panelWidth / 2f;
                 carTypes[i].holder.transform.position = transform.position + xOffset * Vector3.right;
                 carTypes[i].holder.transform.rotation = Quaternion.identity;
 
-                carTypes[i].holder.gameObject.SetActive(GameManager.instance.CurrentState == GameState.Edit);
+                carTypes[i].holder.gameObject.SetActive(GameManager.instance.IsEditing());
             }
 
             GameManager.instance.OnCheckpoint += UpdateHoldersCars;
@@ -58,7 +59,7 @@ namespace Uncooked.UI
 
         private void SetHolderVisibility()
         {
-            foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.instance.CurrentState == GameState.Edit);
+            foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.instance.IsEditing());
         }
 
         void OnDestroy()
@@ -78,11 +79,9 @@ namespace Uncooked.UI
             [HideInInspector] public TrainCarHolder holder;
             private int nextIndex = 0;
 
-            public TrainCar[] TierPrefabs => tierPrefabs;
-
             public bool TrySetNextCar()
             {
-                if (nextIndex == tierPrefabs.Length - 1) return false;
+                if (nextIndex == tierPrefabs.Length) return false;
 
                 var car = Instantiate(tierPrefabs[nextIndex]);
                 car.GetComponent<BoxCollider>().enabled = false;
