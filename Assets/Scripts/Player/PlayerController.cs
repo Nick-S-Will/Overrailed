@@ -59,6 +59,8 @@ namespace Uncooked.Player
 
         void Start()
         {
+            // For beta
+            if (map == null) map = FindObjectOfType<MapManager>();
             controller = GetComponent<CharacterController>();
 
             lastDashTime = -dashDuration;
@@ -134,6 +136,7 @@ namespace Uncooked.Player
             if (Time.time < lastInteractTime + interactInterval) return;
             lastInteractTime = Time.time;
 
+            // TODO: try turning into an overlap, only using raycast if multiple are found
             if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hitData, 1, GameManager.instance.InteractMask))
             {
                 if (heldItem == null) TryToPickUp(hitData.transform.GetComponent<IPickupable>());

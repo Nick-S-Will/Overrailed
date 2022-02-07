@@ -32,7 +32,7 @@ namespace Uncooked.Managers
             else Debug.LogError("Multiple HUDManagers Exist");
 
             FindObjectOfType<GameManager>().OnSpeedChange += UpdateSpeedText;
-            map.OnGenerate += UpdateSeedText;
+            map.OnSeedChange += UpdateSeedText;
             foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
 
             seedStartLength = seedText.text.Length;
@@ -134,7 +134,7 @@ namespace Uncooked.Managers
             instance = null;
 
             if (GameManager.instance) GameManager.instance.OnSpeedChange -= UpdateSpeedText;
-            if (map) map.OnGenerate -= UpdateSeedText;
+            if (map) map.OnSeedChange -= UpdateSeedText;
             foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange -= UpdateCoinsText;
         }
 

@@ -10,7 +10,7 @@ namespace Uncooked.Terrain.Generation
 {
     public class MapManager : MonoBehaviour
     {
-        public event System.Action<string> OnGenerate;
+        public event System.Action<string> OnSeedChange;
 
         #region Inspector Variables
         [Header("Generation")] [SerializeField] private int seed = 0;
@@ -51,8 +51,15 @@ namespace Uncooked.Terrain.Generation
             private set
             {
                 seed = value;
-                OnGenerate?.Invoke(seed.ToString());
+                OnSeedChange?.Invoke(seed.ToString());
             }
+        }
+
+        private void Awake()
+        {
+            // For beta
+            Seed = Random.Range(0, 100);
+            GenerateMap();
         }
 
         public void Start()
@@ -62,8 +69,8 @@ namespace Uncooked.Terrain.Generation
             GameManager.instance.OnEndCheckpoint += EnableObstacles;
             GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
 
-            OnGenerate?.Invoke(seed.ToString());
             rng = new System.Random(seed);
+            OnSeedChange?.Invoke(seed.ToString());
         }
 
         void LateUpdate()
@@ -141,6 +148,7 @@ namespace Uncooked.Terrain.Generation
         public void GenerateMap()
         {
             chunks.Clear();
+            groundCollider = null;
             System.Action<Object> destroyType = DestroyImmediate;
             if (Application.isPlaying) destroyType = Destroy;
             foreach (Transform t in transform.Cast<Transform>().ToList()) destroyType(t.gameObject);
@@ -154,7 +162,7 @@ namespace Uncooked.Terrain.Generation
         /// </summary>
         public void AddChunk()
         {
-            if (Application.isPlaying) OnGenerate?.Invoke(seed.ToString());
+            if (Application.isPlaying) OnSeedChange?.Invoke(seed.ToString());
             var heightMap = GenerateHeightMap();
 
             var newChunk = new GameObject("Chunk " + chunks.Count).transform;

@@ -11,9 +11,8 @@ namespace Uncooked.Train
     {
         [Space]
         [SerializeField] private Transform liquid;
-        [SerializeField] private float liquidUsageInterval = 1;
 
-        protected float liquidPercent = 1;
+        protected float liquidPercent { get; private set; } = 1;
 
         protected override void Start()
         {
@@ -26,7 +25,7 @@ namespace Uncooked.Train
         {
             while (liquid)
             {
-                if (liquidPercent > 0) liquidPercent -= Time.fixedDeltaTime * (1 - 0.2f * tier);
+                if (liquidPercent > 0) liquidPercent -= (1 - 0.2f * tier) * Time.fixedDeltaTime;
                 else
                 {
                     liquidPercent = 0;
@@ -41,7 +40,7 @@ namespace Uncooked.Train
                     liquid.gameObject.SetActive(true);
                 }
 
-                yield return new WaitForSeconds(liquidUsageInterval);
+                yield return new WaitForSeconds(1.9f);
                 yield return new WaitUntil(() => GameManager.instance.IsPlaying());
             }
         }

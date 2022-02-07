@@ -19,12 +19,9 @@ namespace Uncooked.Managers
         [SerializeField] private Vector2 endSize;
         [SerializeField] private float fadeDuration;
 
-        private List<Locomotive> followPoints;
         private float startOffsetX;
-        private bool isFollowing = true;
 
         public Camera Main => mainCamera;
-        public Locomotive FirstTarget => followPoints[0];
 
         public static CameraManager instance;
 
@@ -36,28 +33,28 @@ namespace Uncooked.Managers
 
         void Start()
         {
-            followPoints = new List<Locomotive>();
-            foreach (Locomotive l in FindObjectsOfType<Locomotive>()) followPoints.Add(l);
-            if (followPoints.Count == 0) throw new System.Exception("No Locomotive in scene");
-
-            startOffsetX = mainCamera.transform.position.x - GetAverageFollowX();
-            _ = StartCoroutine(Follow());
+            startOffsetX = mainCamera.transform.position.x - GetAverageX(FindObjectsOfType<Locomotive>());
+            _ = StartCoroutine(FollowLocomotives());
         }
 
-        public void ContinueFollowing() => isFollowing = true;
-        public void StopFollowing() => isFollowing = false;
-
-        private IEnumerator Follow()
+        public IEnumerator FollowLocomotives()
         {
-            while (this)
+            yield return new WaitUntil(() => GameManager.instance.Locomotives != null);
+
+            while (instance == this)
             {
-                if (isFollowing)
+                Vector3 oldPos = mainCamera.transform.position;
+                try
                 {
-                    Vector3 oldPos = mainCamera.transform.position;
-                    mainCamera.transform.position = new Vector3(GetAverageFollowX() + startOffsetX, oldPos.y, oldPos.z);
+                    mainCamera.transform.position = new Vector3(GetAverageX(GameManager.instance.Locomotives) + startOffsetX, oldPos.y, oldPos.z);
+                }
+                catch (MissingReferenceException) 
+                {
+                    yield break;
                 }
 
                 yield return null;
+                yield return new WaitUntil(() => GameManager.instance.IsPlaying());
             }
         }
 
@@ -99,12 +96,11 @@ namespace Uncooked.Managers
         /// Calculates the averages transform.position.x in followPoints (field)
         /// </summary>
         /// <returns>The average x position in followPoints (field)</returns>
-        private float GetAverageFollowX()
+        private float GetAverageX(Locomotive[] locomotives)
         {
             float averageOffset = 0;
-
-            followPoints.ForEach(l => averageOffset += l.transform.position.x);
-            averageOffset /= followPoints.Count;
+            foreach (var locomotive in locomotives) averageOffset += locomotive.transform.position.x;
+            averageOffset /= locomotives.Length;
 
             return averageOffset;
         }

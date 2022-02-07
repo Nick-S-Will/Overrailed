@@ -162,7 +162,7 @@ namespace Uncooked.Train
         {
             burningParticles = Instantiate(burningParticlePrefab, burnPoint);
 
-            yield return new WaitForSeconds(4);
+            yield return new WaitForSeconds(6);
 
             if (!burningParticles) yield break;
 
@@ -203,7 +203,8 @@ namespace Uncooked.Train
         /// <param name="newRail">The RailTile the </param>
         private void UpdateRail(RailTile newRail)
         {
-            newRail.Embark();
+            if (currentRail) currentRail.Disembark(this);
+            newRail.Embark(this);
             currentRail = newRail;
 
             if (newRail.IsStraight)
@@ -240,6 +241,7 @@ namespace Uncooked.Train
         {
             BreakIntoParticles(breakParticlePrefab, MeshColorGradient, transform.position);
 
+            if (leaderLocomotive) leaderLocomotive.OnStartTrain -= StartDriving;
             Destroy(gameObject);
         }
 

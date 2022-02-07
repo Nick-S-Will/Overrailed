@@ -51,12 +51,5 @@ namespace Uncooked.Train
         }
 
         public void RemoveCar() => CarCount--;
-
-        protected override void Die()
-        {
-            CameraManager.instance.StopFollowing();
-            GameManager.instance.SpeedUp(); 
-            base.Die();
-        }
     }
 }

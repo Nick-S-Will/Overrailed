@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 using Uncooked.Player;
 using Uncooked.Train;
@@ -25,9 +26,11 @@ namespace Uncooked.Managers
         public GameObject[] numbersPrefabs;
         [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
 
+        private Locomotive[] locomotives;
         private float trainSpeed;
         private int checkpointCount;
 
+        public Locomotive[] Locomotives => locomotives;
         public GameState CurrentState { get; private set; }
         public LayerMask InteractMask => interactMask;
         public float TrainSpeed 
@@ -58,8 +61,15 @@ namespace Uncooked.Managers
         {
             TrainSpeed = baseTrainSpeed;
             CurrentState = GameState.Play;
-
+            
             StartTrainWithDelay(trainInitialDelay);
+        }
+
+        // For beta
+        private async void Reset()
+        {
+            await Task.Delay(5000);
+            if (Application.isPlaying) SceneManager.LoadScene("TestScene");
         }
 
         public void StartTrainWithDelay(float delayTime) => _ = StartCoroutine(StartTrain(delayTime));
@@ -68,7 +78,13 @@ namespace Uncooked.Managers
         {
             yield return new WaitForSeconds(delay - 5);
 
-            var locomotives = FindObjectsOfType<Locomotive>();
+            locomotives = FindObjectsOfType<Locomotive>();
+            foreach (var l in locomotives)
+            {
+                l.OnDeath += SpeedUp;
+                // For beta
+                l.OnDeath += Reset;
+            }
 
             for (int countDown = 5; countDown > 0; countDown--)
             {
@@ -99,6 +115,7 @@ namespace Uncooked.Managers
             while (Time.time < startTime + duration)
             {
                 await Task.Yield();
+                if (numTransform == null) break;
 
                 numTransform.position += deltaPos;
                 var newColor = Color.Lerp(startColor, endColor, (Time.time - startTime) / duration);
@@ -125,7 +142,7 @@ namespace Uncooked.Managers
             // Edit mode UI
             Vector3 pos = checkpointContinueButton.transform.position;
             checkpointContinueButton.GetComponent<BoxCollider>().enabled = true;
-            checkpointContinueButton.transform.position = new Vector3(pos.x, pos.y, CameraManager.instance.FirstTarget.transform.position.z - 1);
+            checkpointContinueButton.transform.position = new Vector3(pos.x, pos.y, locomotives[0].transform.position.z - 1);
 
             OnCheckpoint?.Invoke();
         }
@@ -159,8 +176,7 @@ namespace Uncooked.Managers
             {
                 currentTarget = moveTargets.Pop();
                 currentTarget.gameObject.layer = layer;
-                foreach (Transform child in currentTarget)
-                    moveTargets.Push(child);
+                foreach (Transform child in currentTarget) moveTargets.Push(child);
             }
         }
 
@@ -169,6 +185,16 @@ namespace Uncooked.Managers
             instance = null;
             
             checkpointContinueButton.OnClick -= ContinueFromCheckpoint;
+
+            if (locomotives == null) return;
+            foreach (var l in locomotives)
+            {
+                if (l == null) continue;
+
+                l.OnDeath -= SpeedUp;
+                // For beta
+                l.OnDeath -= Reset;
+            }
         }
     }
 }
