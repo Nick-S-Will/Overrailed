@@ -16,7 +16,7 @@ namespace Uncooked.Terrain.Generation
         [Header("Generation")] [SerializeField] private int seed = 0;
         [SerializeField] [Min(1)] private float noiseScale = 10;
         [SerializeField] private Vector2 noiseOffset;
-        [Range(1, 1000)] [SerializeField] private int chunkLength = 25, mapWidth = 19;
+        [Range(10, 1000)] [SerializeField] private int chunkLength = 25, mapWidth = 19;
 
         [Header("Regions")] [SerializeField] private Biome groundBiome = Biome.Base;
         [SerializeField] private Biome obstacleBiome = Biome.Base;
@@ -58,15 +58,15 @@ namespace Uncooked.Terrain.Generation
         private void Awake()
         {
             // For beta
-            Seed = Random.Range(0, 100);
-            GenerateMap();
+            // Seed = Random.Range(0, 100);
+            // GenerateMap();
         }
 
         public void Start()
         {
-            GameManager.instance.OnCheckpoint += AddChunk; // Must be before DisableObstacles
-            GameManager.instance.OnCheckpoint += DisableObstacles; // Must be after AddChunk
+            GameManager.instance.OnCheckpoint += DisableObstacles;
             GameManager.instance.OnEndCheckpoint += EnableObstacles;
+            GameManager.instance.OnEndCheckpoint += AddChunk;
             GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
 
             rng = new System.Random(seed);
@@ -290,7 +290,7 @@ namespace Uncooked.Terrain.Generation
         /// <returns>The transform of the tile at <paramref name="pos"/> if there is one, otherwise null</returns>
         public Transform GetTileAt(Vector3Int pos)
         {
-            if (!PointIsInBounds(pos)) return null;
+            if (!PointIsInPlayBounds(pos)) return null;
 
             if (pos.y == transform.position.y)
             {
@@ -322,7 +322,7 @@ namespace Uncooked.Terrain.Generation
         /// </summary>
         public void PlacePickup(IPickupable pickup, Vector3Int startCoords)
         {
-            if (!PointIsInBounds(startCoords)) throw new System.Exception("Starting coord isn't in the bounds of the map");
+            if (!PointIsInPlayBounds(startCoords)) throw new System.Exception("Starting coord isn't in the bounds of the map");
             
             LayerMask mask = LayerMask.GetMask("Default", "Water", "Rail", "Train");
             var flags = new HashSet<Vector3Int>();
@@ -342,7 +342,7 @@ namespace Uncooked.Terrain.Generation
                     flags.Add(coord);
 
                     // Adds adjacent points to list of points to check
-                    foreach (var point in GetAdjacentCoords(coord)) if (!flags.Contains(point) && PointIsInBounds(point)) toCheck.Enqueue(point);
+                    foreach (var point in GetAdjacentCoords(coord)) if (!flags.Contains(point) && PointIsInPlayBounds(point)) toCheck.Enqueue(point);
                 }
                 else
                 {
@@ -362,12 +362,27 @@ namespace Uncooked.Terrain.Generation
         }
         private Vector3Int[] GetAdjacentCoords(Vector3Int coord) => new Vector3Int[] { coord + Vector3Int.forward, coord + Vector3Int.right, coord + Vector3Int.back, coord + Vector3Int.left };
         
-        public bool PointIsInBounds(Vector3 point)
+        /// <summary>
+        /// Checks if <paramref name="point"/> is over the ground collider, up to 3 units above it
+        /// </summary>
+        public bool PointIsInPlayBounds(Vector3 point)
         {
             var groundCollider = transform.GetChild(0);
             var center = groundCollider.position;
             var size = groundCollider.GetComponent<BoxCollider>().size;
-            var bounds = new Bounds(new Vector3(center.x, 1, center.z), new Vector3(size.x, 3, size.z));
+            var bounds = new Bounds(new Vector3(center.x, 1.5f, center.z), new Vector3(size.x, 3, size.z));
+
+            return bounds.Contains(point);
+        }
+        /// <summary>
+        /// Checks if <paramref name="point"/> is over the ground collider extended by 30 on the x axis and up to 3 units above it
+        /// </summary>
+        public bool PointInEditBounds(Vector3 point)
+        {
+            var groundCollider = transform.GetChild(0);
+            var center = groundCollider.position;
+            var size = groundCollider.GetComponent<BoxCollider>().size;
+            var bounds = new Bounds(new Vector3(center.x, 1.5f, center.z), new Vector3(size.x + 30, 3, size.z));
 
             return bounds.Contains(point);
         }

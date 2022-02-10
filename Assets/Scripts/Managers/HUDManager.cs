@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using Uncooked.Terrain.Generation;
+using Uncooked.Train;
 using Uncooked.Terrain.Tools;
 
 namespace Uncooked.Managers
@@ -31,7 +32,7 @@ namespace Uncooked.Managers
             if (instance == null) instance = this;
             else Debug.LogError("Multiple HUDManagers Exist");
 
-            FindObjectOfType<GameManager>().OnSpeedChange += UpdateSpeedText;
+            FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
             map.OnSeedChange += UpdateSeedText;
             foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
 
@@ -133,7 +134,6 @@ namespace Uncooked.Managers
         {
             instance = null;
 
-            if (GameManager.instance) GameManager.instance.OnSpeedChange -= UpdateSpeedText;
             if (map) map.OnSeedChange -= UpdateSeedText;
             foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange -= UpdateCoinsText;
         }

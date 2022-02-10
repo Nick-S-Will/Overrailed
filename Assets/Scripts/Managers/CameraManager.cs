@@ -33,6 +33,9 @@ namespace Uncooked.Managers
 
         void Start()
         {
+            GameManager.instance.OnCheckpoint += TransitionEditMode;
+            GameManager.instance.OnEndCheckpoint += TransitionGameMode;
+
             startOffsetX = mainCamera.transform.position.x - GetAverageX(FindObjectsOfType<Locomotive>());
             _ = StartCoroutine(FollowLocomotives());
         }
@@ -41,20 +44,33 @@ namespace Uncooked.Managers
         {
             yield return new WaitUntil(() => GameManager.instance.Locomotives != null);
 
-            while (instance == this)
+            while (GameManager.instance)
             {
                 Vector3 oldPos = mainCamera.transform.position;
                 try
                 {
                     mainCamera.transform.position = new Vector3(GetAverageX(GameManager.instance.Locomotives) + startOffsetX, oldPos.y, oldPos.z);
                 }
-                catch (MissingReferenceException) 
+                catch (MissingReferenceException)
                 {
                     yield break;
                 }
 
                 yield return null;
                 yield return new WaitUntil(() => GameManager.instance.IsPlaying());
+            }
+        }
+
+        public async Task SlideToStart()
+        {
+            var camTransform = mainCamera.transform;
+            var finalPos = new Vector3(4, camTransform.position.y, camTransform.position.z);
+
+            while (camTransform.position != finalPos)
+            {
+                camTransform.position = Vector3.MoveTowards(camTransform.position, finalPos, 5 * Time.deltaTime);
+
+                await Task.Yield();
             }
         }
 
@@ -108,6 +124,12 @@ namespace Uncooked.Managers
         private void OnDestroy()
         {
             instance = null;
+
+            if (GameManager.instance)
+            {
+                GameManager.instance.OnCheckpoint -= TransitionEditMode;
+                GameManager.instance.OnEndCheckpoint -= TransitionGameMode;
+            }
         }
     }
 }

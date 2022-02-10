@@ -66,13 +66,12 @@ namespace Uncooked.Train
                     // Reached end of rail
                     else if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
                     {
-                        var nextRail = currentRail.TryGetNextPoweredRail();
-                        if (nextRail == null)
+                        if (currentRail.nextRail) UpdateRail(currentRail.nextRail);
+                        else
                         {
                             OnDeath?.Invoke();
                             yield break;
                         }
-                        else UpdateRail(nextRail);
                     }
 
                     // Sets new start values
@@ -81,7 +80,7 @@ namespace Uncooked.Train
                     startDst = (target.position - transform.position).magnitude;
                 }
 
-                transform.position = Vector3.MoveTowards(transform.position, target.position, GameManager.instance.TrainSpeed * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, target.position, leaderLocomotive.TrainSpeed * Time.deltaTime);
                 float currentDst = (target.position - transform.position).magnitude;
                 transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
@@ -95,7 +94,6 @@ namespace Uncooked.Train
                 else if (GameManager.instance.IsPaused()) yield return DriveWait();
             }
         }
-
         private WaitUntil DriveWait() => new WaitUntil(() => this is Locomotive ? GameManager.instance.IsPlaying() : leaderLocomotive.IsDriving);
 
         /// <summary>

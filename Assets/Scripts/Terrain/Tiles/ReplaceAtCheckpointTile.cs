@@ -17,7 +17,7 @@ namespace Uncooked.Terrain.Tiles
         {
             foreach (MapManager map in FindObjectsOfType<MapManager>())
             {
-                if (map.PointIsInBounds(transform.position))
+                if (map.PointIsInPlayBounds(transform.position))
                 {
                     map.PlacePickup(Instantiate(replacementTile), Vector3Int.RoundToInt(transform.position + Vector3.up));
                     Destroy(gameObject);

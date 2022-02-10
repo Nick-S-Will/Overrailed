@@ -14,8 +14,8 @@ namespace Uncooked.Managers
 
     public class GameManager : MonoBehaviour
     {
+        public event System.Action<GameState> OnStateChange;
         public event System.Action OnCheckpoint, OnEndCheckpoint;
-        public event System.Action<string> OnSpeedChange;
 
         [SerializeField] private LayerMask interactMask;
         [SerializeField] [Min(0)] private float baseTrainSpeed = 0.05f, trainSpeedIncrement = 0.05f, speedUpMultiplier = 2;
@@ -27,21 +27,22 @@ namespace Uncooked.Managers
         [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
 
         private Locomotive[] locomotives;
-        private float trainSpeed;
+        private GameState currentState;
         private int checkpointCount;
 
         public Locomotive[] Locomotives => locomotives;
-        public GameState CurrentState { get; private set; }
-        public LayerMask InteractMask => interactMask;
-        public float TrainSpeed 
+        public GameState CurrentState 
         {
-            get { return trainSpeed; }
-            private set {
-                trainSpeed = value;
-                OnSpeedChange?.Invoke(trainSpeed.ToString());
+            get => currentState;
+            private set 
+            {
+                currentState = value;
+                OnStateChange?.Invoke(value);
             } 
         }
-        public bool TrainIsSpeeding => TrainSpeed - (baseTrainSpeed + trainSpeedIncrement * checkpointCount) > 0.0001f; // > operator is inconsistent
+        public LayerMask InteractMask => interactMask;
+        public float GetBaseTrainSpeed() => baseTrainSpeed + trainSpeedIncrement * checkpointCount;
+        public float GetBoostTrainSpeed() => speedUpMultiplier * (baseTrainSpeed + trainSpeedIncrement * checkpointCount);
         public bool IsPlaying() => CurrentState == GameState.Play;
         public bool IsPaused() => CurrentState == GameState.Pause;
         public bool IsEditing() => CurrentState == GameState.Edit;
@@ -59,33 +60,26 @@ namespace Uncooked.Managers
 
         void Start()
         {
-            TrainSpeed = baseTrainSpeed;
-            CurrentState = GameState.Play;
+            currentState = GameState.Play;
             
-            StartTrainWithDelay(trainInitialDelay);
+            StartTrainsWithDelay(trainInitialDelay);
         }
 
         // For beta
-        private async void Reset()
+        private void Reset()
         {
-            await Task.Delay(5000);
             if (Application.isPlaying) SceneManager.LoadScene("TestScene");
         }
 
-        public void StartTrainWithDelay(float delayTime) => _ = StartCoroutine(StartTrain(delayTime));
+        public void StartTrainsWithDelay(float delayTime) => _ = StartCoroutine(StartTrains(delayTime));
 
-        private IEnumerator StartTrain(float delay)
+        private IEnumerator StartTrains(float delay)
         {
             yield return new WaitForSeconds(delay - 5);
 
             locomotives = FindObjectsOfType<Locomotive>();
-            foreach (var l in locomotives)
-            {
-                l.OnDeath += SpeedUp;
-                // For beta
-                l.OnDeath += Reset;
-            }
-
+            foreach (var locomotive in locomotives) locomotive.OnDeath += EndGame;
+            
             for (int countDown = 5; countDown > 0; countDown--)
             {
                 yield return new WaitUntil(() => IsPlaying());
@@ -94,7 +88,7 @@ namespace Uncooked.Managers
                 yield return new WaitForSeconds(1);
             }
 
-            foreach (var l in locomotives) l.OnStartTrain?.Invoke();
+            foreach (var l in locomotives) l.StartTrain();
         }
 
         /// <summary>
@@ -122,22 +116,13 @@ namespace Uncooked.Managers
                 foreach (var mesh in meshes) mesh.material.color = newColor;
             }
 
-            Destroy(numTransform.gameObject);
+            if (numTransform) Destroy(numTransform.gameObject);
         }
-
-        /// <summary>
-        /// Gives train temporary speed buff until it reaches the next checkpoint
-        /// </summary>
-        public void SpeedUp() => trainSpeed = speedUpMultiplier * (baseTrainSpeed + trainSpeedIncrement * checkpointCount);
 
         public void ReachCheckpoint()
         {
-            foreach (var player in FindObjectsOfType<PlayerController>()) player.ForceDrop();
-
-            // Managers
             CurrentState = GameState.Edit;
             checkpointCount++;
-            CameraManager.instance.TransitionEditMode();
 
             // Edit mode UI
             Vector3 pos = checkpointContinueButton.transform.position;
@@ -151,13 +136,19 @@ namespace Uncooked.Managers
         {
             // Managers
             CurrentState = GameState.Play;
-            TrainSpeed = baseTrainSpeed + trainSpeedIncrement * checkpointCount;
-            CameraManager.instance.TransitionGameMode();
 
             // Edit mode UI
             checkpointContinueButton.GetComponent<BoxCollider>().enabled = false;
 
             OnEndCheckpoint?.Invoke();
+        }
+
+        private async void EndGame()
+        {
+            await Task.Delay(2000);
+            await CameraManager.instance.SlideToStart();
+
+            Reset();
         }
 
         // Mainly used method for edit cam to see tracks
@@ -185,16 +176,6 @@ namespace Uncooked.Managers
             instance = null;
             
             checkpointContinueButton.OnClick -= ContinueFromCheckpoint;
-
-            if (locomotives == null) return;
-            foreach (var l in locomotives)
-            {
-                if (l == null) continue;
-
-                l.OnDeath -= SpeedUp;
-                // For beta
-                l.OnDeath -= Reset;
-            }
         }
     }
 }

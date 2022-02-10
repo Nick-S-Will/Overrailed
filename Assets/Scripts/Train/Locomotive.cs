@@ -8,14 +8,25 @@ namespace Uncooked.Train
 {
     public class Locomotive : TrainCar
     {
-        public System.Action OnStartTrain;
+        public event System.Action<string> OnSpeedChange;
+        public event System.Action OnStartTrain;
 
         [Space]
         [SerializeField] private ParticleSystem smokeParticlePrefab;
         [SerializeField] private Transform smokePoint;
 
         protected ParticleSystem smokeParticles;
+        private float trainSpeed;
 
+        public float TrainSpeed
+        {
+            get { return trainSpeed; }
+            private set
+            {
+                trainSpeed = value;
+                OnSpeedChange?.Invoke(trainSpeed.ToString());
+            }
+        }
         public int MaxCarCount => 4 + 2 * tier;
         public int CarCount { get; private set; } = 4;
         public bool IsDriving => smokeParticles.emission.enabled;
@@ -24,12 +35,17 @@ namespace Uncooked.Train
         {
             OnStartDriving += StartEmittingSmoke;
             OnPauseDriving += StopEmittingSmoke;
+            OnDeath += SpeedUp;
+            GameManager.instance.OnEndCheckpoint += ReturnToBaseSpeed;
             
             base.Start();
 
             smokeParticles = Instantiate(smokeParticlePrefab, smokePoint);
+            ReturnToBaseSpeed();
             SetEmitSmoke(false);
         }
+
+        public void StartTrain() => OnStartTrain?.Invoke();
 
         protected void StartEmittingSmoke() => SetEmitSmoke(true);
         protected void StopEmittingSmoke() => SetEmitSmoke(false);
@@ -40,6 +56,13 @@ namespace Uncooked.Train
             emissionSettings.enabled = emit;
         }
 
+        /// <summary>
+        /// Gives train temporary speed buff until it reaches the next checkpoint
+        /// </summary>
+        public void SpeedUp() => trainSpeed = GameManager.instance.GetBoostTrainSpeed();
+        
+        public void ReturnToBaseSpeed() => TrainSpeed = GameManager.instance.GetBaseTrainSpeed();
+        
         public bool TryAddCar()
         {
             if (CarCount < MaxCarCount)

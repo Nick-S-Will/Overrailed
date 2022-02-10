@@ -59,8 +59,11 @@ namespace Uncooked.Player
 
         void Start()
         {
+            GameManager.instance.OnCheckpoint += ForceDrop;
+
             // For beta
             if (map == null) map = FindObjectOfType<MapManager>();
+
             controller = GetComponent<CharacterController>();
 
             lastDashTime = -dashDuration;
@@ -73,7 +76,7 @@ namespace Uncooked.Player
             // Interact Input
             if (Input.GetMouseButton(0)) TryInteract();
 
-            // Tile highlight
+            // Tile highlighting
             var tile = map.GetTileAt(LookPoint);
             if (tile == null) tile = map.GetTileAt(LookPoint + Vector3Int.down);
             map.TryHighlightTile(tile);
@@ -98,7 +101,7 @@ namespace Uncooked.Player
             if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
 
             // Moves player
-            if (map.PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
+            if (map.PointIsInPlayBounds(transform.position + deltaPos) || map.PointInEditBounds(transform.position + deltaPos)) controller.Move(deltaPos);
         }
 
         /// <summary>
@@ -200,7 +203,7 @@ namespace Uncooked.Player
         private bool TryDrop()
         {
             Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
-            if (heldItem == null || toolSwinging != null || !map.PointIsInBounds(coords) || !heldItem.OnTryDrop()) return false;
+            if (heldItem == null || toolSwinging != null || !map.PointIsInPlayBounds(coords) || !heldItem.OnTryDrop()) return false;
 
             map.PlacePickup(heldItem, coords);
             LowerArms(heldItem.IsTwoHanded());
@@ -251,7 +254,7 @@ namespace Uncooked.Player
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, 0, armSwingSpeed)));
             yield return currentArmTurns[currentArmTurns.Count - 1];
             yield return new WaitForSeconds(0.05f);
-            currentArmTurns.Add(StartCoroutine(TurnArm(armR, -90, armTurnSpeed)));
+            currentArmTurns.Add(StartCoroutine(TurnArm(armR, -90, armSwingSpeed / 2)));
             yield return currentArmTurns[currentArmTurns.Count - 1];
 
             toolSwinging = null;
@@ -262,11 +265,11 @@ namespace Uncooked.Player
         /// </summary>
         /// <param name="arm">Selected arm pivot</param>
         /// <param name="rotation">Final x value on arm.eulerAngles.x</param>
-        /// <param name="speed">Speed of rotation in degrees per second</param>
-        private IEnumerator TurnArm(Transform arm, float rotation, float speed)
+        /// <param name="turnSpeed">Speed of rotation in degrees per second</param>
+        private IEnumerator TurnArm(Transform arm, float rotation, float turnSpeed)
         {
             Quaternion from = arm.localRotation, to = from * Quaternion.Euler(rotation - from.eulerAngles.x, 0, 0);
-            float animSpeed = speed / Quaternion.Angle(from, to);
+            float animSpeed = turnSpeed / Quaternion.Angle(from, to);
             float percent = 0;
 
             while (percent < 1)
@@ -335,5 +338,10 @@ namespace Uncooked.Player
             }
         }
         #endregion
+
+        private void OnDestroy()
+        {
+            if (GameManager.instance) GameManager.instance.OnCheckpoint -= ForceDrop;
+        }
     }
 }
