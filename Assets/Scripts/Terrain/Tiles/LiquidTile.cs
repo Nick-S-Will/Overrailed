@@ -36,7 +36,7 @@ namespace Uncooked.Terrain.Tiles
                     time += Time.deltaTime;
                 }
                 yield return null;
-                yield return new WaitUntil(() => GameManager.instance.IsPlaying());
+                yield return new WaitUntil(() => GameManager.IsPlaying());
             }
 
             liquid.localScale = Vector3.one;

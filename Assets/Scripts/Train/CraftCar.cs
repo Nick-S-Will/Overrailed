@@ -68,7 +68,7 @@ namespace Uncooked.Train
             while (CanCraft)
             {
                 yield return StartCoroutine(Craft());
-                yield return new WaitUntil(() => GameManager.instance.IsPlaying());
+                yield return new WaitUntil(() => GameManager.IsPlaying());
             }
         }
 
@@ -114,7 +114,7 @@ namespace Uncooked.Train
                 if (onCount - (int)(oldPercent * craftMeshes.Length) == 1) craftMeshes[onCount - 1].enabled = true;
 
                 yield return null;
-                if (GameManager.instance.IsEditing())
+                if (GameManager.IsEditing())
                 {
                     foreach (var mesh in craftMeshes) mesh.enabled = true;
                     break;

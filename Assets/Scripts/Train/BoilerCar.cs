@@ -41,7 +41,7 @@ namespace Uncooked.Train
                 }
 
                 yield return new WaitForSeconds(1.9f);
-                yield return new WaitUntil(() => GameManager.instance.IsPlaying());
+                yield return new WaitUntil(() => GameManager.IsPlaying());
             }
         }
 

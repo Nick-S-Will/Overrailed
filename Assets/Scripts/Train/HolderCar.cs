@@ -30,7 +30,7 @@ namespace Uncooked.Train
 
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (GameManager.instance.IsEditing()) return base.TryPickUp(parent, amount);
+            if (GameManager.IsEditing()) return base.TryPickUp(parent, amount);
             else return TryPickupCraftedTile(parent, amount);
         }
 

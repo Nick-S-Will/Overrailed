@@ -59,9 +59,9 @@ namespace Uncooked.Train
         /// <summary>
         /// Gives train temporary speed buff until it reaches the next checkpoint
         /// </summary>
-        public void SpeedUp() => trainSpeed = GameManager.instance.GetBoostTrainSpeed();
+        public void SpeedUp() => trainSpeed = GameManager.GetBoostTrainSpeed();
         
-        public void ReturnToBaseSpeed() => TrainSpeed = GameManager.instance.GetBaseTrainSpeed();
+        public void ReturnToBaseSpeed() => TrainSpeed = GameManager.GetBaseTrainSpeed();
         
         public bool TryAddCar()
         {

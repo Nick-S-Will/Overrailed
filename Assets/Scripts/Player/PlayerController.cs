@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,14 +14,14 @@ namespace Uncooked.Player
     public class PlayerController : MonoBehaviour
     {
         #region Inspector Variables
-        [SerializeField] private MapManager map;
-
         [Header("Controls")]
         [SerializeField] private KeyCode forwards = KeyCode.W;
         [SerializeField] private KeyCode backwards = KeyCode.S, left = KeyCode.A, right = KeyCode.D;
 
         [Header("Walk")]
         [SerializeField] private float moveSpeed = 5;
+        [Tooltip("Radians per second of the player's turn")]
+        [SerializeField] private float turnSpeed = 15;
         [SerializeField] private float legSwingCoefficient = 0.1f, legRaiseAngle = 45;
 
         [Header("Dash")]
@@ -39,6 +40,7 @@ namespace Uncooked.Player
         [SerializeField] private Transform armR, legL, legR, calfL, calfR, toolHolder, pickupHolder;
         #endregion
 
+        private MapManager map;
         private CharacterController controller;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
         private Coroutine toolSwinging, legSwinging;
@@ -61,11 +63,9 @@ namespace Uncooked.Player
         {
             GameManager.instance.OnCheckpoint += ForceDrop;
 
-            // For beta
-            if (map == null) map = FindObjectOfType<MapManager>();
-
+            try { map = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Ground"))[0].transform.parent.GetComponent<MapManager>(); }
+            catch (NullReferenceException) { throw new Exception("Player spawned in without a map beneath it"); }
             controller = GetComponent<CharacterController>();
-
             lastDashTime = -dashDuration;
         }
 
@@ -88,20 +88,23 @@ namespace Uncooked.Player
             // Movement Input
             var hori = (Input.GetKey(left) ? -1 : 0) + (Input.GetKey(right) ? 1 : 0);
             var vert = (Input.GetKey(forwards) ? 1 : 0) + (Input.GetKey(backwards) ? -1 : 0);
-            var input = new Vector3(hori, 0, vert).normalized;
+            var input = new Vector3(hori, 0, vert);
 
             if (!UpdateMovingStates(input)) return;
 
-            if (input != Vector3.zero) transform.forward = input;
-            var deltaPos = moveSpeed * transform.forward * Time.deltaTime;
+            Vector3 deltaPos;
+            if (input == Vector3.zero) deltaPos = moveSpeed * transform.forward * Time.deltaTime;
+            else
+            {
+                transform.forward = Vector3.RotateTowards(transform.forward, input, turnSpeed * Time.deltaTime, 0);
+                deltaPos = moveSpeed * input * Time.deltaTime;
+            }
 
-            /// Updates <see cref="lastDashTime"/> if dash key was pressed
             if (Input.GetKeyDown(dash)) lastDashTime = Time.time;
-            /// Multiplies <see cref="deltaPos"/> if dashing
             if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
 
             // Moves player
-            if (map.PointIsInPlayBounds(transform.position + deltaPos) || map.PointInEditBounds(transform.position + deltaPos)) controller.Move(deltaPos);
+            if (map.PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
         }
 
         /// <summary>

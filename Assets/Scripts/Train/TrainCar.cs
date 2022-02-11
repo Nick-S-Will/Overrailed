@@ -85,16 +85,16 @@ namespace Uncooked.Train
                 transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
                 yield return null;
-                if (GameManager.instance.IsEditing())
+                if (GameManager.IsEditing())
                 {
                     OnPauseDriving?.Invoke();
                     yield return DriveWait();
                     OnStartDriving?.Invoke();
                 }
-                else if (GameManager.instance.IsPaused()) yield return DriveWait();
+                else if (GameManager.IsPaused()) yield return DriveWait();
             }
         }
-        private WaitUntil DriveWait() => new WaitUntil(() => this is Locomotive ? GameManager.instance.IsPlaying() : leaderLocomotive.IsDriving);
+        private WaitUntil DriveWait() => new WaitUntil(() => this is Locomotive ? GameManager.IsPlaying() : leaderLocomotive.IsDriving);
 
         /// <summary>
         /// Picks up this car if in edit mode
@@ -102,7 +102,7 @@ namespace Uncooked.Train
         /// <returns>This train car if in edit mode, otherwise null</returns>
         public virtual IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (GameManager.instance.CurrentState != GameState.Edit || this is Locomotive || currentRail) return null;
+            if (GameManager.CurrentState != GameState.Edit || this is Locomotive || currentRail) return null;
 
             GetComponent<BoxCollider>().enabled = false;
             transform.parent = parent;
@@ -118,7 +118,7 @@ namespace Uncooked.Train
 
         public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
         {
-            if (GameManager.instance.IsEditing() && item is TrainCar car) return TryUpgradeCar(car);
+            if (GameManager.IsEditing() && item is TrainCar car) return TryUpgradeCar(car);
             else if (item is Bucket bucket) return TryExtinguish(bucket);
             else return false;
         }

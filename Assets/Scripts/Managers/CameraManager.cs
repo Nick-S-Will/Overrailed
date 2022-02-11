@@ -42,14 +42,14 @@ namespace Uncooked.Managers
 
         public IEnumerator FollowLocomotives()
         {
-            yield return new WaitUntil(() => GameManager.instance.Locomotives != null);
+            yield return new WaitUntil(() => GameManager.Locomotives != null);
 
             while (GameManager.instance)
             {
                 Vector3 oldPos = mainCamera.transform.position;
                 try
                 {
-                    mainCamera.transform.position = new Vector3(GetAverageX(GameManager.instance.Locomotives) + startOffsetX, oldPos.y, oldPos.z);
+                    mainCamera.transform.position = new Vector3(GetAverageX(GameManager.Locomotives) + startOffsetX, oldPos.y, oldPos.z);
                 }
                 catch (MissingReferenceException)
                 {
@@ -57,7 +57,7 @@ namespace Uncooked.Managers
                 }
 
                 yield return null;
-                yield return new WaitUntil(() => GameManager.instance.IsPlaying());
+                yield return new WaitUntil(() => GameManager.IsPlaying());
             }
         }
 

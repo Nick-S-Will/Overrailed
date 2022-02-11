@@ -37,13 +37,13 @@ namespace Uncooked.Managers
             for (int i = 0; i < carTypes.Length; i++)
             {
                 carTypes[i].holder = Instantiate(holderPrefab, transform);
-                carTypes[i].holder.SetManager(this);
+                carTypes[i].holder.manager = this;
 
                 float xOffset = (i + 1) * panelInterval - panelWidth / 2f;
                 carTypes[i].holder.transform.position = transform.position + xOffset * Vector3.right;
                 carTypes[i].holder.transform.rotation = Quaternion.identity;
 
-                carTypes[i].holder.gameObject.SetActive(GameManager.instance.IsEditing());
+                carTypes[i].holder.gameObject.SetActive(GameManager.IsEditing());
             }
 
             GameManager.instance.OnCheckpoint += UpdateHoldersCars;
@@ -59,7 +59,7 @@ namespace Uncooked.Managers
 
         private void SetHolderVisibility()
         {
-            foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.instance.IsEditing());
+            foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.IsEditing());
         }
 
         void OnDestroy()
@@ -84,6 +84,7 @@ namespace Uncooked.Managers
                 if (nextIndex == tierPrefabs.Length) return false;
 
                 var car = Instantiate(tierPrefabs[nextIndex]);
+                GameManager.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));
                 car.GetComponent<BoxCollider>().enabled = false;
 
                 nextIndex++;

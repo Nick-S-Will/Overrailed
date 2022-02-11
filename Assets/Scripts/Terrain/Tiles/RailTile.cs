@@ -56,6 +56,7 @@ namespace Uncooked.Terrain.Tiles
             base.Start();
         }
 
+        #region Train Interactions
         public void Embark(TrainCar newCar)
         {
             Passenger = newCar;
@@ -65,25 +66,9 @@ namespace Uncooked.Terrain.Tiles
         {
             if (Passenger == car) Passenger = null;
         }
+        #endregion
 
-        /// <summary>
-        /// Looks through previous powered rails for locomotive to speed up train
-        /// </summary>
-        private void SpeedUpTrain()
-        {
-            var prev = this;
-            do
-            {
-                prev = prev.prevRail;
-                prev.hasBeenRidden = true;
-                if (prev.Passenger && prev.Passenger is Locomotive locomotive)
-                {
-                    locomotive.SpeedUp();
-                    break;
-                }
-            } while (prev);
-        }
-
+        #region Rail Interactions
         private void ConvertToNonCheckpoint()
         {
             if (Passenger)
@@ -100,6 +85,7 @@ namespace Uncooked.Terrain.Tiles
             if (Physics.Raycast(transform.position, OutDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) nextRail = info.collider.GetComponent<RailTile>();
             if (Physics.Raycast(transform.position, -InDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) prevRail = info.collider.GetComponent<RailTile>();
         }
+        #endregion
 
         #region IInteractable Overrides
         /// <summary>
@@ -169,12 +155,6 @@ namespace Uncooked.Terrain.Tiles
         #endregion
 
         #region Find Rails
-        /// <summary>
-        /// Gets adjacent rail in the given direction from this transform
-        /// </summary>
-        /// <returns>Adjacent RailTile if there is one, otherwise null</returns>
-        private RailTile TryGetAdjacentRail(Vector3 direction) => TryFindRail(direction, LayerMask.GetMask("Default", "Rail"));
-
         /// <summary>
         /// Gets adjacent rail in the given direction from this transform if it's IsPowered (property) is equal to isPowered (parameter)
         /// </summary>
@@ -254,7 +234,8 @@ namespace Uncooked.Terrain.Tiles
                 transform.forward = isStraight ? outDir : InOutToForward(inDir, outDir);
 
                 if (newConnection) nextRail = newConnection;
-                else // Tries to connect this to proceeding rail
+                // Tries to connect this to proceeding rail
+                else
                 {
                     // Iterates the local left, forward, then right to find an unpowered rail to connect to
                     Vector3Int dir = Vector3Int.RoundToInt(Quaternion.AngleAxis(-90, Vector3.up) * outDir);
@@ -271,8 +252,21 @@ namespace Uncooked.Terrain.Tiles
                             if (nextRail.isCheckpoint)
                             {
                                 nextRail.DelaySetState(dir, nextRail.OutDirection, null);
-                                
-                                if (!isCheckpoint) SpeedUpTrain();
+
+                                if (!isCheckpoint)
+                                {
+                                    var prev = this;
+                                    do
+                                    {
+                                        prev = prev.prevRail;
+                                        prev.hasBeenRidden = true;
+                                        if (prev.Passenger && prev.Passenger is Locomotive locomotive)
+                                        {
+                                            locomotive.SpeedUp();
+                                            break;
+                                        }
+                                    } while (prev);
+                                }
                             }
                             // Other rails
                             else nextRail.DelaySetState(dir, dir, null);

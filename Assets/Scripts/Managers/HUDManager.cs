@@ -72,11 +72,11 @@ namespace Uncooked.Managers
                 }
 
                 yield return null;
-                if (!GameManager.instance.IsPlaying())
+                if (!GameManager.IsPlaying())
                 {
                     foreach (var toolHUD in tools) SetToolHUD(toolHUD.Tool, false);
 
-                    yield return new WaitUntil(() => GameManager.instance.IsPlaying());
+                    yield return new WaitUntil(() => GameManager.IsPlaying());
 
                     foreach (var toolHUD in tools) SetToolHUD(toolHUD.Tool, true);
                 }

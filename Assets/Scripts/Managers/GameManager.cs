@@ -26,26 +26,26 @@ namespace Uncooked.Managers
         public GameObject[] numbersPrefabs;
         [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
 
-        private Locomotive[] locomotives;
+        private static Locomotive[] locomotives;
         private GameState currentState;
         private int checkpointCount;
 
-        public Locomotive[] Locomotives => locomotives;
-        public GameState CurrentState 
+        public static Locomotive[] Locomotives => locomotives;
+        public static GameState CurrentState 
         {
-            get => currentState;
+            get => instance.currentState;
             private set 
             {
-                currentState = value;
-                OnStateChange?.Invoke(value);
+                instance.currentState = value;
+                instance.OnStateChange?.Invoke(value);
             } 
         }
         public LayerMask InteractMask => interactMask;
-        public float GetBaseTrainSpeed() => baseTrainSpeed + trainSpeedIncrement * checkpointCount;
-        public float GetBoostTrainSpeed() => speedUpMultiplier * (baseTrainSpeed + trainSpeedIncrement * checkpointCount);
-        public bool IsPlaying() => CurrentState == GameState.Play;
-        public bool IsPaused() => CurrentState == GameState.Pause;
-        public bool IsEditing() => CurrentState == GameState.Edit;
+        public static float GetBaseTrainSpeed() => instance.baseTrainSpeed + instance.trainSpeedIncrement * instance.checkpointCount;
+        public static float GetBoostTrainSpeed() => instance.speedUpMultiplier * (instance.baseTrainSpeed + instance.trainSpeedIncrement * instance.checkpointCount);
+        public static bool IsPlaying() => CurrentState == GameState.Play;
+        public static bool IsPaused() => CurrentState == GameState.Pause;
+        public static bool IsEditing() => CurrentState == GameState.Edit;
 
         public static GameManager instance;
 
@@ -63,12 +63,6 @@ namespace Uncooked.Managers
             currentState = GameState.Play;
             
             StartTrainsWithDelay(trainInitialDelay);
-        }
-
-        // For beta
-        private void Reset()
-        {
-            if (Application.isPlaying) SceneManager.LoadScene("TestScene");
         }
 
         public void StartTrainsWithDelay(float delayTime) => _ = StartCoroutine(StartTrains(delayTime));
@@ -146,9 +140,10 @@ namespace Uncooked.Managers
         private async void EndGame()
         {
             await Task.Delay(2000);
+            var startTime = Time.time;
             await CameraManager.instance.SlideToStart();
-
-            Reset();
+            if (Time.time > startTime + 2) await Task.Delay(2000);
+            if (instance) SceneManager.LoadScene("TestScene");
         }
 
         // Mainly used method for edit cam to see tracks

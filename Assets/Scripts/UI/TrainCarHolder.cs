@@ -9,7 +9,7 @@ namespace Uncooked.UI
 {
     public class TrainCarHolder : MonoBehaviour, IInteractable, IPickupable
     {
-        private TrainStoreManager manager;
+        public TrainStoreManager manager { private get; set; }
         private TrainCar heldCar;
 
         public bool IsTwoHanded() => heldCar ? heldCar.IsTwoHanded() : false;
@@ -22,6 +22,7 @@ namespace Uncooked.UI
                 var car = heldCar.TryPickUp(parent, 1) as TrainCar;
                 if (car && manager.Coins >= car.Tier)
                 {
+                    GameManager.MoveToLayer(car.transform, LayerMask.NameToLayer("Train"));
                     heldCar.GetComponent<BoxCollider>().enabled = true;
                     manager.Coins -= car.Tier;
                     return car;
@@ -34,8 +35,6 @@ namespace Uncooked.UI
         public bool OnTryDrop() => false;
         public void Drop(Vector3Int position) { }
 
-        public void SetManager(TrainStoreManager newManager) => manager = newManager;
-
         public bool TryPlaceCar(TrainCar car)
         {
             if (IsHolding) return false;
@@ -44,6 +43,8 @@ namespace Uncooked.UI
                 car.transform.parent = transform;
                 car.transform.localPosition = 1.1f * Vector3.up;
                 car.transform.localRotation = Quaternion.identity;
+
+                GameManager.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));
 
                 heldCar = car;
                 return true;
