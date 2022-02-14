@@ -139,10 +139,14 @@ namespace Uncooked.Managers
 
         private async void EndGame()
         {
+            foreach (var player in PlayerController.players) player.ForceDrop();
             await Task.Delay(2000);
+
             var startTime = Time.time;
             await CameraManager.instance.SlideToStart();
+
             if (Time.time > startTime + 2) await Task.Delay(2000);
+
             if (instance) SceneManager.LoadScene("TestScene");
         }
 

@@ -36,12 +36,12 @@ namespace Uncooked.Train
             OnStartDriving += StartEmittingSmoke;
             OnPauseDriving += StopEmittingSmoke;
             OnDeath += SpeedUp;
-            GameManager.instance.OnEndCheckpoint += ReturnToBaseSpeed;
+            GameManager.instance.OnEndCheckpoint += SetToBaseSpeed;
             
             base.Start();
 
             smokeParticles = Instantiate(smokeParticlePrefab, smokePoint);
-            ReturnToBaseSpeed();
+            SetToBaseSpeed();
             SetEmitSmoke(false);
         }
 
@@ -61,7 +61,7 @@ namespace Uncooked.Train
         /// </summary>
         public void SpeedUp() => trainSpeed = GameManager.GetBoostTrainSpeed();
         
-        public void ReturnToBaseSpeed() => TrainSpeed = GameManager.GetBaseTrainSpeed();
+        public void SetToBaseSpeed() => TrainSpeed = GameManager.GetBaseTrainSpeed();
         
         public bool TryAddCar()
         {

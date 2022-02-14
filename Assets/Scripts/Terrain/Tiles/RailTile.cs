@@ -255,6 +255,7 @@ namespace Uncooked.Terrain.Tiles
 
                                 if (!isCheckpoint)
                                 {
+                                    // Speeds train to checkpoint
                                     var prev = this;
                                     do
                                     {

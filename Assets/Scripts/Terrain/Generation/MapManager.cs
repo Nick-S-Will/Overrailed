@@ -365,7 +365,7 @@ namespace Uncooked.Terrain.Generation
         {
             if (!PointIsInPlayBounds(startCoords)) throw new System.Exception("Starting coord isn't in the bounds of the map");
             
-            LayerMask mask = LayerMask.GetMask("Default", "Water", "Rail", "Train");
+            LayerMask mask = LayerMask.GetMask("Default", "Water", "Rail");
             var flags = new HashSet<Vector3Int>();
             var toCheck = new Queue<Vector3Int>();
             toCheck.Enqueue(startCoords);
@@ -405,7 +405,6 @@ namespace Uncooked.Terrain.Generation
         
         private void DisableObstacles() => SetObstacleHitboxes(false);
         private void EnableObstacles() => SetObstacleHitboxes(true);
-
         private void SetObstacleHitboxes(bool enabled)
         {
             // Water

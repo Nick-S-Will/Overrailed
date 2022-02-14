@@ -15,8 +15,8 @@ namespace Uncooked.Player
     {
         #region Inspector Variables
         [Header("Controls")]
-        [SerializeField] private KeyCode forwards = KeyCode.W;
-        [SerializeField] private KeyCode backwards = KeyCode.S, left = KeyCode.A, right = KeyCode.D;
+        [SerializeField] private KeyCode forwardKey = KeyCode.W;
+        [SerializeField] private KeyCode backKey = KeyCode.S, leftKey = KeyCode.A, rightKey = KeyCode.D;
 
         [Header("Walk")]
         [SerializeField] private float moveSpeed = 5;
@@ -25,7 +25,7 @@ namespace Uncooked.Player
         [SerializeField] private float legSwingCoefficient = 0.1f, legRaiseAngle = 45;
 
         [Header("Dash")]
-        [SerializeField] private KeyCode dash = KeyCode.LeftShift;
+        [SerializeField] private KeyCode dashKey = KeyCode.LeftShift;
         [SerializeField] [Range(1, 10)] private float dashSpeedMultiplier = 2;
         [SerializeField] [Range(0, 1)] private float dashDuration = 1;
 
@@ -45,6 +45,7 @@ namespace Uncooked.Player
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
         private Coroutine toolSwinging, legSwinging;
         private IPickupable heldItem;
+        private Vector3 lastInputDir = Vector3.forward;
         private float lastDashTime, lastInteractTime;
         /// <summary>
         /// True if player was moving in the previous update, used to start leg swinging
@@ -55,12 +56,16 @@ namespace Uncooked.Player
         /// </summary>
         private bool isMoving;
 
-        public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + transform.forward + Vector3.up);
+        public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + lastInputDir + Vector3.up);
         public int Strength { get; private set; } = 1;
         public bool IsHoldingItem => heldItem != null;
 
+        public static List<PlayerController> players = new List<PlayerController>();
+
         void Start()
         {
+            players.Add(this);
+
             GameManager.instance.OnCheckpoint += ForceDrop;
 
             try { map = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Ground"))[0].transform.parent.GetComponent<MapManager>(); }
@@ -86,21 +91,22 @@ namespace Uncooked.Player
         private void HandleMovement()
         {
             // Movement Input
-            var hori = (Input.GetKey(left) ? -1 : 0) + (Input.GetKey(right) ? 1 : 0);
-            var vert = (Input.GetKey(forwards) ? 1 : 0) + (Input.GetKey(backwards) ? -1 : 0);
-            var input = new Vector3(hori, 0, vert);
+            var hori = (Input.GetKey(leftKey) ? -1 : 0) + (Input.GetKey(rightKey) ? 1 : 0);
+            var vert = (Input.GetKey(forwardKey) ? 1 : 0) + (Input.GetKey(backKey) ? -1 : 0);
+            var input = new Vector3(hori, 0, vert).normalized;
 
+            transform.forward = Vector3.RotateTowards(transform.forward, lastInputDir, turnSpeed * Time.deltaTime, 0);
             if (!UpdateMovingStates(input)) return;
 
             Vector3 deltaPos;
             if (input == Vector3.zero) deltaPos = moveSpeed * transform.forward * Time.deltaTime;
             else
             {
-                transform.forward = Vector3.RotateTowards(transform.forward, input, turnSpeed * Time.deltaTime, 0);
                 deltaPos = moveSpeed * input * Time.deltaTime;
+                lastInputDir = input;
             }
 
-            if (Input.GetKeyDown(dash)) lastDashTime = Time.time;
+            if (Input.GetKeyDown(dashKey)) lastDashTime = Time.time;
             if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
 
             // Moves player
@@ -115,7 +121,7 @@ namespace Uncooked.Player
         private bool UpdateMovingStates(Vector3 input)
         {
             // Gets current moving state
-            isMoving = input != Vector3.zero || Input.GetKeyDown(dash) || Time.time < lastDashTime + dashDuration;
+            isMoving = input != Vector3.zero || Input.GetKeyDown(dashKey) || Time.time < lastDashTime + dashDuration;
             if (!isMoving) return wasMoving = false;
 
             // Start swinging legs if player wasn't moving last update
@@ -143,7 +149,7 @@ namespace Uncooked.Player
             lastInteractTime = Time.time;
 
             // TODO: try turning into an overlap, only using raycast if multiple are found
-            if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hitData, 1, GameManager.instance.InteractMask))
+            if (Physics.Raycast(transform.position + Vector3.up, lastInputDir, out RaycastHit hitData, 1, GameManager.instance.InteractMask))
             {
                 if (heldItem == null) TryToPickUp(hitData.transform.GetComponent<IPickupable>());
                 else TryUseHeldItemOn(hitData.transform.GetComponent<IInteractable>(), hitData);
@@ -205,7 +211,7 @@ namespace Uncooked.Player
         /// <returns>True if heldItem was placed</returns>
         private bool TryDrop()
         {
-            Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + transform.forward);
+            Vector3Int coords = Vector3Int.RoundToInt(transform.position + Vector3.up + lastInputDir);
             if (heldItem == null || toolSwinging != null || !map.PointIsInPlayBounds(coords) || !heldItem.OnTryDrop()) return false;
 
             map.PlacePickup(heldItem, coords);
@@ -342,9 +348,24 @@ namespace Uncooked.Player
         }
         #endregion
 
+        public static float MinDistanceToPlayer(Vector3 point)
+        {
+            float minDst = float.MaxValue;
+
+            foreach (var player in players)
+            {
+                float dst = Vector3.Distance(point, player.transform.position);
+                if (dst < minDst) minDst = dst; 
+            }
+
+            return minDst;
+        }
+
         private void OnDestroy()
         {
             if (GameManager.instance) GameManager.instance.OnCheckpoint -= ForceDrop;
+
+            players.Remove(this);
         }
     }
 }
