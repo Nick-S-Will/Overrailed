@@ -51,7 +51,7 @@ namespace Uncooked.UI
             }
         }
 
-        public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public bool TryInteractUsing(IPickupable item)
         {
             if (item is TrainCar car)
             {

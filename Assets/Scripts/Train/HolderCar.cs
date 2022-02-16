@@ -50,6 +50,7 @@ namespace Uncooked.Train
                 extraStack.transform.localPosition = Vector3.zero;
             }
 
+            GameManager.MoveToLayer(holdersContent.transform, LayerMask.NameToLayer("Default"));
             holdCount = Mathf.Max(holdCount - amount, holdCount % 1);
 
             OnTaken?.Invoke();

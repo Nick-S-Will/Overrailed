@@ -121,6 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2938251442246619907}
+  leaderLocomotive: {fileID: 0}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
   breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   burnPoint: {fileID: 4889698553185357918}
@@ -128,7 +129,6 @@ MonoBehaviour:
   tier: 2
   isPermeable: 0
   liquid: {fileID: 4903379332272289045}
-  liquidUsageInterval: 5
 --- !u!65 &2938251442626286252
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -140,7 +140,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 2, z: 1}
+  m_Size: {x: 1.01, y: 2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2938251442907286811
 GameObject:

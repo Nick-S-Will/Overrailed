@@ -140,7 +140,10 @@ namespace Uncooked.Managers
         private async void EndGame()
         {
             foreach (var player in PlayerController.players) player.ForceDrop();
+            PlayerController.DisableControls();
             await Task.Delay(2000);
+
+            if (!Application.isPlaying) return;
 
             var startTime = Time.time;
             await CameraManager.instance.SlideToStart();

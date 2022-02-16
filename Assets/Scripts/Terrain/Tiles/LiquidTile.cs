@@ -42,7 +42,7 @@ namespace Uncooked.Terrain.Tiles
             liquid.localScale = Vector3.one;
         }
 
-        public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public virtual bool TryInteractUsing(IPickupable item)
         {
             if (item is StackTile stack && stack.HasBridge) stack.BuildBridge(this);
             else if (item is Rod rod) rod.Use(this);

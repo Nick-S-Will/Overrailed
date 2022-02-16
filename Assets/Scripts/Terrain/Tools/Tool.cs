@@ -14,14 +14,15 @@ namespace Uncooked.Terrain.Tools
         [SerializeField] private int tier = 1;
 
         public int Tier => tier;
-        public bool IsTwoHanded() => false;
+        public override bool IsTwoHanded() => false;
+        public override bool CanPickUp => true;
 
         /// <summary>
         /// Picks up this Tool
         /// </summary>
         /// <param name="parent">Transform this will be parented to</param>
         /// <returns>Tool that was picked up</returns>
-        public IPickupable TryPickUp(Transform parent, int amount)
+        public override IPickupable TryPickUp(Transform parent, int amount)
         {
             GetComponent<BoxCollider>().enabled = false;
 
@@ -35,8 +36,8 @@ namespace Uncooked.Terrain.Tools
             return this;
         }
 
-        public virtual bool OnTryDrop() => true;
+        public override bool OnTryDrop() => true;
 
-        public virtual void Drop(Vector3Int position) => OnDropTool?.Invoke(this);
+        public override void Drop(Vector3Int position) => OnDropTool?.Invoke(this);
     }
 }

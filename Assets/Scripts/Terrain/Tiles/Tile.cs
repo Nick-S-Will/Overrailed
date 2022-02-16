@@ -4,11 +4,14 @@ using UnityEngine;
 
 namespace Uncooked.Terrain.Tiles
 {
-    public class Tile : MonoBehaviour
+    public class Tile : MonoBehaviour, IPickupable
     {
         public Transform meshParent;
 
         public Gradient MeshColorGradient { get; private set; }
+        public virtual bool CanPickUp => false;
+        public virtual bool IsTwoHanded() => true;
+        public virtual bool OnTryDrop() => true;
 
         protected virtual void Start()
         {
@@ -36,6 +39,10 @@ namespace Uncooked.Terrain.Tiles
 
             return meshColors;
         }
+
+        public virtual IPickupable TryPickUp(Transform parent, int amount) => null;
+
+        public virtual void Drop(Vector3Int position) { }
 
         public void SetVisible(bool isVisible) => meshParent.gameObject.SetActive(isVisible);
         

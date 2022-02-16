@@ -58,12 +58,12 @@ namespace Uncooked.Terrain.Generation
 
         private Vector3Int IntPos => Vector3Int.RoundToInt(transform.position);
 
-        private void Awake()
-        {
-            // For beta
-            // Seed = Random.Range(0, 100);
-            // GenerateMap();
-        }
+        //private void Awake()
+        //{
+        //    // For beta
+        //    Seed = Random.Range(0, 100);
+        //    GenerateMap();
+        //}
 
         public void Start()
         {
@@ -237,7 +237,7 @@ namespace Uncooked.Terrain.Generation
         public void TryHighlightTile(Transform tile)
         {
             if (tile == null) return;
-            
+
             if (newHighlights.Contains(tile)) return;
             else newHighlights.Add(tile);
         }
@@ -333,10 +333,10 @@ namespace Uncooked.Terrain.Generation
         private Bounds GetPlayBounds()
         {
             var groundCollider = transform.GetChild(0);
-            var center = groundCollider.position + 2 * Vector3.up;
+            var center = groundCollider.position + Vector3.up;
             var size = groundCollider.GetComponent<BoxCollider>().size;
 
-            return new Bounds(center, new Vector3(size.x, 3, size.z));
+            return new Bounds(center, new Vector3(size.x, 1, size.z));
         }
         /// <summary>
         /// Checks if <paramref name="point"/> is over the ground collider, up to 3 units above it
@@ -359,50 +359,72 @@ namespace Uncooked.Terrain.Generation
         #endregion
 
         /// <summary>
-        /// Places given Tile at coords, sets obstacleParent as its parent, and enables its BoxCollider
+        /// Places given pickup at the nearest coords around <paramref name="pickup"/>'s position
         /// </summary>
-        public void PlacePickup(IPickupable pickup, Vector3Int startCoords)
+        /// <returns>The coords at which the pickup is move to</returns>
+        public Vector3Int MovePickup(IPickupable pickup) => PlacePickup(pickup, Vector3Int.RoundToInt((pickup as Tile).transform.position), false);
+        /// <summary>
+        /// Places given pickup at coords, sets obstacleParent as its parent, and enables its BoxCollider
+        /// </summary>
+        /// <returns>The coords at which the pickup is placed</returns>
+        public Vector3Int PlacePickup(IPickupable pickup, Vector3Int startCoords) => PlacePickup(pickup, startCoords, true);
+        private Vector3Int PlacePickup(IPickupable pickup, Vector3Int startCoords, bool includeStart)
         {
             if (!PointIsInPlayBounds(startCoords)) throw new System.Exception("Starting coord isn't in the bounds of the map");
-            
-            LayerMask mask = LayerMask.GetMask("Default", "Water", "Rail");
+
+            LayerMask mask = LayerMask.GetMask("Default", "Water", "Rail", "Entity");
             var flags = new HashSet<Vector3Int>();
             var toCheck = new Queue<Vector3Int>();
-            toCheck.Enqueue(startCoords);
+
+            if (includeStart) toCheck.Enqueue(startCoords);
+            else
+            {
+                flags.Add(startCoords);
+                foreach (var point in GetAdjacentCoords(startCoords)) if (PointIsInBounds(point)) toCheck.Enqueue(point);
+            }
+
             while (toCheck.Count > 0)
             {
-                var coord = toCheck.Dequeue();
-                Collider[] colliders = Physics.OverlapBox(coord, 0.1f * Vector3.one, Quaternion.identity, mask);
+                var coords = toCheck.Dequeue();
+                Collider[] colliders = Physics.OverlapBox(coords, 0.45f * Vector3.one, Quaternion.identity, mask);
                 if (colliders.Length > 0)
                 {
                     // Tries to stack pickup if possible
                     var stack = colliders[0].GetComponent<StackTile>();
-                    if (pickup is StackTile toStack && stack != null && toStack.TryStackOn(stack)) return;
+                    if (pickup is StackTile toStack && stack != null && toStack.TryStackOn(stack)) return coords;
 
                     // Prevents from checking same coord twice
-                    flags.Add(coord);
+                    flags.Add(coords);
 
                     // Adds adjacent points to list of points to check
-                    foreach (var point in GetAdjacentCoords(coord)) if (!flags.Contains(point) && PointIsInPlayBounds(point)) toCheck.Enqueue(point);
+                    foreach (var point in GetAdjacentCoords(coords)) if (!flags.Contains(point) && PointIsInBounds(point)) toCheck.Enqueue(point);
                 }
                 else
                 {
-                    // Places pickup in empty space
-                    var t = (pickup as MonoBehaviour).transform;
-                    t.parent = GetParentAt(coord);
-                    t.position = coord;
-                    t.localRotation = Quaternion.identity;
-
-                    t.GetComponent<BoxCollider>().enabled = true;
-                    pickup.Drop(coord);
-                    return;
+                    ForcePlacePickup(pickup, coords);
+                    return coords;
                 }
             }
 
             throw new System.Exception("No viable coord found on map");
         }
+        /// <summary>
+        /// Places <paramref name="pickup"/> at <paramref name="coords"/> without any collision checks
+        /// </summary>
+        public void ForcePlacePickup(IPickupable pickup, Vector3Int coords)
+        {
+            // Places pickup in empty space
+            var t = (pickup as MonoBehaviour).transform;
+            t.parent = GetParentAt(coords);
+            t.position = coords;
+            t.localRotation = Quaternion.identity;
+
+            t.GetComponent<BoxCollider>().enabled = true;
+            pickup.Drop(coords);
+        }
+
         private Vector3Int[] GetAdjacentCoords(Vector3Int coord) => new Vector3Int[] { coord + Vector3Int.forward, coord + Vector3Int.right, coord + Vector3Int.back, coord + Vector3Int.left };
-        
+
         private void DisableObstacles() => SetObstacleHitboxes(false);
         private void EnableObstacles() => SetObstacleHitboxes(true);
         private void SetObstacleHitboxes(bool enabled)

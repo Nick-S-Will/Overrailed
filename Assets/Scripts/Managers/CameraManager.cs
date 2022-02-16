@@ -36,7 +36,7 @@ namespace Uncooked.Managers
             GameManager.instance.OnCheckpoint += TransitionEditMode;
             GameManager.instance.OnEndCheckpoint += TransitionGameMode;
 
-            startOffsetX = mainCamera.transform.position.x - GetAverageX(FindObjectsOfType<Locomotive>());
+            startOffsetX = mainCamera.transform.position.x - GetAverageX(FindObjectsOfType<Locomotive>(), mainCamera.transform.position.x);
             _ = StartCoroutine(FollowLocomotives());
         }
 
@@ -44,12 +44,12 @@ namespace Uncooked.Managers
         {
             yield return new WaitUntil(() => GameManager.Locomotives != null);
 
-            while (GameManager.instance)
+            while (instance && GameManager.instance)
             {
                 Vector3 oldPos = mainCamera.transform.position;
                 try
                 {
-                    mainCamera.transform.position = new Vector3(GetAverageX(GameManager.Locomotives) + startOffsetX, oldPos.y, oldPos.z);
+                    mainCamera.transform.position = new Vector3(GetAverageX(GameManager.Locomotives, mainCamera.transform.position.x) + startOffsetX, oldPos.y, oldPos.z);
                 }
                 catch (MissingReferenceException)
                 {
@@ -112,13 +112,16 @@ namespace Uncooked.Managers
         /// Calculates the averages transform.position.x in followPoints (field)
         /// </summary>
         /// <returns>The average x position in followPoints (field)</returns>
-        private float GetAverageX(Locomotive[] locomotives)
+        private float GetAverageX(Locomotive[] locomotives, float startPos)
         {
-            float averageOffset = 0;
-            foreach (var locomotive in locomotives) averageOffset += locomotive.transform.position.x;
-            averageOffset /= locomotives.Length;
+            float newPos = startPos;
+            foreach (var locomotive in locomotives)
+            {
+                if (locomotive) newPos += (locomotive.transform.position.x - startPos) / locomotives.Length;
+                else continue;
+            }
 
-            return averageOffset;
+            return newPos;
         }
 
         private void OnDestroy()

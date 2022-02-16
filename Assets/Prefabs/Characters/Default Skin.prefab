@@ -699,19 +699,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5bc3fde89a1cce40bc9af37fda50b2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  map: {fileID: 0}
-  forwards: 119
-  backwards: 115
-  left: 97
-  right: 100
   moveSpeed: 7
+  turnSpeed: 15
   legSwingCoefficient: 0.04
   legRaiseAngle: 45
-  dash: 304
   dashSpeedMultiplier: 2.25
   dashDuration: 0.2
   armTurnSpeed: 180
-  armSwingSpeed: 2000
+  armSwingSpeed: 720
   interactInterval: 0.3
   armL: {fileID: 2264036826433275187}
   armR: {fileID: 2264036827478139122}
@@ -721,6 +716,11 @@ MonoBehaviour:
   calfR: {fileID: 2264036828255320574}
   toolHolder: {fileID: 2264036826726341595}
   pickupHolder: {fileID: 2264036826503545315}
+  forwardKey: 119
+  backKey: 115
+  leftKey: 97
+  rightKey: 100
+  dashKey: 304
 --- !u!143 &2264036827029980983
 CharacterController:
   m_ObjectHideFlags: 0

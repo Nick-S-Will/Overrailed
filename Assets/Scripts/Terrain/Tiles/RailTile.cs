@@ -26,14 +26,14 @@ namespace Uncooked.Terrain.Tiles
 
         public Transform Path => IsStraight ? straightPathParent : bentPathParent;
         public TrainCar Passenger { get; private set; }
-        public RailTile prevRail { get; private set; }
-        public RailTile nextRail { get; private set; }
+        public RailTile PrevRail { get; private set; }
+        public RailTile NextRail { get; private set; }
         public Vector3Int InDirection { get; private set; } = Vector3Int.zero;
         public Vector3Int OutDirection { get; private set; } = Vector3Int.zero;
         public override bool CanPickUp => !(startsPowered || hasBeenRidden || isCheckpoint);
         public bool IsStraight => straightMesh.activeSelf;
-        public bool IsPowered => prevRail || nextRail;
-        public bool IsFinalCheckpoint => isCheckpoint && nextRail == null;
+        public bool IsPowered => PrevRail || NextRail;
+        public bool IsFinalCheckpoint => isCheckpoint && NextRail == null;
 
         private void Awake()
         {
@@ -82,8 +82,8 @@ namespace Uncooked.Terrain.Tiles
         private void UpdateConnections()
         {
             RaycastHit info;
-            if (Physics.Raycast(transform.position, OutDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) nextRail = info.collider.GetComponent<RailTile>();
-            if (Physics.Raycast(transform.position, -InDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) prevRail = info.collider.GetComponent<RailTile>();
+            if (Physics.Raycast(transform.position, OutDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) NextRail = info.collider.GetComponent<RailTile>();
+            if (Physics.Raycast(transform.position, -InDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) PrevRail = info.collider.GetComponent<RailTile>();
         }
         #endregion
 
@@ -101,9 +101,9 @@ namespace Uncooked.Terrain.Tiles
             return base.TryPickUp(parent, amount);
         }
 
-        public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public override bool TryInteractUsing(IPickupable item)
         {
-            if (Passenger && Passenger.TryInteractUsing(item, hitInfo)) return true;
+            if (Passenger && Passenger.TryInteractUsing(item)) return true;
             else if (item is TrainCar car) return car.TrySetRail(this, true);
             else if (item is RailTile rail && !IsPowered) return rail.TryStackOn(this);
             else return false;
@@ -133,7 +133,7 @@ namespace Uncooked.Terrain.Tiles
             {
                 var rail = TryGetAdjacentRail(dir, true);
                 // rail found, has a connection available, has no passenger or rail already pointing at this
-                if (rail && rail.nextRail == null && (rail.Passenger == null || rail.OutDirection == (transform.position - rail.transform.position)))
+                if (rail && rail.NextRail == null && (rail.Passenger == null || rail.OutDirection == (transform.position - rail.transform.position)))
                 {
                     connectableRail = rail;
                     break;
@@ -146,9 +146,9 @@ namespace Uncooked.Terrain.Tiles
                 Vector3Int dirToThis = coords - Vector3Int.FloorToInt(connectableRail.transform.position);
 
                 if (connectableRail.OutDirection != dirToThis) connectableRail.SetState(connectableRail.InDirection, dirToThis, this);
-                else connectableRail.nextRail = this;
+                else connectableRail.NextRail = this;
 
-                prevRail = connectableRail;
+                PrevRail = connectableRail;
                 SetState(dirToThis, dirToThis, null);
             }
         }
@@ -208,16 +208,16 @@ namespace Uncooked.Terrain.Tiles
                 // Tries to disconnect this and proceeding rails from track
                 if (newConnection == null)
                 {
-                    if (nextRail)
+                    if (NextRail)
                     {
-                        nextRail.prevRail = null;
-                        nextRail.DelaySetState(Vector3Int.zero, Vector3Int.zero, null);
-                        nextRail = null;
+                        NextRail.PrevRail = null;
+                        NextRail.DelaySetState(Vector3Int.zero, Vector3Int.zero, null);
+                        NextRail = null;
                     }
-                    if (prevRail)
+                    if (PrevRail)
                     {
-                        prevRail.nextRail = null;
-                        prevRail = null;
+                        PrevRail.NextRail = null;
+                        PrevRail = null;
                     }
                 }
             }
@@ -233,7 +233,7 @@ namespace Uncooked.Terrain.Tiles
 
                 transform.forward = isStraight ? outDir : InOutToForward(inDir, outDir);
 
-                if (newConnection) nextRail = newConnection;
+                if (newConnection) NextRail = newConnection;
                 // Tries to connect this to proceeding rail
                 else
                 {
@@ -246,7 +246,7 @@ namespace Uncooked.Terrain.Tiles
                         if (nextRail && nextRail.NextInStack == null)
                         {
                             SetState(inDir, dir, nextRail);
-                            nextRail.prevRail = this;
+                            nextRail.PrevRail = this;
 
                             // Checkpoint rails
                             if (nextRail.isCheckpoint)
@@ -259,7 +259,7 @@ namespace Uncooked.Terrain.Tiles
                                     var prev = this;
                                     do
                                     {
-                                        prev = prev.prevRail;
+                                        prev = prev.PrevRail;
                                         prev.hasBeenRidden = true;
                                         if (prev.Passenger && prev.Passenger is Locomotive locomotive)
                                         {
@@ -283,7 +283,7 @@ namespace Uncooked.Terrain.Tiles
             InDirection = inDir;
             OutDirection = outDir;
 
-            GameManager.MoveToLayer(transform, prevRail ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default"));
+            GameManager.MoveToLayer(transform, PrevRail ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default"));
         }
         #endregion
 

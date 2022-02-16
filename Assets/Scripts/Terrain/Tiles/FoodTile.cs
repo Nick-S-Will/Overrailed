@@ -8,5 +8,7 @@ namespace Uncooked.Terrain.Tiles
     {
         [Space]
         [SerializeField] private StackTile dishPrefab;
+
+        public override bool CanPickUp => true;
     }
 }

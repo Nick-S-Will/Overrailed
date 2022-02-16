@@ -21,8 +21,8 @@ namespace Uncooked.Terrain.Tiles
         public StackTile PrevInStack => prevInStack;
         public string StackType => stackType;
         public float TileHeight => tileHeight;
-        public virtual bool CanPickUp => true;
-        public bool IsTwoHanded() => true;
+        public override bool CanPickUp => true;
+        public override bool IsTwoHanded() => true;
 
         override protected void Start()
         {
@@ -55,7 +55,7 @@ namespace Uncooked.Terrain.Tiles
             return top;
         }
 
-        public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public virtual bool TryInteractUsing(IPickupable item)
         {
             if (item is StackTile stack) return stack.TryStackOn(this);
             else return false;
@@ -67,7 +67,7 @@ namespace Uncooked.Terrain.Tiles
         /// <param name="parent">Transform this will be parented to</param>
         /// <param name="amount">Max amount of tiles to be picked up from the stack</param>
         /// <returns>Bottom StackTile of the stack to be picked up</returns>
-        public virtual IPickupable TryPickUp(Transform parent, int amount)
+        public override IPickupable TryPickUp(Transform parent, int amount)
         {
             if (!CanPickUp) return null;
 
@@ -96,9 +96,9 @@ namespace Uncooked.Terrain.Tiles
             return toPickUp;
         }
 
-        public virtual bool OnTryDrop() => true;
+        public override bool OnTryDrop() => true;
 
-        public virtual void Drop(Vector3Int position) { }
+        public override void Drop(Vector3Int position) { }
 
         /// <summary>
         /// Places this on stackBase if they have the same stackType

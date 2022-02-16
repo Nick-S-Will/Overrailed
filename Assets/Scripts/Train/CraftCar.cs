@@ -85,6 +85,7 @@ namespace Uncooked.Train
 
             // Disable craft's hitboxes
             craftResult.GetComponent<BoxCollider>().enabled = false;
+            GameManager.MoveToLayer(craftResult.transform, LayerMask.NameToLayer("Train"));
 
             // Parent craftResult to stack if there is one, otherwise parent it to craft spawnpoint
             if (craftResultHolder.SpawnPoint.childCount == 0) ParentAToB(craftResult.transform, craftResultHolder.SpawnPoint);
@@ -135,10 +136,10 @@ namespace Uncooked.Train
             yield return null; // Required for destroy cleanup
         }
 
-        public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public override bool TryInteractUsing(IPickupable item)
         {
             if (item is StackTile stack) return TryAddItem(stack);
-            else return base.TryInteractUsing(item, hitInfo);
+            else return base.TryInteractUsing(item);
         }
 
         private bool TryAddItem(StackTile stack)
@@ -158,10 +159,10 @@ namespace Uncooked.Train
 
             // Add stack to point
             ParentAToB(stack.transform, craftPoint.Transform);
+            GameManager.MoveToLayer(stack.transform, LayerMask.NameToLayer("Train"));
 
             // Stack point's previous stack on given stack. Must be added beneath for when new tiles are added during craft, the top one is always the one being used
-            if (craftPoint.Transform.childCount == 2)
-                craftPoint.Transform.GetChild(0).GetComponent<StackTile>().TryStackOn(stack);
+            if (craftPoint.Transform.childCount == 2) craftPoint.Transform.GetChild(0).GetComponent<StackTile>().TryStackOn(stack);
             else craftPoint.stackTop = stack.GetStackTop();
 
             _ = StartCoroutine(TryCraft());

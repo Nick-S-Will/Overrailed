@@ -13,9 +13,9 @@ namespace Uncooked.Terrain.Tiles
 
         protected override void Start() => base.Start();
         
-        public bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public bool TryInteractUsing(IPickupable item)
         {
-            if (item is BreakTool breaker && name.Contains(breaker.BreakTileCode)) TakeHit(breaker.Tier, hitInfo);
+            if (item is BreakTool breaker && name.Contains(breaker.BreakTileCode)) TakeHit(breaker.Tier);
             else return false;
 
             return true;
@@ -26,7 +26,7 @@ namespace Uncooked.Terrain.Tiles
         /// </summary>
         /// <param name="damage">Max amount of times Tile toSpawn will get its lowerTier</param>
         /// <param name="hit">Info about the Raycast used to find this</param>
-        public void TakeHit(int damage, RaycastHit hit)
+        public void TakeHit(int damage)
         {
             Tile toSpawn = this;
 
@@ -34,7 +34,7 @@ namespace Uncooked.Terrain.Tiles
             {
                 if (toSpawn is BreakableTile t)
                 {
-                    BreakIntoParticles(breakParticlePrefab, toSpawn.MeshColorGradient, hit.transform.position);
+                    BreakIntoParticles(breakParticlePrefab, toSpawn.MeshColorGradient, transform.position);
                     
                     toSpawn = t.lowerTier;
                 }

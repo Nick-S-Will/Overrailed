@@ -630,7 +630,6 @@ MonoBehaviour:
   tier: 1
   isPermeable: 0
   liquid: {fileID: 5553327889204682102}
-  liquidUsageInterval: 2
 --- !u!65 &2439802911480396495
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -642,7 +641,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 2, z: 1}
+  m_Size: {x: 1.01, y: 2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2439802911898205025
 GameObject:

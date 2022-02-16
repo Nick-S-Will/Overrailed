@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using Uncooked.Terrain;
 using UnityEngine;
 
 using Uncooked.Managers;
@@ -30,7 +28,7 @@ namespace Uncooked.Train
 
         public int Tier => tier;
         public bool HasRail => currentRail;
-        public bool IsTwoHanded() => true;
+        public override bool IsTwoHanded() => true;
 
         override protected void Start()
         {
@@ -66,7 +64,7 @@ namespace Uncooked.Train
                     // Reached end of rail
                     else if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
                     {
-                        if (currentRail.nextRail) UpdateRail(currentRail.nextRail);
+                        if (currentRail.NextRail) UpdateRail(currentRail.NextRail);
                         else
                         {
                             OnDeath?.Invoke();
@@ -100,7 +98,7 @@ namespace Uncooked.Train
         /// Picks up this car if in edit mode
         /// </summary>
         /// <returns>This train car if in edit mode, otherwise null</returns>
-        public virtual IPickupable TryPickUp(Transform parent, int amount)
+        public override IPickupable TryPickUp(Transform parent, int amount)
         {
             if (GameManager.CurrentState != GameState.Edit || this is Locomotive || currentRail) return null;
 
@@ -112,11 +110,11 @@ namespace Uncooked.Train
             return this;
         }
 
-        public virtual bool OnTryDrop() => false;
-        
-        public virtual void Drop(Vector3Int position) { }
+        public override bool OnTryDrop() => false;
 
-        public virtual bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public override void Drop(Vector3Int position) { }
+
+        public virtual bool TryInteractUsing(IPickupable item)
         {
             if (GameManager.IsEditing() && item is TrainCar car) return TryUpgradeCar(car);
             else if (item is Bucket bucket) return TryExtinguish(bucket);

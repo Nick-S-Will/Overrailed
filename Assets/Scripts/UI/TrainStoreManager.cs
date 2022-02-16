@@ -47,17 +47,17 @@ namespace Uncooked.Managers
             }
 
             GameManager.instance.OnCheckpoint += UpdateHoldersCars;
-            GameManager.instance.OnEndCheckpoint += SetHolderVisibility;
+            GameManager.instance.OnEndCheckpoint += UpdateHolderVisibility;
         }
 
         private void UpdateHoldersCars()
         {
             foreach (var type in carTypes) _ = type.TrySetNextCar();
 
-            SetHolderVisibility();
+            UpdateHolderVisibility();
         }
 
-        private void SetHolderVisibility()
+        private void UpdateHolderVisibility()
         {
             foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.IsEditing());
         }
@@ -67,7 +67,7 @@ namespace Uncooked.Managers
             if (GameManager.instance)
             {
                 GameManager.instance.OnCheckpoint -= UpdateHoldersCars;
-                GameManager.instance.OnEndCheckpoint -= SetHolderVisibility;
+                GameManager.instance.OnEndCheckpoint -= UpdateHolderVisibility;
             }
         }
 
@@ -81,7 +81,7 @@ namespace Uncooked.Managers
 
             public bool TrySetNextCar()
             {
-                if (nextIndex == tierPrefabs.Length) return false;
+                if (nextIndex == tierPrefabs.Length || holder.IsHolding) return false;
 
                 var car = Instantiate(tierPrefabs[nextIndex]);
                 GameManager.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));

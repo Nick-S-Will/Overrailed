@@ -45,12 +45,12 @@ namespace Uncooked.Train
             }
         }
 
-        public override bool TryInteractUsing(IPickupable item, RaycastHit hitInfo)
+        public override bool TryInteractUsing(IPickupable item)
         {
             if (item is Bucket bucket && bucket.IsFull)
             {
                 liquidPercent = 1;
-                if (!base.TryInteractUsing(item, hitInfo)) bucket.IsFull = false;
+                if (!base.TryInteractUsing(item)) bucket.IsFull = false;
             }
             else return false;
 
