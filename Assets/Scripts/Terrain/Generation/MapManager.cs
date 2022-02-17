@@ -19,8 +19,8 @@ namespace Uncooked.Terrain.Generation
         [Range(10, 1000)] [SerializeField] private int chunkLength = 25, mapWidth = 19;
         [SerializeField] private bool showBounds;
 
-        [Header("Regions")] [SerializeField] private Biome groundBiome = Biome.Base;
-        [SerializeField] private Biome obstacleBiome = Biome.Base;
+        [Header("Biomes")]
+        [SerializeField] private Biome currentBiome;
         [SerializeField] private Color highlightColor = Color.white;
 
         [Header("Stations")]
@@ -109,7 +109,6 @@ namespace Uncooked.Terrain.Generation
         public void AddChunk()
         {
             if (Application.isPlaying) OnSeedChange?.Invoke(seed.ToString());
-            var heightMap = GenerateHeightMap();
 
             var newChunk = new GameObject("Chunk " + chunks.Count).transform;
             chunks.Add(newChunk);
@@ -127,7 +126,8 @@ namespace Uncooked.Terrain.Generation
             // Ground tiles
             groundParent = new GameObject("Ground").transform;
             groundParent.parent = newChunk;
-            GenerateSection(heightMap, groundBiome, groundParent, stationBounds, checkpointBounds, true);
+            var groundHeightMap = GenerateHeightMap();
+            GenerateSection(GenerateGroundMap(groundHeightMap), groundParent, stationBounds, checkpointBounds, true);
 
             // Ground collider
             if (groundCollider == null)
@@ -143,7 +143,7 @@ namespace Uncooked.Terrain.Generation
             // Obstacle tiles
             obstacleParent = new GameObject("Obstacles").transform;
             obstacleParent.parent = newChunk;
-            GenerateSection(heightMap, obstacleBiome, obstacleParent, stationBounds, checkpointBounds, false);
+            GenerateSection(GenerateObstacleMap(groundHeightMap), obstacleParent, stationBounds, checkpointBounds, false);
 
             // Spawn station and checkpoint
             if (chunks.Count == 1)
@@ -159,13 +159,12 @@ namespace Uncooked.Terrain.Generation
         /// <summary>
         /// Generates the ground or obstacles of a chunk
         /// </summary>
-        /// <param name="heightMap">Height info to differentiate sections of the map</param>
-        /// <param name="biome">Gradient that determines which tile corresponds to which height on the <paramref name="heightMap"/></param>
+        /// <param name="tiles"></param>
         /// <param name="parent">Object the rows of the chunk are parented to</param>
         /// <param name="station">Bounds where the station resides if there is one in the chunk</param>
         /// <param name="checkpoint">Bounds where the checkpoint of the chunk resides</param>
         /// <param name="isGround">True if the desired section is ground tiles</param>
-        private void GenerateSection(float[,] heightMap, Biome biome, Transform parent, BoundsInt station, BoundsInt checkpoint, bool isGround)
+        private void GenerateSection(Tile[,] tiles, Transform parent, BoundsInt station, BoundsInt checkpoint, bool isGround)
         {
             int mapLength = chunks.Count * chunkLength;
 
@@ -180,8 +179,8 @@ namespace Uncooked.Terrain.Generation
                 {
                     Tile bridge = null;
 
-                    // Gets tile type based on height map and biome
-                    var tilePrefab = biome.GetTile(heightMap[x, z]);
+                    // Get tile
+                    var tilePrefab = tiles[x, z];
                     if (tilePrefab == null) continue;
 
                     var newPos = IntPos + new Vector3Int(x, 0, z);
@@ -230,6 +229,44 @@ namespace Uncooked.Terrain.Generation
             }
 
             return heightMap;
+        }
+
+        private Tile[,] GenerateGroundMap(float[,] groundHeightMap)
+        {
+            Tile[,] tileHeightMap = new Tile[groundHeightMap.GetLength(0), mapWidth];
+
+            for (int y = 0; y < mapWidth; y++)
+            {
+                for (int x = 0; x < groundHeightMap.GetLength(0); x++)
+                {
+                    tileHeightMap[x, y] = currentBiome.GroundRegion.GetTile(groundHeightMap[x, y]);
+                }
+            }
+
+            return tileHeightMap;
+        }
+
+        private Tile[,] GenerateObstacleMap(float[,] groundHeightMap)
+        {
+            var treeMap = GenerateHeightMap();
+            var treeHeightMap = GenerateHeightMap();
+            var stoneMap = GenerateHeightMap();
+            var stoneHeightMap = GenerateHeightMap();
+
+            Tile[,] tileHeightMap = new Tile[groundHeightMap.GetLength(0), mapWidth];
+
+            for (int y = 0; y < mapWidth; y++)
+            {
+                for (int x = 0; x < groundHeightMap.GetLength(0); x++)
+                {
+                    if (groundHeightMap[x, y] >= currentBiome.MinObstaclePercentage)
+                    {
+                        tileHeightMap[x, y] = treeHeightMap[x, y] > stoneHeightMap[x, y] ? currentBiome.TreeRegion.GetTile(treeMap[x, y]) : currentBiome.StoneRegion.GetTile(stoneMap[x, y]);
+                    }
+                }
+            }
+
+            return tileHeightMap;
         }
         #endregion
 
@@ -358,6 +395,7 @@ namespace Uncooked.Terrain.Generation
         public bool PointIsInBounds(Vector3 point) => (GameManager.IsPlaying() && PointIsInPlayBounds(point)) || (GameManager.IsEditing() && PointIsInEditBounds(point));
         #endregion
 
+        #region Pickup Placing
         /// <summary>
         /// Places given pickup at the nearest coords around <paramref name="pickup"/>'s position
         /// </summary>
@@ -424,7 +462,9 @@ namespace Uncooked.Terrain.Generation
         }
 
         private Vector3Int[] GetAdjacentCoords(Vector3Int coord) => new Vector3Int[] { coord + Vector3Int.forward, coord + Vector3Int.right, coord + Vector3Int.back, coord + Vector3Int.left };
+        #endregion
 
+        #region Obstacle Setting
         private void DisableObstacles() => SetObstacleHitboxes(false);
         private void EnableObstacles() => SetObstacleHitboxes(true);
         private void SetObstacleHitboxes(bool enabled)
@@ -451,6 +491,7 @@ namespace Uncooked.Terrain.Generation
                 }
             }
         }
+        #endregion
 
         #region Spawning animation
         public void AnimateNewChunk() => _ = StartCoroutine(AnimateChunk(chunks[chunks.Count - 1]));

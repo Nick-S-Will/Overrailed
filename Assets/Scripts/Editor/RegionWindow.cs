@@ -6,12 +6,12 @@ using Uncooked.Terrain.Tiles;
 
 namespace Uncooked.Editors
 {
-    public class BiomeWindow : EditorWindow
+    public class RegionWindow : EditorWindow
     {
-        Biome biome;
         const float keyWidth = 10, keyHeight = 20;
         const int windowBorder = 10, keyHighlightSize = 2;
 
+        private Region region;
         private int selectedKeyIndex = -1;
         private bool movingKey;
 
@@ -20,11 +20,11 @@ namespace Uncooked.Editors
             Event guiEvent = Event.current;
 
             Rect gradientRect = new Rect(windowBorder, windowBorder, position.width - 2 * windowBorder, 30);
-            GUI.DrawTexture(gradientRect, biome.GetTexture((int)gradientRect.width));
+            GUI.DrawTexture(gradientRect, region.GetTexture((int)gradientRect.width));
 
             #region Draw Keys
-            Rect[] keyBounds = new Rect[biome.KeyCount];
-            for (int i = 0; i < biome.KeyCount; i++)
+            Rect[] keyBounds = new Rect[region.KeyCount];
+            for (int i = 0; i < region.KeyCount; i++)
             {
                 // Calculate key bounds
                 keyBounds[i] = GetKeyBounds(i);
@@ -40,7 +40,7 @@ namespace Uncooked.Editors
                         Color.white);
                 }
                 // Draw key bound
-                EditorGUI.DrawRect(keyBounds[i], biome.GetKey(i).Color);
+                EditorGUI.DrawRect(keyBounds[i], region.GetKey(i).Color);
             }
 
             Rect settingsRect = new Rect(gradientRect.x, gradientRect.yMax + 2 * windowBorder + keyHeight, gradientRect.width, position.height - gradientRect.height - 4 * windowBorder - keyHeight);
@@ -48,11 +48,11 @@ namespace Uncooked.Editors
             {
                 GUILayout.BeginArea(settingsRect);
                 EditorGUI.BeginChangeCheck();
-                Tile newTile = (Tile)EditorGUILayout.ObjectField(biome.GetKey(selectedKeyIndex).Tile, typeof(Tile), true);
-                if (EditorGUI.EndChangeCheck()) biome.SetTile(selectedKeyIndex, newTile);
+                Tile newTile = (Tile)EditorGUILayout.ObjectField(region.GetKey(selectedKeyIndex).Tile, typeof(Tile), true);
+                if (EditorGUI.EndChangeCheck()) region.SetTile(selectedKeyIndex, newTile);
                 EditorGUI.BeginChangeCheck();
-                float newPercent = EditorGUILayout.FloatField(biome.GetKey(selectedKeyIndex).Percent);
-                if (EditorGUI.EndChangeCheck()) biome.SetPercent(selectedKeyIndex, newPercent);
+                float newPercent = EditorGUILayout.FloatField(region.GetKey(selectedKeyIndex).Percent);
+                if (EditorGUI.EndChangeCheck()) region.SetPercent(selectedKeyIndex, newPercent);
                 GUILayout.EndArea();
             }
             #endregion
@@ -66,7 +66,7 @@ namespace Uncooked.Editors
                     {
                         // Add key
                         float keyPercent = Mathf.InverseLerp(gradientRect.x, gradientRect.xMax, guiEvent.mousePosition.x);
-                        selectedKeyIndex = biome.AddKey(new Biome.TileKey(null, keyPercent));
+                        selectedKeyIndex = region.AddKey(new Region.TileKey(null, keyPercent));
                     }
                     else
                     {
@@ -93,13 +93,13 @@ namespace Uncooked.Editors
                 {
                     // Drag Key
                     float keyPercent = Mathf.InverseLerp(gradientRect.x, gradientRect.xMax, guiEvent.mousePosition.x);
-                    selectedKeyIndex = biome.MoveKey(selectedKeyIndex, keyPercent);
+                    selectedKeyIndex = region.MoveKey(selectedKeyIndex, keyPercent);
                     Repaint();
                 }
             }
             if (guiEvent.keyCode == KeyCode.Backspace && guiEvent.type == EventType.KeyDown)
             {
-                biome.RemoveKey(selectedKeyIndex);
+                region.RemoveKey(selectedKeyIndex);
                 selectedKeyIndex = -1;
                 Repaint();
             }
@@ -110,20 +110,20 @@ namespace Uncooked.Editors
         {
             Rect gradientRect = new Rect(windowBorder, windowBorder, position.width - 2 * windowBorder, 30);
             return new Rect(
-                gradientRect.x + biome.GetKey(index).Percent * gradientRect.width - keyWidth / 2,
+                gradientRect.x + region.GetKey(index).Percent * gradientRect.width - keyWidth / 2,
                 gradientRect.yMax + windowBorder,
                 keyWidth,
                 keyHeight);
         }
 
-        public void SetBiome(Biome _biome)
+        public void SetRegion(Region newRegion)
         {
-            biome = _biome;
+            region = newRegion;
         }
 
         private void OnEnable()
         {
-            titleContent.text = "Biome Regions";
+            titleContent.text = "Region Editor";
         }
     }
 }
