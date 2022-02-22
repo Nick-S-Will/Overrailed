@@ -9,6 +9,8 @@ namespace Uncooked.Terrain.Generation
     public class Region
     {
         [SerializeField] private List<TileKey> keys = new List<TileKey>();
+        
+        public int KeyCount => keys.Count;
 
         public Region(params TileKey[] keys)
         {
@@ -17,13 +19,17 @@ namespace Uncooked.Terrain.Generation
 
         public static Region Default => new Region(new TileKey(null, 0), new TileKey(null, 1));
 
+        /// <summary>
+        /// Gets the appropriate color to draw on the slider for this region
+        /// </summary>
+        /// <param name="percent"></param>
+        /// <returns></returns>
         public Color Evaluate(float percent)
         {
             foreach (var key in keys) if (percent <= key.Percent) return key.Tile == null ? GetRainbow(percent) : key.Color;
             return Color.white;
         }
 
-        public int KeyCount => keys.Count;
         public TileKey GetKey(int index) => keys[index];
         public Tile GetTile(float percent)
         {

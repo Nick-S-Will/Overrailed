@@ -101,12 +101,12 @@ namespace Uncooked.Terrain.Tiles
             return base.TryPickUp(parent, amount);
         }
 
-        public override bool TryInteractUsing(IPickupable item)
+        public override Interaction TryInteractUsing(IPickupable item)
         {
-            if (Passenger && Passenger.TryInteractUsing(item)) return true;
-            else if (item is TrainCar car) return car.TrySetRail(this, true);
-            else if (item is RailTile rail && !IsPowered) return rail.TryStackOn(this);
-            else return false;
+            if (Passenger) return Passenger.TryInteractUsing(item);
+            else if (item is TrainCar car) return car.TrySetRail(this, true) ? Interaction.Used : Interaction.None;
+            else if (item is RailTile rail && !IsPowered) return rail.TryStackOn(this) ? Interaction.Used : Interaction.None;
+            else return Interaction.None;
         }
 
         /// <summary>

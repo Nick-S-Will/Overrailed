@@ -8,11 +8,10 @@ namespace Uncooked.Terrain.Generation
     public class Biome : ScriptableObject
     {
         [SerializeField] private Region groundRegion = Region.Default;
-        [SerializeField] [Range(0, 1)] private float minObstaclePercentage = 0.4f;
         [SerializeField] private Region treeRegion = Region.Default, stoneRegion = Region.Default;
 
         public Region GroundRegion => groundRegion;
-        public float MinObstaclePercentage => minObstaclePercentage;
+        public float MinObstaclePercentage => Mathf.Min(groundRegion.GetKey(0).Percent + 0.05f, 1);
         public Region TreeRegion => treeRegion;
         public Region StoneRegion => stoneRegion;
     }

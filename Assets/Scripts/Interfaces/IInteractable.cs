@@ -8,6 +8,8 @@ public interface IInteractable
     /// Tries to use given pickup on this
     /// </summary>
     /// <param name="item">IPickupable used on this</param>
-    /// <returns>True if an interaction happened, otherwise false</returns>
-    bool TryInteractUsing(IPickupable item);
+    /// <returns>The number of interactions</returns>
+    Interaction TryInteractUsing(IPickupable item);
 }
+
+public enum Interaction { None, Used, Interacted }

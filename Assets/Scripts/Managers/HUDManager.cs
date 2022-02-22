@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using Uncooked.Terrain.Generation;
-using Uncooked.Train;
 using Uncooked.Terrain.Tools;
+using Uncooked.Player;
+using Uncooked.Train;
 
 namespace Uncooked.Managers
 {
@@ -14,7 +15,7 @@ namespace Uncooked.Managers
         [SerializeField] private MapManager map;
         [Header("Tools")]
         [SerializeField] private GameObject toolHUDPrefab;
-        [SerializeField] private ToolHUD[] tools;
+        [SerializeField] private ToolType[] toolTypes;
         [SerializeField] private Vector2 opacityDistance = new Vector2(2, 4);
         [SerializeField] private Color warningColor = Color.red;
         [SerializeField] [Range(0, 1)] private float warningScreenPercentage = 0.1f;
@@ -25,6 +26,7 @@ namespace Uncooked.Managers
         [SerializeField] private Text seedText;
         [SerializeField] private Text speedText, coinsText;
 
+        private List<ToolHUD> toolHUDs = new List<ToolHUD>();
         private int seedStartLength, speedStartLength, coinsStartLength;
         [HideInInspector] public bool isUpdating;
 
@@ -47,58 +49,57 @@ namespace Uncooked.Managers
         void Start()
         {
             // Spawns Tool HUDs
-            for (int i = 0; i < tools.Length; i++)
+            foreach (var tool in FindObjectsOfType<Tool>())
             {
-                tools[i].Tool.OnPickup += OnToolPickup;
-                tools[i].Tool.OnDropTool += OnToolDrop;
+                var toolType = ToolType.GetType(tool);
+                if (toolType == null) continue; // Doesn't make a HUD if a type can't be found
 
-                var toolHUD = Instantiate(toolHUDPrefab, hudParent).GetComponent<RectTransform>();
-                tools[i].background = toolHUD.GetChild(0).GetComponent<Image>();
-                tools[i].icon = toolHUD.GetChild(0).GetChild(0).GetComponent<Image>();
+                tool.OnPickup += HideToolHUD;
+                tool.OnDropTool += ShowToolHUD;
 
-                tools[i].background.color = tools[i].Tint;
-                tools[i].icon.sprite = tools[i].ToolImage;
-
-                tools[i].rect = toolHUD;
+                var hudRect = Instantiate(toolHUDPrefab, hudParent).GetComponent<RectTransform>();
+                toolHUDs.Add(
+                    new ToolHUD(
+                        hudRect,
+                        hudRect.GetChild(0).GetComponent<Image>(),
+                        hudRect.GetChild(0).GetChild(0).GetComponent<Image>(),
+                        toolType,
+                        tool,
+                        toolType.Tint,
+                        toolType.ToolImage));
             }
 
-            _ = StartCoroutine(UpdateHUD());
+            _ = StartCoroutine(UpdateToolHUDs());
         }
 
-        private IEnumerator UpdateHUD()
+        #region Tool HUDs
+        private IEnumerator UpdateToolHUDs()
         {
             while (instance == this)
             {
-                foreach (var toolHUD in tools)
+                foreach (var toolHUD in toolHUDs)
                 {
                     if (toolHUD.rect.gameObject.activeSelf)
                     {
                         MoveRectToTransform(toolHUD);
-                        UpdateOpacity(toolHUD);
+                        UpdateToolHUDOpacity(toolHUD);
                     }
                 }
 
                 yield return null;
                 if (!GameManager.IsPlaying())
                 {
-                    foreach (var toolHUD in tools) SetToolHUD(toolHUD.Tool, false);
+                    foreach (var toolHUD in toolHUDs) SetToolHUD(toolHUD.tool, false);
 
                     yield return new WaitUntil(() => GameManager.IsPlaying());
 
-                    foreach (var toolHUD in tools) SetToolHUD(toolHUD.Tool, true);
+                    foreach (var toolHUD in toolHUDs) SetToolHUD(toolHUD.tool, true);
                 }
             }
         }
 
-        private void MoveRectToTransform(ToolHUD toolHUD)
+        private void UpdateToolHUDOpacity(ToolHUD toolHUD)
         {
-            toolHUD.rect.position = CameraManager.instance.Main.WorldToScreenPoint(toolHUD.Tool.transform.position);
-            toolHUD.rect.rotation = Quaternion.Inverse(CameraManager.instance.Main.transform.rotation);
-        }
-
-        private void UpdateOpacity(ToolHUD toolHUD)
-        {
-            float toolToPlayerDst = Player.PlayerController.MinDistanceToPlayer(toolHUD.Tool.transform.position);
             float opacity;
             if (toolHUD.ScreenPercent < warningScreenPercentage)
             {
@@ -107,18 +108,32 @@ namespace Uncooked.Managers
             }
             else
             {
+                float toolToPlayerDst = PlayerController.MinDistanceToPlayer(toolHUD.tool.transform.position);
                 opacity = 0.8f * Mathf.InverseLerp(instance.opacityDistance.x, instance.opacityDistance.y, toolToPlayerDst);
-                toolHUD.background.color = toolHUD.Tint;
+                toolHUD.background.color = toolHUD.toolType.Tint;
             }
 
-            var newColor = toolHUD.background.color;
-            newColor.a = opacity;
-            toolHUD.background.color = newColor;
+            var color = toolHUD.background.color;
+            toolHUD.background.color = new Color(color.r, color.g, color.b, opacity);
 
-            newColor = toolHUD.icon.color;
-            newColor.a = opacity;
-            toolHUD.icon.color = newColor;
+            color = toolHUD.icon.color;
+            toolHUD.icon.color = new Color(color.r, color.g, color.b, opacity);
         }
+
+        private void HideToolHUD(Tool tool) => SetToolHUD(tool, false);
+        private void ShowToolHUD(Tool tool) => SetToolHUD(tool, true);
+        private void SetToolHUD(Tool tool, bool isVisible)
+        {
+            foreach (var toolHUD in toolHUDs)
+            {
+                if (tool == toolHUD.tool)
+                {
+                    toolHUD.rect.gameObject.SetActive(isVisible);
+                    break;
+                }
+            }
+        }
+        #endregion
 
         #region Set HUD Text
         public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
@@ -130,21 +145,11 @@ namespace Uncooked.Managers
         }
         #endregion
 
-        #region Toggle Tool HUDs
-        private void OnToolPickup(Tool tool) => SetToolHUD(tool, false);
-        private void OnToolDrop(Tool tool) => SetToolHUD(tool, true);
-        private void SetToolHUD(Tool tool, bool isVisible)
+        private void MoveRectToTransform(ToolHUD toolHUD)
         {
-            foreach (var t in tools)
-            {
-                if (tool == t.Tool)
-                {
-                    t.rect.gameObject.SetActive(isVisible);
-                    break;
-                }
-            }
+            toolHUD.rect.position = CameraManager.instance.Main.WorldToScreenPoint(toolHUD.tool.transform.position);
+            toolHUD.rect.rotation = Quaternion.Inverse(CameraManager.instance.Main.transform.rotation);
         }
-        #endregion
 
         private void OnDestroy()
         {
@@ -155,19 +160,44 @@ namespace Uncooked.Managers
         }
 
         [System.Serializable]
-        private struct ToolHUD
+        private class ToolType
         {
-            [SerializeField] private Tool tool;
+            [SerializeField] private string toolName;
             [SerializeField] private Sprite toolImage;
             [SerializeField] private Color tint;
 
-            [HideInInspector] public RectTransform rect;
-            [HideInInspector] public Image background, icon;
-            [HideInInspector] public bool isInDanger;
-
-            public Tool Tool => tool;
+            public string ToolName => toolName;
             public Sprite ToolImage => toolImage;
             public Color Tint => tint;
+
+            public static ToolType GetType(Tool tool)
+            {
+                foreach (var type in instance.toolTypes) if (tool.name.StartsWith(type.ToolName)) return type;
+                return null;
+            }
+        }
+
+        private struct ToolHUD
+        {
+            public RectTransform rect;
+            public Image background, icon;
+            public ToolType toolType;
+            public Tool tool;
+            public bool isInDanger;
+
+            public ToolHUD(RectTransform rectTransform, Image bg, Image iconImage, ToolType type, Tool newTool, Color bgColor, Sprite iconSprite)
+            {
+                rect = rectTransform;
+                background = bg;
+                icon = iconImage;
+                toolType = type;
+                tool = newTool;
+                isInDanger = false;
+
+                background.color = bgColor;
+                icon.sprite = iconSprite;
+            }
+
             public float ScreenPercent => (rect.position.x + Screen.width) / Screen.width - 1;
         }
     }

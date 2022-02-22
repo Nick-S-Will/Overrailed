@@ -13,12 +13,12 @@ namespace Uncooked.Terrain.Tiles
 
         protected override void Start() => base.Start();
         
-        public bool TryInteractUsing(IPickupable item)
+        public Interaction TryInteractUsing(IPickupable item)
         {
             if (item is BreakTool breaker && name.Contains(breaker.BreakTileCode)) TakeHit(breaker.Tier);
-            else return false;
+            else return Interaction.None;
 
-            return true;
+            return Interaction.Interacted;
         }
 
         /// <summary>

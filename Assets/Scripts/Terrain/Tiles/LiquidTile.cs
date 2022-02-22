@@ -42,14 +42,18 @@ namespace Uncooked.Terrain.Tiles
             liquid.localScale = Vector3.one;
         }
 
-        public virtual bool TryInteractUsing(IPickupable item)
+        public virtual Interaction TryInteractUsing(IPickupable item)
         {
-            if (item is StackTile stack && stack.HasBridge) stack.BuildBridge(this);
+            if (item is StackTile stack && stack.HasBridge)
+            {
+                stack.BuildBridge(this);
+                return stack.GetStackCount() == 1 ? Interaction.Used : Interaction.Interacted;
+            }
             else if (item is Rod rod) rod.Use(this);
             else if (item is Bucket bucket) bucket.IsFull = true;
-            else return false;
+            else return Interaction.None;
 
-            return true;
+            return Interaction.Used;
         }
     }
 }

@@ -136,9 +136,9 @@ namespace Uncooked.Train
             yield return null; // Required for destroy cleanup
         }
 
-        public override bool TryInteractUsing(IPickupable item)
+        public override Interaction TryInteractUsing(IPickupable item)
         {
-            if (item is StackTile stack) return TryAddItem(stack);
+            if (item is StackTile stack) return TryAddItem(stack) ? Interaction.Used : Interaction.None;
             else return base.TryInteractUsing(item);
         }
 

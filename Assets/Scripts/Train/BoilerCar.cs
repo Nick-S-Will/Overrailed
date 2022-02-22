@@ -45,16 +45,16 @@ namespace Uncooked.Train
             }
         }
 
-        public override bool TryInteractUsing(IPickupable item)
+        public override Interaction TryInteractUsing(IPickupable item)
         {
             if (item is Bucket bucket && bucket.IsFull)
             {
                 liquidPercent = 1;
-                if (!base.TryInteractUsing(item)) bucket.IsFull = false;
+                if (base.TryInteractUsing(item) == 0) bucket.IsFull = false;
             }
-            else return false;
+            else return Interaction.None;
 
-            return true;
+            return Interaction.Interacted;
         }
     }
 }

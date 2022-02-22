@@ -114,11 +114,11 @@ namespace Uncooked.Train
 
         public override void Drop(Vector3Int position) { }
 
-        public virtual bool TryInteractUsing(IPickupable item)
+        public virtual Interaction TryInteractUsing(IPickupable item)
         {
-            if (GameManager.IsEditing() && item is TrainCar car) return TryUpgradeCar(car);
-            else if (item is Bucket bucket) return TryExtinguish(bucket);
-            else return false;
+            if (GameManager.IsEditing() && item is TrainCar car) return TryUpgradeCar(car) ? Interaction.Used : Interaction.None;
+            else if (item is Bucket bucket) return TryExtinguish(bucket) ? Interaction.Interacted : Interaction.None;
+            else return Interaction.None;
         }
 
         protected virtual bool TryUpgradeCar(TrainCar newCar)

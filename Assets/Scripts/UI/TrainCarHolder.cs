@@ -51,18 +51,18 @@ namespace Uncooked.UI
             }
         }
 
-        public bool TryInteractUsing(IPickupable item)
+        public Interaction TryInteractUsing(IPickupable item)
         {
             if (item is TrainCar car)
             {
                 if (car == heldCar && TryPlaceCar(car))
                 {
                     manager.Coins += car.Tier;
-                    return true;
+                    return Interaction.Used;
                 }
             }
             
-            return false;
+            return Interaction.None;
         }
     }
 }

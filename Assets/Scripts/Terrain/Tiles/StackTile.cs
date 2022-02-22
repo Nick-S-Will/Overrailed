@@ -55,10 +55,10 @@ namespace Uncooked.Terrain.Tiles
             return top;
         }
 
-        public virtual bool TryInteractUsing(IPickupable item)
+        public virtual Interaction TryInteractUsing(IPickupable item)
         {
-            if (item is StackTile stack) return stack.TryStackOn(this);
-            else return false;
+            if (item is StackTile stack) return stack.TryStackOn(this) ? Interaction.Used : Interaction.None;
+            else return Interaction.None;
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace Uncooked.Terrain.Tiles
         public void BuildBridge(LiquidTile liquid)
         {
             Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform);
-            Destroy(gameObject);
+            Destroy(GetStackTop().gameObject);
 
             Destroy(liquid.GetComponent<BoxCollider>());
         }

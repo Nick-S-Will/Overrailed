@@ -162,11 +162,15 @@ public abstract class CharacterControls : MonoBehaviour
     {
         if (toolSwinging != null || interactable == null) return;
 
-        if (interactable.TryInteractUsing(heldItem))
+        var interaction = interactable.TryInteractUsing(heldItem);
+        if (interaction == Interaction.Used || interaction == Interaction.Interacted)
         {
             if (heldItem is Tool) toolSwinging = StartCoroutine(SwingTool());
             else
             {
+                // Doesn't lower arms if tile wasn't fully used up
+                if (interaction == Interaction.Interacted) return;
+                
                 LowerArms(heldItem.IsTwoHanded());
                 heldItem = null;
             }
