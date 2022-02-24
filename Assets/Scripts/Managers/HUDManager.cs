@@ -13,6 +13,12 @@ namespace Uncooked.Managers
     public class HUDManager : MonoBehaviour
     {
         [SerializeField] private MapManager map;
+        [Header("Transforms")]
+        [SerializeField] private Transform toolHUDParent;
+        [SerializeField] private Transform warningHUDParent;
+        [Header("Texts")]
+        [SerializeField] private Text seedText;
+        [SerializeField] private Text speedText, coinsText;
         [Header("Tools")]
         [SerializeField] private GameObject toolHUDPrefab;
         [SerializeField] private ToolType[] toolTypes;
@@ -20,11 +26,8 @@ namespace Uncooked.Managers
         [SerializeField] private Color warningColor = Color.red;
         [SerializeField] [Range(0, 1)] private float warningScreenPercentage = 0.1f;
         [SerializeField] [Min(1)] private float warningBlinkSpeed = 2;
-        [Header("Transforms")]
-        [SerializeField] private Transform hudParent;
-        [Header("Texts")]
-        [SerializeField] private Text seedText;
-        [SerializeField] private Text speedText, coinsText;
+        [Header("Warnings")]
+        [SerializeField] private GameObject warningHUDPrefab;
 
         private List<ToolHUD> toolHUDs = new List<ToolHUD>();
         private int seedStartLength, speedStartLength, coinsStartLength;
@@ -57,7 +60,7 @@ namespace Uncooked.Managers
                 tool.OnPickup += HideToolHUD;
                 tool.OnDropTool += ShowToolHUD;
 
-                var hudRect = Instantiate(toolHUDPrefab, hudParent).GetComponent<RectTransform>();
+                var hudRect = Instantiate(toolHUDPrefab, toolHUDParent).GetComponent<RectTransform>();
                 toolHUDs.Add(
                     new ToolHUD(
                         hudRect,
@@ -69,8 +72,20 @@ namespace Uncooked.Managers
                         toolType.ToolImage));
             }
 
+            foreach (var car in FindObjectsOfType<TrainCar>()) car.OnWarning += MakeWarningHUD;
+
             _ = StartCoroutine(UpdateToolHUDs());
         }
+
+        #region Set Stats HUD Texts
+        public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
+        public void UpdateSpeedText(string newSpeed) => UpdateText(speedText, speedStartLength, newSpeed);
+        public void UpdateCoinsText(string newCoinCount) => UpdateText(coinsText, coinsStartLength, newCoinCount);
+        private void UpdateText(Text textElement, int baseLength, string newString)
+        {
+            textElement.text = textElement.text.Substring(0, baseLength) + newString;
+        }
+        #endregion
 
         #region Tool HUDs
         private IEnumerator UpdateToolHUDs()
@@ -81,7 +96,7 @@ namespace Uncooked.Managers
                 {
                     if (toolHUD.rect.gameObject.activeSelf)
                     {
-                        MoveRectToTransform(toolHUD);
+                        MoveRectToWorldPosition(toolHUD.rect, toolHUD.tool.transform.position);
                         UpdateToolHUDOpacity(toolHUD);
                     }
                 }
@@ -109,7 +124,7 @@ namespace Uncooked.Managers
             else
             {
                 float toolToPlayerDst = PlayerController.MinDistanceToPlayer(toolHUD.tool.transform.position);
-                opacity = 0.8f * Mathf.InverseLerp(instance.opacityDistance.x, instance.opacityDistance.y, toolToPlayerDst);
+                opacity = Mathf.InverseLerp(instance.opacityDistance.x, instance.opacityDistance.y, toolToPlayerDst);
                 toolHUD.background.color = toolHUD.toolType.Tint;
             }
 
@@ -135,20 +150,29 @@ namespace Uncooked.Managers
         }
         #endregion
 
-        #region Set HUD Text
-        public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
-        public void UpdateSpeedText(string newSpeed) => UpdateText(speedText, speedStartLength, newSpeed);
-        public void UpdateCoinsText(string newCoinCount) => UpdateText(coinsText, coinsStartLength, newCoinCount);
-        private void UpdateText(Text textElement, int baseLength, string newString)
+        #region Train Warning HUDs
+        private void MakeWarningHUD(TrainCar car) => _ = StartCoroutine(ManageWarningHUD(car));
+        private IEnumerator ManageWarningHUD(TrainCar car)
         {
-            textElement.text = textElement.text.Substring(0, baseLength) + newString;
+            var warningHUD = Instantiate(warningHUDPrefab, warningHUDParent).GetComponent<RectTransform>();
+            var image = warningHUD.GetComponentInChildren<Image>();
+
+            while (car.IsWarning)
+            {
+                MoveRectToWorldPosition(warningHUD, car.transform.position);
+                image.color = Color.Lerp(Color.white, Color.red, Mathf.PingPong(warningBlinkSpeed * Time.time, 1));
+
+                yield return null;
+            }
+
+            Destroy(warningHUD.gameObject);
         }
         #endregion
 
-        private void MoveRectToTransform(ToolHUD toolHUD)
+        private void MoveRectToWorldPosition(RectTransform rect, Vector3 position)
         {
-            toolHUD.rect.position = CameraManager.instance.Main.WorldToScreenPoint(toolHUD.tool.transform.position);
-            toolHUD.rect.rotation = Quaternion.Inverse(CameraManager.instance.Main.transform.rotation);
+            rect.position = CameraManager.instance.Main.WorldToScreenPoint(position);
+            rect.rotation = Quaternion.Inverse(CameraManager.instance.Main.transform.rotation);
         }
 
         private void OnDestroy()

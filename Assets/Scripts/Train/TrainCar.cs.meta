@@ -3,7 +3,14 @@ guid: 48323598e36b1ab49a6392c5a0a2b441
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - meshParent: {instanceID: 0}
+  - leaderLocomotive: {instanceID: 0}
+  - burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
+  - breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
+  - splashParticlePrefab: {fileID: 5256204201205229158, guid: 2564afb13d47b0d44801e6317b90800e, type: 3}
+  - burnPoint: {instanceID: 0}
+  - startRail: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

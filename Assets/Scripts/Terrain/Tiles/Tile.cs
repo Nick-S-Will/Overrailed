@@ -10,7 +10,7 @@ namespace Uncooked.Terrain.Tiles
 
         public Gradient MeshColorGradient { get; private set; }
         public virtual bool CanPickUp => false;
-        public virtual bool IsTwoHanded() => true;
+        public virtual bool IsTwoHanded => true;
         public virtual bool OnTryDrop() => true;
 
         protected virtual void Start()

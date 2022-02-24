@@ -26,7 +26,8 @@ namespace Uncooked.Train
 
         public float holdCount { get; private set; }
 
-        public bool HasSpace() => Mathf.CeilToInt(holdCount) < 2 + 2 * tier;
+        public bool HasSpace => Mathf.CeilToInt(holdCount) < 2 + 2 * tier;
+        public override bool IsWarning => false;
 
         public override IPickupable TryPickUp(Transform parent, int amount)
         {

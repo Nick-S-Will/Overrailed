@@ -22,7 +22,7 @@ namespace Uncooked.Terrain.Tiles
         public string StackType => stackType;
         public float TileHeight => tileHeight;
         public override bool CanPickUp => true;
-        public override bool IsTwoHanded() => true;
+        public override bool IsTwoHanded => true;
 
         override protected void Start()
         {

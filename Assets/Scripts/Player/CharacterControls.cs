@@ -148,7 +148,7 @@ public abstract class CharacterControls : MonoBehaviour
     {
         if (pickup == null) return false;
 
-        bool bothHands = pickup.IsTwoHanded();
+        bool bothHands = pickup.IsTwoHanded;
         heldItem = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, Strength);
         if (heldItem != null) RaiseArms(bothHands);
 
@@ -171,7 +171,7 @@ public abstract class CharacterControls : MonoBehaviour
                 // Doesn't lower arms if tile wasn't fully used up
                 if (interaction == Interaction.Interacted) return;
                 
-                LowerArms(heldItem.IsTwoHanded());
+                LowerArms(heldItem.IsTwoHanded);
                 heldItem = null;
             }
         }
@@ -189,7 +189,7 @@ public abstract class CharacterControls : MonoBehaviour
 
         if (interactTile.CanPickUp && (!(interactTile is StackTile stackTile) || stackTile.GetStackCount() <= Strength))
         {
-            _ = interactTile.TryPickUp(interactTile.IsTwoHanded() ? pickupHolder : toolHolder, Strength);
+            _ = interactTile.TryPickUp(interactTile.IsTwoHanded ? pickupHolder : toolHolder, Strength);
             map.PlacePickup(heldItem, stackPos);
             heldItem = interactTile;
             return true;
@@ -210,7 +210,7 @@ public abstract class CharacterControls : MonoBehaviour
         _ = map.MovePickup(toReplace);
         map.ForcePlacePickup(heldItem, replacePos);
 
-        LowerArms(heldItem.IsTwoHanded());
+        LowerArms(heldItem.IsTwoHanded);
         heldItem = null;
 
         return true;
@@ -226,7 +226,7 @@ public abstract class CharacterControls : MonoBehaviour
         if (heldItem == null || toolSwinging != null || !map.PointIsInPlayBounds(coords) || !heldItem.OnTryDrop()) return false;
 
         map.PlacePickup(heldItem, coords);
-        LowerArms(heldItem.IsTwoHanded());
+        LowerArms(heldItem.IsTwoHanded);
         heldItem = null;
 
         return true;
@@ -252,7 +252,7 @@ public abstract class CharacterControls : MonoBehaviour
         if (heldItem == null) return;
 
         map.PlacePickup(heldItem, Vector3Int.RoundToInt(transform.position + Vector3.up));
-        LowerArms(heldItem.IsTwoHanded());
+        LowerArms(heldItem.IsTwoHanded);
         heldItem = null;
     }
     #endregion

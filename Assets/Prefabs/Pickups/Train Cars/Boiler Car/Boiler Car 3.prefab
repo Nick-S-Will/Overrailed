@@ -1303,11 +1303,13 @@ MonoBehaviour:
   leaderLocomotive: {fileID: 0}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
   breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
+  splashParticlePrefab: {fileID: 5256204201205229158, guid: 2564afb13d47b0d44801e6317b90800e, type: 3}
   burnPoint: {fileID: 7634083072107500072}
   startRail: {fileID: 0}
   tier: 3
   isPermeable: 0
   liquid: {fileID: 8726667202825031564}
+  warningPercent: 0.13
 --- !u!65 &4956551187751659844
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -12,7 +12,7 @@ namespace Uncooked.UI
         public TrainStoreManager manager { private get; set; }
         private TrainCar heldCar;
 
-        public bool IsTwoHanded() => heldCar ? heldCar.IsTwoHanded() : false;
+        public bool IsTwoHanded => heldCar ? heldCar.IsTwoHanded : false;
         public bool IsHolding => heldCar && heldCar.transform.parent == transform;
 
         public IPickupable TryPickUp(Transform parent, int amount)

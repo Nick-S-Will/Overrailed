@@ -14,7 +14,7 @@ namespace Uncooked.Terrain.Tools
         [SerializeField] private int tier = 1;
 
         public int Tier => tier;
-        public override bool IsTwoHanded() => false;
+        public override bool IsTwoHanded => false;
         public override bool CanPickUp => true;
 
         /// <summary>

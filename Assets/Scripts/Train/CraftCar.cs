@@ -23,9 +23,10 @@ namespace Uncooked.Train
             {
                 if (isCrafting) return false;
                 foreach (StackPoint cp in craftPoints) if (!cp.IsHolding) return false;
-                return craftResultHolder.HasSpace();
+                return craftResultHolder.HasSpace;
             }
         }
+        public override bool IsWarning => false;
 
         override protected void Start()
         {

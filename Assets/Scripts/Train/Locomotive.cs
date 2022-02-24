@@ -30,6 +30,7 @@ namespace Uncooked.Train
         public int MaxCarCount => 4 + 2 * tier;
         public int CarCount { get; private set; } = 4;
         public bool IsDriving => smokeParticles.emission.enabled;
+        public override bool IsWarning => false;
 
         protected override void Start()
         {
@@ -49,11 +50,18 @@ namespace Uncooked.Train
 
         protected void StartEmittingSmoke() => SetEmitSmoke(true);
         protected void StopEmittingSmoke() => SetEmitSmoke(false);
-
         private void SetEmitSmoke(bool emit)
         {
             var emissionSettings = smokeParticles.emission;
             emissionSettings.enabled = emit;
+        }
+
+        public override IEnumerator Ignite()
+        {
+            _ = StartCoroutine(base.Ignite());
+            yield return new WaitForSeconds(6);
+
+            if (burningParticles) Die();
         }
 
         /// <summary>

@@ -7,7 +7,7 @@ public interface IPickupable
     /// <summary>
     /// Chosen by classes that implement this, used to determine how the object will be held when picked up
     /// </summary>
-    bool IsTwoHanded();
+    bool IsTwoHanded { get; }
 
     /// <summary>
     /// Picks up an IPickupable 

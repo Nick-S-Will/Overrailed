@@ -10,12 +10,13 @@ namespace Uncooked.Train
     public abstract class TrainCar : Tile, IPickupable, IInteractable
     {
         public event System.Action OnDeath;
+        public virtual event System.Action<TrainCar> OnWarning;
         protected event System.Action OnStartDriving, OnPauseDriving;
 
         [SerializeField] private Locomotive leaderLocomotive;
         [Space]
         [SerializeField] private ParticleSystem burningParticlePrefab;
-        [SerializeField] private ParticleSystem breakParticlePrefab;
+        [SerializeField] private ParticleSystem breakParticlePrefab, splashParticlePrefab;
         [Space]
         [SerializeField] private Transform burnPoint;
         [SerializeField] private RailTile startRail;
@@ -28,13 +29,13 @@ namespace Uncooked.Train
 
         public int Tier => tier;
         public bool HasRail => currentRail;
-        public override bool IsTwoHanded() => true;
+        public override bool IsTwoHanded => true;
+        public abstract bool IsWarning { get; }
 
         override protected void Start()
         {
             if (startRail) _ = TrySetRail(startRail, false);
             if (leaderLocomotive) leaderLocomotive.OnStartTrain += StartDriving;
-            OnDeath += Die;
 
             base.Start();
         }
@@ -67,7 +68,7 @@ namespace Uncooked.Train
                         if (currentRail.NextRail) UpdateRail(currentRail.NextRail);
                         else
                         {
-                            OnDeath?.Invoke();
+                            Die();
                             yield break;
                         }
                     }
@@ -94,6 +95,7 @@ namespace Uncooked.Train
         }
         private WaitUntil DriveWait() => new WaitUntil(() => this is Locomotive ? GameManager.IsPlaying() : leaderLocomotive.IsDriving);
 
+        #region IPickupable and IInteractable implementations
         /// <summary>
         /// Picks up this car if in edit mode
         /// </summary>
@@ -120,6 +122,7 @@ namespace Uncooked.Train
             else if (item is Bucket bucket) return TryExtinguish(bucket) ? Interaction.Interacted : Interaction.None;
             else return Interaction.None;
         }
+        #endregion
 
         protected virtual bool TryUpgradeCar(TrainCar newCar)
         {
@@ -130,7 +133,8 @@ namespace Uncooked.Train
                 newCar.leaderLocomotive = leaderLocomotive;
                 newCar.StartDriving();
             }
-            OnDeath?.Invoke();
+
+            Die();
             return true;
         }
 
@@ -154,21 +158,24 @@ namespace Uncooked.Train
             else return false;
         }
 
-        public IEnumerator Ignite()
+        public virtual IEnumerator Ignite()
         {
             burningParticles = Instantiate(burningParticlePrefab, burnPoint);
 
-            yield return new WaitForSeconds(6);
+            while (burningParticles)
+            {
+                yield return new WaitForSeconds(6);
 
-            if (!burningParticles) yield break;
+                if (!burningParticles) yield break;
 
-            var carF = TryGetAdjacentCar(transform.position, transform.forward);
-            var carB = TryGetAdjacentCar(transform.position, -transform.forward);
+                var carF = TryGetAdjacentCar(transform.position, transform.forward);
+                var carB = TryGetAdjacentCar(transform.position, -transform.forward);
 
-            if (carF && !carF.burningParticles && carF.currentRail) _ = StartCoroutine(carF.Ignite());
-            if (carB && !carB.burningParticles && carB.currentRail) _ = StartCoroutine(carB.Ignite());
+                if (carF && !carF.burningParticles && carF.currentRail) _ = StartCoroutine(carF.Ignite());
+                if (carB && !carB.burningParticles && carB.currentRail) _ = StartCoroutine(carB.Ignite());
+            }
         }
-
+        
         // TODO: Clean up how these work
         /// <summary>
         /// Places this train car on given rail tile
@@ -233,12 +240,18 @@ namespace Uncooked.Train
             else return null;
         }
 
+        protected void MakeWarning() => OnWarning?.Invoke(this);
+        
         protected virtual void Die()
         {
             BreakIntoParticles(breakParticlePrefab, MeshColorGradient, transform.position);
+            var waterColliders = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Water"));
+            if (waterColliders.Length > 0) Destroy(Instantiate(splashParticlePrefab, waterColliders[0].transform.position, Quaternion.identity), splashParticlePrefab.main.startLifetime.constant);
 
             if (leaderLocomotive) leaderLocomotive.OnStartTrain -= StartDriving;
             Destroy(gameObject);
+
+            OnDeath?.Invoke();
         }
 
         [System.Serializable]
