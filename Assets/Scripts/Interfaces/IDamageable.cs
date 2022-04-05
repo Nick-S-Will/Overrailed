@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using Overrailed.Terrain.Tools;
 
 public interface IDamageable
 {
-    void TakeHit(int damage);
+    void TakeHit(Tool tool);
 }

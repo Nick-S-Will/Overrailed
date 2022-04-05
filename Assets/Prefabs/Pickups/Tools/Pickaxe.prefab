@@ -405,6 +405,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 7327209237009232892}
+  pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
+  dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
+  interactSound: {fileID: 8300000, guid: 46d77fd68f3582d49a81d39506248b40, type: 3}
   handOffset: {fileID: 7194312622031976740}
   tier: 1
   breakTileCode: Stone

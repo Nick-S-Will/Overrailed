@@ -1392,7 +1392,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 7812671489880600963}
+  pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
+  dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   bridge: {fileID: 0}
+  bridgeBuildAudio: {fileID: 0}
   stackType: Rail
   tileHeight: 0.2
   startStackHeight: 1
@@ -1402,6 +1405,7 @@ MonoBehaviour:
   bentPower: {fileID: 8178672163177733667}
   straightPathParent: {fileID: 2095408942196132437}
   bentPathParent: {fileID: 3565178009839078391}
+  connectSound: {fileID: 8300000, guid: 604b3165c3882404aa1b3bd442b3b83c, type: 3}
   startsPowered: 0
   isCheckpoint: 0
   showPath: 0

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Player;
+using Overrailed.Player;
 
-namespace Uncooked.UI
+namespace Overrailed.UI
 {
     [RequireComponent(typeof(BoxCollider))]
     [RequireComponent(typeof(SpriteRenderer))]

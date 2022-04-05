@@ -128,8 +128,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2074680700467061115}
+  pickupAudio: {fileID: 0}
+  dropAudio: {fileID: 0}
   lowerTier: {fileID: 653283158049739767, guid: bbaf1adf628cfd74c9a1e7faab9c6b5c, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!65 &6222977855582117423
 BoxCollider:
   m_ObjectHideFlags: 0

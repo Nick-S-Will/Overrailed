@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Uncooked.Terrain.Tools
+using Overrailed.Managers;
+
+namespace Overrailed.Terrain.Tools
 {
     public class Bucket : Tool
     {
@@ -18,6 +20,12 @@ namespace Uncooked.Terrain.Tools
         override protected void Start()
         {
             liquid.gameObject.SetActive(IsFull);
+        }
+
+        public void Refill()
+        {
+            AudioManager.instance.PlaySound(InteractSound, transform.position);
+            IsFull = true;
         }
     }
 }

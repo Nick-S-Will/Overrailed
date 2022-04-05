@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Terrain.Generation;
-using Uncooked.Terrain.Tiles;
+using Overrailed.Terrain.Generation;
+using Overrailed.Terrain.Tiles;
 
-namespace Uncooked.Terrain.Tiles
+namespace Overrailed.Terrain.Tiles
 {
     public class ReplaceAtCheckpointTile : CheckpointTile
     {

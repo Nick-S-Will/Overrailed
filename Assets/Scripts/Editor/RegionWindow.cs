@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-using Uncooked.Terrain.Generation;
-using Uncooked.Terrain.Tiles;
+using Overrailed.Terrain.Generation;
+using Overrailed.Terrain.Tiles;
 
-namespace Uncooked.Editors
+namespace Overrailed.Editors
 {
     public class RegionWindow : EditorWindow
     {

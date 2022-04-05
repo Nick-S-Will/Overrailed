@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Terrain.Tiles;
+using Overrailed.Terrain.Tiles;
 
-namespace Uncooked.Managers
+namespace Overrailed.Managers
 {
     public class MobManager : MonoBehaviour
     {
@@ -14,15 +14,19 @@ namespace Uncooked.Managers
 
         void Awake()
         {
-            if (instance == null) instance = this;
-            else Debug.LogError("Multiple MobManagers Exist");
+            if (instance)
+            {
+                Destroy(gameObject);
+                Debug.LogError("Multiple MobManagers Found");
+            }
+            else instance = this; 
         }
 
         public StackTile RandomFish => Instantiate(fishPrefabs[Random.Range(0, fishPrefabs.Length - 1)], transform);
 
         private void OnDestroy()
         {
-            instance = null;
+            if (instance == this) instance = null;
         }
     }
 }

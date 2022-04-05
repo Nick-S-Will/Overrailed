@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Managers;
-using Uncooked.Terrain.Tools;
+using Overrailed.Managers;
+using Overrailed.Terrain.Tools;
 
-namespace Uncooked.Terrain.Tiles
+namespace Overrailed.Terrain.Tiles
 {
     public class LiquidTile : Tile, IInteractable
     {
@@ -49,11 +49,11 @@ namespace Uncooked.Terrain.Tiles
                 stack.BuildBridge(this);
                 return stack.GetStackCount() == 1 ? Interaction.Used : Interaction.Interacted;
             }
-            else if (item is Rod rod) rod.Use(this);
-            else if (item is Bucket bucket) bucket.IsFull = true;
+            else if (item is Rod rod) rod.UseOn(this);
+            else if (item is Bucket bucket) bucket.Refill();
             else return Interaction.None;
 
-            return Interaction.Used;
+            return Interaction.Interacted;
         }
     }
 }

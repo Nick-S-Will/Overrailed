@@ -3,49 +3,62 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Managers;
+using Overrailed.Managers;
+using Overrailed.Mob;
 
-namespace Uncooked.Player
+namespace Overrailed.Player
 {
-    [RequireComponent(typeof(CharacterController))]
-    public class PlayerController : CharacterControls
+    public class PlayerController : HumanoidControls
     {
-        [Header("Controls")]
-        [SerializeField] private KeyCode forwardKey = KeyCode.W;
-        [SerializeField] private KeyCode backKey = KeyCode.S, leftKey = KeyCode.A, rightKey = KeyCode.D, dashKey = KeyCode.LeftShift;
+        [Space]
+        [SerializeField] private AudioClip dashSound;
 
-        public static List<PlayerController> players = new List<PlayerController>();
+        private PlayerInput playerInput;
+
+        protected static List<PlayerController> players = new List<PlayerController>();
+
+        private void Awake()
+        {
+            playerInput = new PlayerInput();
+
+            playerInput.Movement.Walk.performed += ctx => InputDir = ctx.ReadValue<Vector2>();
+            playerInput.Movement.Walk.canceled += ctx => InputDir = Vector2.zero;
+            playerInput.Movement.Dash.started += ctx => AudioManager.instance.PlaySound(dashSound, transform.position);
+            playerInput.Movement.Dash.started += ctx => HoldingDashKey = true;
+            playerInput.Movement.Dash.canceled += ctx => HoldingDashKey = false;
+
+            playerInput.Interaction.InteractMain.performed += ctx => MainInteract();
+            playerInput.Interaction.InteractAlt.performed += ctx => AltInteract();
+
+            playerInput.Enable();
+            players.Add(this);
+        }
+
+        private void OnEnable() => playerInput.Enable();
 
         protected override void Start()
         {
-            players.Add(this);
             GameManager.instance.OnCheckpoint += ForceDrop;
+            GameManager.instance.OnGameEnd += playerInput.Disable;
+            GameManager.instance.OnGameEnd += ForceDrop;
 
             base.Start();
         }
 
         void Update()
         {
-            HandleMovement(Input.GetKey(leftKey), Input.GetKey(rightKey), Input.GetKey(forwardKey), Input.GetKey(backKey), Input.GetKey(dashKey));
-
-            // Interact Input
-            if (Input.GetMouseButton(0) || Input.GetMouseButton(1)) TryInteract(Input.GetMouseButton(1));
-
             // Tile highlighting
             var tile = map.GetTileAt(LookPoint);
             if (tile == null) tile = map.GetTileAt(LookPoint + Vector3Int.down);
             map.TryHighlightTile(tile);
         }
 
-        public static void EnableControls() => SetControls(true);
-        public static void DisableControls() => SetControls(false);
-        private static void SetControls(bool enabled)
+        public void EnableControls() => SetControls(true);
+        public void DisableControls() => SetControls(false);
+        private void SetControls(bool enabled)
         {
-            foreach (var player in players)
-            {
-                player.StopMovement();
-                player.enabled = false;
-            }
+            StopMovement();
+            this.enabled = false;
         }
 
         public static float MinDistanceToPlayer(Vector3 point)
@@ -55,11 +68,13 @@ namespace Uncooked.Player
             foreach (var player in players)
             {
                 float dst = Vector3.Distance(point, player.transform.position);
-                if (dst < minDst) minDst = dst; 
+                if (dst < minDst) minDst = dst;
             }
 
             return minDst;
         }
+
+        private void OnDisable() => playerInput.Disable();
 
         private void OnDestroy()
         {

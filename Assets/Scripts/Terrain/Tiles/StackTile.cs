@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Player;
-using Uncooked.Terrain.Generation;
+using Overrailed.Managers;
 
-namespace Uncooked.Terrain.Tiles
+namespace Overrailed.Terrain.Tiles
 {
     public class StackTile : Tile, IPickupable, IInteractable
     {
         [SerializeField] private Tile bridge;
+        [SerializeField] private AudioClip bridgeBuildAudio;
         [Tooltip("Must have same exact same string to stack with")]
         [SerializeField] private string stackType;
         [SerializeField] private float tileHeight;
@@ -93,13 +93,15 @@ namespace Uncooked.Terrain.Tiles
             toPickUp.transform.localPosition = Vector3.up;
             toPickUp.transform.localRotation = Quaternion.identity;
 
+            AudioManager.instance.PlaySound(PickupAudio, transform.position);
+
             return toPickUp;
         }
 
         public override bool OnTryDrop() => true;
 
-        public override void Drop(Vector3Int position) { }
-
+        public override void Drop(Vector3Int position) => AudioManager.instance.PlaySound(dropSound, position);
+        
         /// <summary>
         /// Places this on stackBase if they have the same stackType
         /// </summary>
@@ -121,6 +123,8 @@ namespace Uncooked.Terrain.Tiles
             transform.localPosition = top.tileHeight * Vector3.up;
             transform.rotation = stackBase.transform.parent.rotation;
             transform.localRotation = Quaternion.Euler(0, Random.Range(-5, 5f), 0);
+
+            AudioManager.instance.PlaySound(dropSound, transform.position);
 
             return true;
         }
@@ -144,8 +148,10 @@ namespace Uncooked.Terrain.Tiles
         /// <param name="liquid">Liquid Tile in which bridge is to be placed</param>
         public void BuildBridge(LiquidTile liquid)
         {
-            Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform);
+            _ = Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform);
             Destroy(GetStackTop().gameObject);
+
+            AudioManager.instance.PlaySound(bridgeBuildAudio, liquid.transform.position);
 
             Destroy(liquid.GetComponent<BoxCollider>());
         }

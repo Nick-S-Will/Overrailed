@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using Uncooked.Terrain.Generation;
-using Uncooked.Terrain.Tools;
-using Uncooked.Player;
-using Uncooked.Train;
+using Overrailed.Terrain.Generation;
+using Overrailed.Terrain.Tools;
+using Overrailed.Player;
+using Overrailed.Train;
 
-namespace Uncooked.Managers
+namespace Overrailed.Managers
 {
     public class HUDManager : MonoBehaviour
     {
@@ -23,23 +23,20 @@ namespace Uncooked.Managers
         [SerializeField] private GameObject toolHUDPrefab;
         [SerializeField] private ToolType[] toolTypes;
         [SerializeField] private Vector2 opacityDistance = new Vector2(2, 4);
+        [SerializeField] private float opacityFadeSpeed = 2;
+        [Space]
         [SerializeField] private Color warningColor = Color.red;
         [SerializeField] [Range(0, 1)] private float warningScreenPercentage = 0.1f;
         [SerializeField] [Min(1)] private float warningBlinkSpeed = 2;
-        [Header("Warnings")]
+        [Header("Train Warnings")]
         [SerializeField] private GameObject warningHUDPrefab;
 
         private List<ToolHUD> toolHUDs = new List<ToolHUD>();
         private int seedStartLength, speedStartLength, coinsStartLength;
         [HideInInspector] public bool isUpdating;
 
-        public static HUDManager instance;
-
         private void Awake()
         {
-            if (instance == null) instance = this;
-            else Debug.LogError("Multiple HUDManagers Exist");
-
             FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
             map.OnSeedChange += UpdateSeedText;
             foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
@@ -54,7 +51,15 @@ namespace Uncooked.Managers
             // Spawns Tool HUDs
             foreach (var tool in FindObjectsOfType<Tool>())
             {
-                var toolType = ToolType.GetType(tool);
+                ToolType toolType = null;
+                foreach (var type in toolTypes)
+                {
+                    if (tool.name.Equals(type.ToolName))
+                    {
+                        toolType = type;
+                        break;
+                    }
+                }
                 if (toolType == null) continue; // Doesn't make a HUD if a type can't be found
 
                 tool.OnPickup += HideToolHUD;
@@ -77,7 +82,7 @@ namespace Uncooked.Managers
             _ = StartCoroutine(UpdateToolHUDs());
         }
 
-        #region Set Stats HUD Texts
+        #region Stat HUD Texts
         public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
         public void UpdateSpeedText(string newSpeed) => UpdateText(speedText, speedStartLength, newSpeed);
         public void UpdateCoinsText(string newCoinCount) => UpdateText(coinsText, coinsStartLength, newCoinCount);
@@ -90,7 +95,7 @@ namespace Uncooked.Managers
         #region Tool HUDs
         private IEnumerator UpdateToolHUDs()
         {
-            while (instance == this)
+            while (this)
             {
                 foreach (var toolHUD in toolHUDs)
                 {
@@ -123,8 +128,12 @@ namespace Uncooked.Managers
             }
             else
             {
+                opacity = toolHUD.background.color.a;
+                
                 float toolToPlayerDst = PlayerController.MinDistanceToPlayer(toolHUD.tool.transform.position);
-                opacity = Mathf.InverseLerp(instance.opacityDistance.x, instance.opacityDistance.y, toolToPlayerDst);
+                if (toolToPlayerDst < opacityDistance.x) opacity = Mathf.Clamp01(opacity - opacityFadeSpeed * Time.deltaTime);
+                else if (toolToPlayerDst > opacityDistance.y) opacity = Mathf.Clamp01(opacity + opacityFadeSpeed * Time.deltaTime);
+
                 toolHUD.background.color = toolHUD.toolType.Tint;
             }
 
@@ -177,8 +186,6 @@ namespace Uncooked.Managers
 
         private void OnDestroy()
         {
-            instance = null;
-
             if (map) map.OnSeedChange -= UpdateSeedText;
             foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange -= UpdateCoinsText;
         }
@@ -193,12 +200,6 @@ namespace Uncooked.Managers
             public string ToolName => toolName;
             public Sprite ToolImage => toolImage;
             public Color Tint => tint;
-
-            public static ToolType GetType(Tool tool)
-            {
-                foreach (var type in instance.toolTypes) if (tool.name.StartsWith(type.ToolName)) return type;
-                return null;
-            }
         }
 
         private struct ToolHUD

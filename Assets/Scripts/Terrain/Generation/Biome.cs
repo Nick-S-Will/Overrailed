@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Uncooked.Terrain.Generation
+namespace Overrailed.Terrain.Generation
 {
     [CreateAssetMenu(fileName = "New Biome", menuName = "Biome")]
     public class Biome : ScriptableObject

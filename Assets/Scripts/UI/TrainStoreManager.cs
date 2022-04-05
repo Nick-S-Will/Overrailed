@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Train;
-using Uncooked.UI;
+using Overrailed.Train;
+using Overrailed.UI;
 
-namespace Uncooked.Managers
+namespace Overrailed.Managers
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class TrainStoreManager : MonoBehaviour
@@ -81,7 +81,7 @@ namespace Uncooked.Managers
 
             public bool TrySetNextCar()
             {
-                if (nextIndex == tierPrefabs.Length || holder.IsHolding) return false;
+                if (nextIndex == tierPrefabs.Length || holder.CanPickUp) return false;
 
                 var car = Instantiate(tierPrefabs[nextIndex]);
                 GameManager.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));

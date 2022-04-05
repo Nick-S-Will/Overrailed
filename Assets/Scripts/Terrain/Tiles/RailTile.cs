@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-using Uncooked.Managers;
-using Uncooked.Train;
+using Overrailed.Managers;
+using Overrailed.Train;
 
-namespace Uncooked.Terrain.Tiles
+namespace Overrailed.Terrain.Tiles
 {
     public class RailTile : StackTile, IInteractable
     {
-        [SerializeField] private GameObject straightMesh, bentMesh;
+        [Space]
+        [SerializeField] private GameObject straightMesh;
+        [SerializeField] private GameObject bentMesh;
         [Tooltip("Gameobject that is enabled when this.IsPowered")]
         [SerializeField] private GameObject straightPower, bentPower;
         [Space]
         [Tooltip("Must have odd number of children")] [SerializeField] private Transform straightPathParent;
         [Tooltip("Must have odd number of children")] [SerializeField] private Transform bentPathParent;
+        [SerializeField] private AudioClip connectSound;
         [Space]
         [SerializeField] protected bool startsPowered;
         [SerializeField] private bool isCheckpoint, showPath;
@@ -87,7 +90,19 @@ namespace Uncooked.Terrain.Tiles
         }
         #endregion
 
-        #region IInteractable Overrides
+        #region Interface Overrides
+        public override Interaction TryInteractUsing(IPickupable item)
+        {
+            if (Passenger) return Passenger.TryInteractUsing(item);
+            else if (item is TrainCar car) return car.TrySetRail(this, true) ? Interaction.Used : Interaction.None;
+            else if (item is RailTile rail)
+            {
+                if (IsPowered) return Interaction.Interacted; // To prevent swapping of rails
+                else return rail.TryStackOn(this) ? Interaction.Used : Interaction.None;
+            }
+            else return Interaction.None;
+        }
+
         /// <summary>
         /// Checks if can be picked up, then unpowers it, then returns the base method
         /// </summary>
@@ -99,14 +114,6 @@ namespace Uncooked.Terrain.Tiles
             else if (IsPowered) SetState(Vector3Int.zero, Vector3Int.zero, null);
 
             return base.TryPickUp(parent, amount);
-        }
-
-        public override Interaction TryInteractUsing(IPickupable item)
-        {
-            if (Passenger) return Passenger.TryInteractUsing(item);
-            else if (item is TrainCar car) return car.TrySetRail(this, true) ? Interaction.Used : Interaction.None;
-            else if (item is RailTile rail && !IsPowered) return rail.TryStackOn(this) ? Interaction.Used : Interaction.None;
-            else return Interaction.None;
         }
 
         /// <summary>
@@ -125,7 +132,11 @@ namespace Uncooked.Terrain.Tiles
         public override void Drop(Vector3Int coords)
         {
             // Doesn't connect to tracks if in a stack
-            if (NextInStack) return;
+            if (NextInStack)
+            {
+                AudioManager.instance.PlaySound(dropSound, coords);
+                return;
+            }
 
             RailTile connectableRail = null;
             // Looks for adjacent powered rails to connect to
@@ -150,7 +161,10 @@ namespace Uncooked.Terrain.Tiles
 
                 PrevRail = connectableRail;
                 SetState(dirToThis, dirToThis, null);
+
+                AudioManager.instance.PlaySound(connectSound, transform.position);
             }
+            else AudioManager.instance.PlaySound(dropSound, transform.position);
         }
         #endregion
 

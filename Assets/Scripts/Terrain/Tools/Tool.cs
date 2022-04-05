@@ -2,20 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Terrain.Tiles;
+using Overrailed.Managers;
+using Overrailed.Terrain.Tiles;
 
-namespace Uncooked.Terrain.Tools
+namespace Overrailed.Terrain.Tools
 {
-    public abstract class Tool : Tile, IPickupable
+    public abstract class Tool : Tile, IPickupable, IInteractable
     {
         public event System.Action<Tool> OnPickup, OnDropTool;
 
+        [SerializeField] private AudioClip interactSound;
+        [Space]
         [SerializeField] private Transform handOffset;
         [SerializeField] private int tier = 1;
 
+        public AudioClip InteractSound => interactSound;
         public int Tier => tier;
         public override bool IsTwoHanded => false;
         public override bool CanPickUp => true;
+
+        public Interaction TryInteractUsing(IPickupable item) => Interaction.None;
 
         /// <summary>
         /// Picks up this Tool
@@ -32,12 +38,19 @@ namespace Uncooked.Terrain.Tools
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
 
+            AudioManager.instance.PlaySound(PickupAudio, transform.position);
+
             OnPickup?.Invoke(this);
             return this;
         }
 
         public override bool OnTryDrop() => true;
 
-        public override void Drop(Vector3Int position) => OnDropTool?.Invoke(this);
+        public override void Drop(Vector3Int position)
+        {
+            AudioManager.instance.PlaySound(dropSound, transform.position);
+
+            OnDropTool?.Invoke(this);
+        }
     }
 }

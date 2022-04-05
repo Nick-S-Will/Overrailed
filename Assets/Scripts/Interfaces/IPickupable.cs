@@ -4,10 +4,15 @@ using UnityEngine;
 
 public interface IPickupable
 {
+    AudioClip PickupAudio { get; }
+    AudioClip dropSound { get; }
+
     /// <summary>
     /// Chosen by classes that implement this, used to determine how the object will be held when picked up
     /// </summary>
     bool IsTwoHanded { get; }
+
+    bool CanPickUp { get; }
 
     /// <summary>
     /// Picks up an IPickupable 

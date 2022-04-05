@@ -860,6 +860,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7080451181323737381}
   - component: {fileID: 7080451181323737383}
+  - component: {fileID: 137023754558340559}
   - component: {fileID: 7080451181323737378}
   m_Layer: 9
   m_Name: Locomotive 2
@@ -897,16 +898,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 7080451181472684173}
+  pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
+  dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 0}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
   breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   splashParticlePrefab: {fileID: 5256204201205229158, guid: 2564afb13d47b0d44801e6317b90800e, type: 3}
+  explosionSound: {fileID: 8300000, guid: e53a8f6e5aef95b49bc739e43f65f2a5, type: 3}
+  igniteSound: {fileID: 8300000, guid: 3809ed2d5e0e97a4faae678c67ce661a, type: 3}
   burnPoint: {fileID: 1101871607242074150}
   startRail: {fileID: 0}
   tier: 2
   isPermeable: 0
   smokeParticlePrefab: {fileID: 6533771927518338995, guid: efc91acb8022878479d4693d7a331c87, type: 3}
   smokePoint: {fileID: 1101871607242074150}
+--- !u!54 &137023754558340559
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7080451181323737380}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!65 &7080451181323737378
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -4,19 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-using Uncooked.Player;
-using Uncooked.Train;
-using Uncooked.UI;
+using Overrailed.Player;
+using Overrailed.Train;
+using Overrailed.UI;
 
-namespace Uncooked.Managers
+namespace Overrailed.Managers
 {
     public enum GameState { Play, Pause, Edit }
 
     public class GameManager : MonoBehaviour
     {
         public event System.Action<GameState> OnStateChange;
-        public event System.Action OnCheckpoint, OnEndCheckpoint;
+        public event System.Action OnCheckpoint, OnEndCheckpoint, OnGameEnd;
 
+        [SerializeField] private string gameSceneName = "TestScene";
+        [Space]
         [SerializeField] private LayerMask interactMask;
         [SerializeField] [Min(0)] private float baseTrainSpeed = 0.05f, trainSpeedIncrement = 0.05f, speedUpMultiplier = 2;
         [SerializeField] [Min(5)] private float trainInitialDelay = 10;
@@ -25,6 +27,7 @@ namespace Uncooked.Managers
         [Space]
         public GameObject[] numbersPrefabs;
         [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
+        [SerializeField] private AudioClip numberSpawnSound;
 
         private static Locomotive[] locomotives;
         private GameState currentState;
@@ -51,8 +54,14 @@ namespace Uncooked.Managers
 
         void Awake()
         {
-            if (instance == null) instance = this;
-            else throw new System.Exception("Multiple GameManagers Exist");
+            if (instance)
+            {
+                Destroy(gameObject);
+                Debug.LogError("Multiple GameManagers Exist");
+                return;
+            }
+
+            instance = this;
 
             checkpointContinueButton.OnClick += ContinueFromCheckpoint;
             checkpointContinueButton.GetComponent<BoxCollider>().enabled = false;
@@ -95,6 +104,7 @@ namespace Uncooked.Managers
 
             var numTransform = Instantiate(instance.numbersPrefabs[number], position, Quaternion.identity, instance.transform).transform;
             var meshes = numTransform.GetComponentsInChildren<MeshRenderer>();
+            AudioManager.instance.PlaySound(instance.numberSpawnSound, position);
 
             var deltaPos = instance.numberFadeSpeed * Time.deltaTime * Vector3.up;
             var startColor = meshes[0].material.color;
@@ -139,8 +149,7 @@ namespace Uncooked.Managers
 
         private async void EndGame()
         {
-            foreach (var player in PlayerController.players) player.ForceDrop();
-            PlayerController.DisableControls();
+            OnGameEnd?.Invoke();
             await Task.Delay(2000);
 
             if (!Application.isPlaying) return;
@@ -150,7 +159,7 @@ namespace Uncooked.Managers
 
             if (Time.time > startTime + 2) await Task.Delay(2000);
 
-            if (instance) SceneManager.LoadScene("TestScene");
+            if (instance) SceneManager.LoadScene(gameSceneName);
         }
 
         // Mainly used method for edit cam to see tracks
@@ -165,7 +174,7 @@ namespace Uncooked.Managers
             moveTargets.Push(root);
 
             Transform currentTarget;
-            while (moveTargets.Count != 0)
+            while (moveTargets.Count > 0)
             {
                 currentTarget = moveTargets.Pop();
                 currentTarget.gameObject.layer = layer;

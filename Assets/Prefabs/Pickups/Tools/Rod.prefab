@@ -273,6 +273,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 3485655580356299664}
+  pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
+  dropAudio: {fileID: 8300000, guid: 3e1982dc99884ea4a9afda7dc75bbba8, type: 3}
+  interactSound: {fileID: 8300000, guid: 46d77fd68f3582d49a81d39506248b40, type: 3}
   handOffset: {fileID: 6078697467276477658}
   tier: 1
   bobHeight: 0.035

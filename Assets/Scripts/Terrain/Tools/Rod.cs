@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Managers;
-using Uncooked.Terrain.Tiles;
+using Overrailed.Managers;
+using Overrailed.Terrain.Tiles;
 
-namespace Uncooked.Terrain.Tools
+namespace Overrailed.Terrain.Tools
 {
     [RequireComponent(typeof(LineRenderer))]
     public class Rod : Tool
@@ -33,7 +33,7 @@ namespace Uncooked.Terrain.Tools
             line.SetPositions(new Vector3[] { bobberParent.position, bobber.position });
         }
 
-        public void Use(LiquidTile tile)
+        public void UseOn(LiquidTile tile)
         {
             isCast = !isCast;
 
@@ -51,7 +51,7 @@ namespace Uncooked.Terrain.Tools
         /// <returns></returns>
         public override bool OnTryDrop()
         {
-            if (isCast) Use(null);
+            if (isCast) UseOn(null);
             else return true;
 
             return false;
@@ -97,7 +97,6 @@ namespace Uncooked.Terrain.Tools
                     MobManager.instance.RandomFish.transform.position = pos;
                     isCast = false;
                 }
-                else print("missed fish");
             }
 
             tryCatchFish = false;

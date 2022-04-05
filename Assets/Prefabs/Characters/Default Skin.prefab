@@ -716,11 +716,7 @@ MonoBehaviour:
   calfR: {fileID: 2264036828255320574}
   toolHolder: {fileID: 2264036826726341595}
   pickupHolder: {fileID: 2264036826503545315}
-  forwardKey: 119
-  backKey: 115
-  leftKey: 97
-  rightKey: 100
-  dashKey: 304
+  dashSound: {fileID: 8300000, guid: 212c048a3d3a11a459367b859bafea33, type: 3}
 --- !u!143 &2264036827029980983
 CharacterController:
   m_ObjectHideFlags: 0

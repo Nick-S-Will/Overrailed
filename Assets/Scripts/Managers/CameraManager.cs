@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using Uncooked.Train;
+using Overrailed.Train;
 
-namespace Uncooked.Managers
+namespace Overrailed.Managers
 {
     public class CameraManager : MonoBehaviour
     {
@@ -27,8 +27,12 @@ namespace Uncooked.Managers
 
         private void Awake()
         {
-            if (instance == null) instance = this;
-            else Debug.LogError("Multiple CameraManagers Exist");
+            if (instance)
+            {
+                Destroy(gameObject);
+                Debug.LogError("Multiple CameraManagers Found");
+            }
+            else instance = this;
         }
 
         void Start()
@@ -77,7 +81,6 @@ namespace Uncooked.Managers
         private static async void TransitionWipe(Camera startCam, Camera endCam, RenderTexture fadeTexture, RawImage fadeShape, Vector2 shapeEndSize, float duration)
         {
             if (!startCam.enabled) throw new System.Exception("Start camera not enabled");
-            if (endCam.enabled) throw new System.Exception("End camera already enabled");
 
             // Starts rendering final texture
             endCam.targetTexture = fadeTexture;
@@ -126,7 +129,7 @@ namespace Uncooked.Managers
 
         private void OnDestroy()
         {
-            instance = null;
+            if (instance == this) instance = null;
 
             if (GameManager.instance)
             {

@@ -1,21 +1,20 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Managers;
-using Uncooked.Terrain.Tools;
-using System;
+using Overrailed.Managers;
+using Overrailed.Terrain.Tools;
 
-namespace Uncooked.Train
+namespace Overrailed.Train
 {
     public class BoilerCar : TrainCar
     {
         [Space]
+        [SerializeField] private AudioClip refillSound;
         [SerializeField] private Transform liquid;
         [SerializeField] [Range(0, 1)] private float warningPercent = 0.2f;
 
         private float liquidPercent = 1;
-        private bool liquidIsLow;
+        private bool lowLiquidIsDisplayed;
 
         protected float LiquidPercent
         {
@@ -26,7 +25,7 @@ namespace Uncooked.Train
                 liquid.localScale = new Vector3(1, liquidPercent, 1);
             }
         }
-        public override bool IsWarning => liquidIsLow;
+        public override bool IsWarning => lowLiquidIsDisplayed;
 
         protected override void Start()
         {
@@ -52,9 +51,9 @@ namespace Uncooked.Train
                     yield return new WaitWhile(() => LiquidPercent == 0);
                     liquid.gameObject.SetActive(true);
                 }
-                else if (LiquidPercent < warningPercent && !liquidIsLow)
+                else if (LiquidPercent < warningPercent && !lowLiquidIsDisplayed)
                 {
-                    liquidIsLow = true;
+                    lowLiquidIsDisplayed = true;
                     MakeWarning();
                 }
 
@@ -68,9 +67,14 @@ namespace Uncooked.Train
             if (item is Bucket bucket && bucket.IsFull)
             {
                 LiquidPercent = 1;
-                liquidIsLow = false;
+                lowLiquidIsDisplayed = false;
 
-                if (base.TryInteractUsing(item) == Interaction.None) bucket.IsFull = false;
+                if (base.TryInteractUsing(item) == Interaction.None)
+                {
+                    bucket.IsFull = false;
+
+                    AudioManager.instance.PlaySound(refillSound, transform.position);
+                }
 
                 return Interaction.Interacted;
             }

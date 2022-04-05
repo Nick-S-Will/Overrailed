@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-using Uncooked.Managers;
-using Uncooked.Terrain.Tools;
-using Uncooked.Terrain.Tiles;
+using Overrailed.Managers;
+using Overrailed.Terrain.Tools;
+using Overrailed.Terrain.Tiles;
 
-namespace Uncooked.Train
+namespace Overrailed.Train
 {
+    [RequireComponent(typeof(Rigidbody))]
     public abstract class TrainCar : Tile, IPickupable, IInteractable
     {
         public event System.Action OnDeath;
@@ -18,12 +19,16 @@ namespace Uncooked.Train
         [SerializeField] private ParticleSystem burningParticlePrefab;
         [SerializeField] private ParticleSystem breakParticlePrefab, splashParticlePrefab;
         [Space]
+        [SerializeField] private AudioClip explosionSound;
+        [SerializeField] private AudioClip igniteSound;
+        [Space]
         [SerializeField] private Transform burnPoint;
         [SerializeField] private RailTile startRail;
         [SerializeField] protected int tier = 1;
         [SerializeField] protected bool isPermeable;
 
         protected ParticleSystem burningParticles;
+        private Rigidbody rb;
         protected RailTile currentRail;
         private int pathIndex, pathDir;
 
@@ -36,6 +41,7 @@ namespace Uncooked.Train
         {
             if (startRail) _ = TrySetRail(startRail, false);
             if (leaderLocomotive) leaderLocomotive.OnStartTrain += StartDriving;
+            rb = GetComponent<Rigidbody>();
 
             base.Start();
         }
@@ -80,6 +86,7 @@ namespace Uncooked.Train
                 }
 
                 transform.position = Vector3.MoveTowards(transform.position, target.position, leaderLocomotive.TrainSpeed * Time.deltaTime);
+                rb.MovePosition(transform.position);
                 float currentDst = (target.position - transform.position).magnitude;
                 transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
@@ -109,12 +116,14 @@ namespace Uncooked.Train
             transform.localPosition = Vector3.up;
             transform.localRotation = Quaternion.identity;
 
+            AudioManager.instance.PlaySound(PickupAudio, transform.position);
+
             return this;
         }
 
         public override bool OnTryDrop() => false;
 
-        public override void Drop(Vector3Int position) { }
+        public override void Drop(Vector3Int position) => AudioManager.instance.PlaySound(dropSound, transform.position);
 
         public virtual Interaction TryInteractUsing(IPickupable item)
         {
@@ -132,6 +141,8 @@ namespace Uncooked.Train
             {
                 newCar.leaderLocomotive = leaderLocomotive;
                 newCar.StartDriving();
+
+                AudioManager.instance.PlaySound(dropSound, transform.position);
             }
 
             Die();
@@ -161,6 +172,7 @@ namespace Uncooked.Train
         public virtual IEnumerator Ignite()
         {
             burningParticles = Instantiate(burningParticlePrefab, burnPoint);
+            AudioManager.instance.PlaySound(igniteSound, transform.position);
 
             while (burningParticles)
             {
@@ -245,6 +257,8 @@ namespace Uncooked.Train
         protected virtual void Die()
         {
             BreakIntoParticles(breakParticlePrefab, MeshColorGradient, transform.position);
+            AudioManager.instance.PlaySound(explosionSound, transform.position);
+
             var waterColliders = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Water"));
             if (waterColliders.Length > 0) Destroy(Instantiate(splashParticlePrefab, waterColliders[0].transform.position, Quaternion.identity), splashParticlePrefab.main.startLifetime.constant);
 

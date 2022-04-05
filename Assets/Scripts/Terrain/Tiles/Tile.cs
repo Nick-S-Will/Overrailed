@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Uncooked.Terrain.Tiles
+namespace Overrailed.Terrain.Tiles
 {
     public class Tile : MonoBehaviour, IPickupable
     {
         public Transform meshParent;
+        [Space]
+        [SerializeField] private AudioClip pickupAudio;
+        [SerializeField] private AudioClip dropAudio;
 
         public Gradient MeshColorGradient { get; private set; }
+        public AudioClip PickupAudio => pickupAudio;
+        public AudioClip dropSound => dropAudio;
         public virtual bool CanPickUp => false;
         public virtual bool IsTwoHanded => true;
-        public virtual bool OnTryDrop() => true;
 
         protected virtual void Start()
         {
@@ -41,6 +45,8 @@ namespace Uncooked.Terrain.Tiles
         }
 
         public virtual IPickupable TryPickUp(Transform parent, int amount) => null;
+
+        public virtual bool OnTryDrop() => true;
 
         public virtual void Drop(Vector3Int position) { }
 

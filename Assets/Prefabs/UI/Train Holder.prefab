@@ -162,6 +162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55e18fbbead892c488828d761845ba80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
+  dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
 --- !u!65 &7125156459205050303
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-using Uncooked.Terrain.Tiles;
+using Overrailed.Terrain.Tiles;
 
-namespace Uncooked.Terrain.Generation
+namespace Overrailed.Terrain.Generation
 {
     [System.Serializable]
     public class Region

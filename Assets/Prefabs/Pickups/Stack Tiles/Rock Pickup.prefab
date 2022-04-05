@@ -325,7 +325,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 5496626075479364162}
+  pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
+  dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   bridge: {fileID: 0}
+  bridgeBuildAudio: {fileID: 0}
   stackType: Rock
   tileHeight: 0.4
   startStackHeight: 1

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-using Uncooked.Terrain.Generation;
+using Overrailed.Terrain.Generation;
 
-namespace Uncooked.Editors
+namespace Overrailed.Editors
 {
     [CustomPropertyDrawer(typeof(Region))]
     public class RegionDrawer : PropertyDrawer

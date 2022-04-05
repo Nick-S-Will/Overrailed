@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-using Uncooked.Managers;
-using Uncooked.Terrain.Tiles;
+using Overrailed.Managers;
+using Overrailed.Terrain.Tiles;
 
-namespace Uncooked.Terrain.Generation
+namespace Overrailed.Terrain.Generation
 {
     public class MapManager : MonoBehaviour
     {
@@ -44,8 +44,8 @@ namespace Uncooked.Terrain.Generation
         [SerializeField] [HideInInspector] private System.Random rng;
 
         private List<Transform> newHighlights = new List<Transform>(), highlights = new List<Transform>();
+        private Vector3Int IntPos => Vector3Int.RoundToInt(transform.position);
 
-        public Vector3 StartPoint => stationPos;
         public int Seed
         {
             get { return seed; }
@@ -56,21 +56,13 @@ namespace Uncooked.Terrain.Generation
             }
         }
 
-        private Vector3Int IntPos => Vector3Int.RoundToInt(transform.position);
-
-        //private void Awake()
-        //{
-        //    // For beta
-        //    Seed = Random.Range(0, 100);
-        //    GenerateMap();
-        //}
-
         public void Start()
         {
             GameManager.instance.OnCheckpoint += DisableObstacles;
             GameManager.instance.OnEndCheckpoint += EnableObstacles;
             GameManager.instance.OnEndCheckpoint += AddChunk;
             GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
+            GameManager.instance.OnGameEnd += ShowAllChunks;
 
             transform.position = IntPos;
             rng = new System.Random(seed);
@@ -108,7 +100,12 @@ namespace Uncooked.Terrain.Generation
         /// </summary>
         public void AddChunk()
         {
-            if (Application.isPlaying) OnSeedChange?.Invoke(seed.ToString());
+            if (Application.isPlaying)
+            {
+                OnSeedChange?.Invoke(seed.ToString());
+
+                if (chunks.Count > 1) chunks[chunks.Count - 2].gameObject.SetActive(false);
+            }
 
             var newChunk = new GameObject("Chunk " + chunks.Count).transform;
             chunks.Add(newChunk);
@@ -464,7 +461,7 @@ namespace Uncooked.Terrain.Generation
         private Vector3Int[] GetAdjacentCoords(Vector3Int coord) => new Vector3Int[] { coord + Vector3Int.forward, coord + Vector3Int.right, coord + Vector3Int.back, coord + Vector3Int.left };
         #endregion
 
-        #region Obstacle Setting
+        #region Map Toggles
         private void DisableObstacles() => SetObstacleHitboxes(false);
         private void EnableObstacles() => SetObstacleHitboxes(true);
         private void SetObstacleHitboxes(bool enabled)
@@ -490,6 +487,11 @@ namespace Uncooked.Terrain.Generation
                     if (collider.gameObject.layer == LayerMask.NameToLayer("Default")) collider.enabled = enabled;
                 }
             }
+        }
+
+        public void ShowAllChunks()
+        {
+            foreach (var c in chunks) c.gameObject.SetActive(true);
         }
         #endregion
 
