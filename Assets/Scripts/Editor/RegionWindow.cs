@@ -40,19 +40,28 @@ namespace Overrailed.Editors
                         Color.white);
                 }
                 // Draw key bound
-                EditorGUI.DrawRect(keyBounds[i], region.GetKey(i).Color);
+                EditorGUI.DrawRect(keyBounds[i], region.GetKey(i).GroundColor);
             }
 
             Rect settingsRect = new Rect(gradientRect.x, gradientRect.yMax + 2 * windowBorder + keyHeight, gradientRect.width, position.height - gradientRect.height - 4 * windowBorder - keyHeight);
             if (selectedKeyIndex != -1)
             {
                 GUILayout.BeginArea(settingsRect);
+
                 EditorGUI.BeginChangeCheck();
-                Tile newTile = (Tile)EditorGUILayout.ObjectField(region.GetKey(selectedKeyIndex).Tile, typeof(Tile), true);
-                if (EditorGUI.EndChangeCheck()) region.SetTile(selectedKeyIndex, newTile);
+                Tile newObstacleTile = (Tile)EditorGUILayout.ObjectField(new GUIContent("Obstacle Tile: "), region.GetKey(selectedKeyIndex).ObstacleTile, typeof(Tile), true);
+                _ = EditorGUI.EndChangeCheck();
+
                 EditorGUI.BeginChangeCheck();
-                float newPercent = EditorGUILayout.FloatField(region.GetKey(selectedKeyIndex).Percent);
+                Tile newGroundTile = (Tile)EditorGUILayout.ObjectField(new GUIContent("Ground Tile: "), region.GetKey(selectedKeyIndex).GroundTile, typeof(Tile), true);
+                _ = EditorGUI.EndChangeCheck();
+
+                region.SetTiles(selectedKeyIndex, newGroundTile, newObstacleTile);
+
+                EditorGUI.BeginChangeCheck();
+                float newPercent = Mathf.Clamp01(EditorGUILayout.FloatField(new GUIContent("Percent: "), region.GetKey(selectedKeyIndex).Percent));
                 if (EditorGUI.EndChangeCheck()) region.SetPercent(selectedKeyIndex, newPercent);
+
                 GUILayout.EndArea();
             }
             #endregion
@@ -66,7 +75,7 @@ namespace Overrailed.Editors
                     {
                         // Add key
                         float keyPercent = Mathf.InverseLerp(gradientRect.x, gradientRect.xMax, guiEvent.mousePosition.x);
-                        selectedKeyIndex = region.AddKey(new Region.TileKey(null, keyPercent));
+                        selectedKeyIndex = region.AddKey(new Region.TileKey(null, null, keyPercent));
                     }
                     else
                     {
@@ -97,7 +106,7 @@ namespace Overrailed.Editors
                     Repaint();
                 }
             }
-            if (guiEvent.keyCode == KeyCode.Backspace && guiEvent.type == EventType.KeyDown)
+            if ((guiEvent.keyCode == KeyCode.Backspace || guiEvent.keyCode == KeyCode.Delete) && guiEvent.type == EventType.KeyDown)
             {
                 region.RemoveKey(selectedKeyIndex);
                 selectedKeyIndex = -1;

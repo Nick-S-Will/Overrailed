@@ -111,7 +111,11 @@ namespace Overrailed.Managers
 
                 await Task.Delay(Mathf.CeilToInt(1000 * clip.length));
 
-                if (source) source.clip = null;
+                if (source)
+                {
+                    source.transform.position = Vector3.zero;
+                    source.clip = null;
+                }
             }
             else Debug.LogWarning("Null clip given");
         }

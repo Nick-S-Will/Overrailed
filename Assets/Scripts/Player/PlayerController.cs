@@ -30,7 +30,6 @@ namespace Overrailed.Player
             playerInput.Interaction.InteractMain.performed += ctx => MainInteract();
             playerInput.Interaction.InteractAlt.performed += ctx => AltInteract();
 
-            playerInput.Enable();
             players.Add(this);
         }
 
@@ -78,7 +77,12 @@ namespace Overrailed.Player
 
         private void OnDestroy()
         {
-            if (GameManager.instance) GameManager.instance.OnCheckpoint -= ForceDrop;
+            if (GameManager.instance)
+            {
+                GameManager.instance.OnCheckpoint -= ForceDrop;
+                GameManager.instance.OnGameEnd -= playerInput.Disable;
+                GameManager.instance.OnGameEnd -= ForceDrop;
+            }
 
             players.Remove(this);
         }

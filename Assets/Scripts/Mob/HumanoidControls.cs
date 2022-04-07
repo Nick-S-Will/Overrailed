@@ -59,12 +59,18 @@ namespace Overrailed.Mob
 
         protected virtual void Start()
         {
+            transform.parent = null;
+            transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+
             try { map = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Ground"))[0].transform.parent.GetComponent<MapManager>(); }
-            catch (NullReferenceException) { throw new Exception("Character spawned in without a map beneath it"); }
+            catch (IndexOutOfRangeException) 
+            {
+                enabled = false;
+                throw new Exception("Character spawned in without a map beneath it");
+            }
+            
             controller = GetComponent<CharacterController>();
             lastDashTime = -dashDuration;
-
-            transform.parent = null;
 
             _ = StartCoroutine(HandleMovement());
         }

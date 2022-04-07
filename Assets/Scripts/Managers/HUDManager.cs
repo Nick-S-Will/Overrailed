@@ -37,19 +37,24 @@ namespace Overrailed.Managers
 
         private void Awake()
         {
-            FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
+            foreach (var store in FindObjectsOfType<TrainStoreManager>()) store.OnCoinsChange += UpdateCoinsText;
+            foreach (var map in FindObjectsOfType<MapManager>()) map.OnFinishGeneratingMap += CreateHUDs;
             map.OnSeedChange += UpdateSeedText;
-            foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
 
             seedStartLength = seedText.text.Length;
             speedStartLength = speedText.text.Length;
             coinsStartLength = coinsText.text.Length;
         }
 
-        void Start()
+        private void CreateHUDs()
         {
+            var tools = FindObjectsOfType<Tool>();
+            if (tools.Length == toolHUDs.Count && toolHUDs.TrueForAll(t => t.tool == tools[toolHUDs.IndexOf(t)])) return;
+
+            toolHUDs.Clear();
+
             // Spawns Tool HUDs
-            foreach (var tool in FindObjectsOfType<Tool>())
+            foreach (var tool in tools)
             {
                 ToolType toolType = null;
                 foreach (var type in toolTypes)
@@ -78,6 +83,7 @@ namespace Overrailed.Managers
             }
 
             foreach (var car in FindObjectsOfType<TrainCar>()) car.OnWarning += MakeWarningHUD;
+            FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
 
             _ = StartCoroutine(UpdateToolHUDs());
         }
@@ -133,6 +139,7 @@ namespace Overrailed.Managers
                 float toolToPlayerDst = PlayerController.MinDistanceToPlayer(toolHUD.tool.transform.position);
                 if (toolToPlayerDst < opacityDistance.x) opacity = Mathf.Clamp01(opacity - opacityFadeSpeed * Time.deltaTime);
                 else if (toolToPlayerDst > opacityDistance.y) opacity = Mathf.Clamp01(opacity + opacityFadeSpeed * Time.deltaTime);
+                else opacity = Mathf.Round(opacity);
 
                 toolHUD.background.color = toolHUD.toolType.Tint;
             }

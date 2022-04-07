@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 48882614102991751}
   - component: {fileID: 8098470855400629273}
   m_Layer: 10
-  m_Name: Stone Tile
+  m_Name: Stone Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

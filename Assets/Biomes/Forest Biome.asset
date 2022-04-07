@@ -12,46 +12,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94a8946ef5ae989419f45de6f2d58a22, type: 3}
   m_Name: Forest Biome
   m_EditorClassIdentifier: 
-  groundRegion:
-    keys:
-    - tile: {fileID: -3119896904868105016, guid: 41767379edcb925418acdbdf2bee9655, type: 3}
-      color: {r: 0.3921569, g: 0.9450981, b: 0.9490197, a: 1}
-      percent: 0.30923343
-    - tile: {fileID: -7425801750402064875, guid: 75d9ba06777051847b35c0ebf768ce27, type: 3}
-      color: {r: 0.3509434, g: 0.8773585, b: 0.3561725, a: 1}
-      percent: 0.6489547
-    - tile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
-      color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+  liquid: {fileID: -3119896904868105016, guid: 41767379edcb925418acdbdf2bee9655, type: 3}
+  liquidMaxHeight: 0.23
+  regions:
+  - keys:
+    - groundTile: {fileID: -7425801750402064875, guid: 75d9ba06777051847b35c0ebf768ce27, type: 3}
+      obstacleTile: {fileID: 0}
+      groundColor: {r: 0.35094336, g: 0.8773585, b: 0.35617244, a: 1}
+      obstacleColor: {r: 1, g: 1, b: 1, a: 1}
+      percent: 0.26002505
+    - groundTile: {fileID: -7425801750402064875, guid: 75d9ba06777051847b35c0ebf768ce27, type: 3}
+      obstacleTile: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
+      groundColor: {r: 0.35094336, g: 0.8773585, b: 0.35617244, a: 1}
+      obstacleColor: {r: 0.4811321, g: 0.37895122, b: 0.20606974, a: 1}
+      percent: 0.4135338
+    - groundTile: {fileID: -7425801750402064875, guid: 75d9ba06777051847b35c0ebf768ce27, type: 3}
+      obstacleTile: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
+      groundColor: {r: 0.35094336, g: 0.8773585, b: 0.35617244, a: 1}
+      obstacleColor: {r: 0.4811321, g: 0.37895122, b: 0.20606974, a: 1}
+      percent: 0.70175433
+    - groundTile: {fileID: -7425801750402064875, guid: 75d9ba06777051847b35c0ebf768ce27, type: 3}
+      obstacleTile: {fileID: 6852729824771472296, guid: 80a3c00f0991a7b44a347be58a9edea9, type: 3}
+      groundColor: {r: 0.35094336, g: 0.8773585, b: 0.35617244, a: 1}
+      obstacleColor: {r: 0.4811321, g: 0.37895122, b: 0.20606974, a: 1}
       percent: 1
-  minObstaclePercentage: 0.42
-  treeRegion:
-    keys:
-    - tile: {fileID: 0}
-      color: {r: 1, g: 1, b: 1, a: 1}
-      percent: 0.27439025
-    - tile: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
-      color: {r: 0.4811321, g: 0.37895125, b: 0.20606977, a: 1}
-      percent: 0.48780486
-    - tile: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
-      color: {r: 0.4811321, g: 0.37895125, b: 0.20606977, a: 1}
-      percent: 0.8057491
-    - tile: {fileID: 6852729824771472296, guid: 80a3c00f0991a7b44a347be58a9edea9, type: 3}
-      color: {r: 0.4811321, g: 0.37895125, b: 0.20606977, a: 1}
-      percent: 1
-  stoneRegion:
-    keys:
-    - tile: {fileID: 0}
-      color: {r: 1, g: 1, b: 1, a: 1}
-      percent: 0.39198604
-    - tile: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
-      color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
-      percent: 0.47473866
-    - tile: {fileID: 5595235350578854948, guid: 7cd57254a1d987446ae012b3567db32d, type: 3}
-      color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
-      percent: 0.6489547
-    - tile: {fileID: 653283158049739767, guid: bbaf1adf628cfd74c9a1e7faab9c6b5c, type: 3}
-      color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
-      percent: 0.8101045
-    - tile: {fileID: 644079466757153916, guid: b0d78906848c1134a99f85e1a63eb951, type: 3}
-      color: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+  - keys:
+    - groundTile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
+      obstacleTile: {fileID: 0}
+      groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+      obstacleColor: {r: 1, g: 1, b: 1, a: 1}
+      percent: 0.335213
+    - groundTile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
+      obstacleTile: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
+      groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+      obstacleColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+      percent: 0.46365914
+    - groundTile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
+      obstacleTile: {fileID: 5595235350578854948, guid: 7cd57254a1d987446ae012b3567db32d, type: 3}
+      groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+      obstacleColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+      percent: 0.6766917
+    - groundTile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
+      obstacleTile: {fileID: 653283158049739767, guid: bbaf1adf628cfd74c9a1e7faab9c6b5c, type: 3}
+      groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+      obstacleColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+      percent: 0.877193
+    - groundTile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
+      obstacleTile: {fileID: 644079466757153916, guid: b0d78906848c1134a99f85e1a63eb951, type: 3}
+      groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
+      obstacleColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
       percent: 1
