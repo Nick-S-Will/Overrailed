@@ -9,6 +9,8 @@ namespace Overrailed.Terrain.Tiles
 {
     public class BreakableTile : Tile, IDamageable, IInteractable
     {
+        public event System.Action<Tile> OnBreak;
+
         [Space]
         [SerializeField] private Tile lowerTier;
         [SerializeField] private ParticleSystem breakParticlePrefab;
@@ -46,9 +48,19 @@ namespace Overrailed.Terrain.Tiles
                 else break;
             }
 
-            if (toSpawn == this) return;
+            if (toSpawn == this)
+            {
+                Debug.LogError("Tool is tier 0");
+                return;
+            }
+            else if (toSpawn == null)
+            {
+                Debug.LogError("BreakTile has lower tier assigned");
+                return;
+            }
 
-            Instantiate(toSpawn, transform.position, transform.rotation, transform.parent);
+            var tile = Instantiate(toSpawn, transform.position, transform.rotation, transform.parent);
+            OnBreak?.Invoke(tile);
             Destroy(gameObject);
         }
     }

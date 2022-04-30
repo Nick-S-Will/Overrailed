@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
 using UnityEngine;
 
@@ -11,9 +12,11 @@ namespace Overrailed.Terrain.Generation
     public class MapManager : MonoBehaviour
     {
         public event System.Action<string> OnSeedChange;
-        public event System.Action OnFinishGeneratingMap;
+        public event System.Action OnFinishAnimateChunk;
 
         #region Inspector Variables
+        [SerializeField] private LayerMask interactMask;
+
         [Header("Generation")] [SerializeField] private int seed = 0;
         [SerializeField] [Min(1)] private float noiseScale = 10;
         [SerializeField] private Vector2 noiseOffset;
@@ -34,9 +37,9 @@ namespace Overrailed.Terrain.Generation
         [SerializeField] private Vector2Int checkpointSize = 3 * Vector2Int.one;
 
         [Header("Animation")]
-        [SerializeField] private Vector3 spawnDelta = 10 * Vector3.up;
-        [SerializeField] [Min(1)] private float spawnSpeed = 100;
-        [SerializeField] [Min(0)] private float spawnTimeOffset = 0.2f;
+        [SerializeField] private Vector3 spawnOffset = 10 * Vector3.down;
+        [SerializeField] [Min(1)] private float slideSpeed = 100;
+        [SerializeField] [Min(0)] private float rowSpawnInterval = 0.2f;
         #endregion
 
         [SerializeField] [HideInInspector] private List<Transform> chunks = new List<Transform>();
@@ -47,6 +50,7 @@ namespace Overrailed.Terrain.Generation
         private List<Transform> newHighlights = new List<Transform>(), highlights = new List<Transform>();
         private Vector3Int IntPos => Vector3Int.RoundToInt(transform.position);
 
+        public LayerMask InteractMask => interactMask;
         public int Seed
         {
             get { return seed; }
@@ -66,13 +70,16 @@ namespace Overrailed.Terrain.Generation
 
         private void Start()
         {
-            GameManager.instance.OnCheckpoint += DisableObstacles;
-            GameManager.instance.OnEndCheckpoint += EnableObstacles;
-            GameManager.instance.OnEndCheckpoint += AddChunk;
-            GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
-            GameManager.instance.OnGameEnd += ShowAllChunks;
+            if (GameManager.instance)
+            {
+                GameManager.instance.OnCheckpoint += DisableObstacles;
+                GameManager.instance.OnEndCheckpoint += EnableObstacles;
+                GameManager.instance.OnEndCheckpoint += AddChunk;
+                GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
+                GameManager.instance.OnGameEnd += ShowAllChunks;
+            }
 
-            GenerateMap();
+            if (transform.childCount == 0)  GenerateMap();
             AnimateNewChunk();
         }
 
@@ -100,7 +107,6 @@ namespace Overrailed.Terrain.Generation
             rng = new System.Random(seed);
 
             AddChunk();
-            OnFinishGeneratingMap?.Invoke();
         }
 
         /// <summary>
@@ -203,8 +209,11 @@ namespace Overrailed.Terrain.Generation
                         else continue;
                     }
 
+                    // Spawn tile
                     var tileObj = Instantiate(tilePrefab, newPos, Quaternion.identity, rowParent);
-                    tileObj.name = tileObj.name.Substring(0, tileObj.name.Length - 7) + " " + z;
+                    tileObj.name = string.Format("{0} {1}", tileObj.name.Substring(0, tileObj.name.Length - 7), z);
+                    if (tileObj.RotateOnSpawn) tileObj.MeshParent.localRotation = Quaternion.Euler(0, Random.Range(-15, 15), 0);
+
                     if (bridge)
                     {
                         bridge.transform.parent = tileObj.transform;
@@ -267,7 +276,7 @@ namespace Overrailed.Terrain.Generation
                 obstacleSampleMaps.Add(GenerateHeightMap());
                 obstacleHeightMaps.Add(GenerateHeightMap());
             }
-            
+
             var groundTiles = new Tile[heightMap.GetLength(0), mapWidth];
             var obstacleTiles = new Tile[heightMap.GetLength(0), mapWidth];
 
@@ -377,12 +386,18 @@ namespace Overrailed.Terrain.Generation
             {
                 point -= IntPos;
                 var row = GetParentAt(point);
-                return row.GetChild(point.z);
+
+                try { return row.GetChild(point.z); }
+                catch (UnityException) 
+                { 
+                    Debug.LogError("Invalid point on map " + point);
+                    return null;
+                }
             }
             // Obstacles
             else
             {
-                _ = Physics.Raycast(new Vector3(point.x, transform.position.y - 0.5f, point.z), Vector3.up, out RaycastHit hitData, 1, GameManager.instance.InteractMask);
+                _ = Physics.Raycast(new Vector3(point.x, transform.position.y - 0.5f, point.z), Vector3.up, out RaycastHit hitData, 1, interactMask);
 
                 return hitData.transform;
             }
@@ -413,12 +428,16 @@ namespace Overrailed.Terrain.Generation
         /// <summary>
         /// Checks if <paramref name="point"/> is in bounds based on <see cref="GameManager.CurrentState"/>
         /// </summary>
-        public bool PointIsInBounds(Vector3 point) => (GameManager.IsPlaying() && PointIsInPlayBounds(point)) || (GameManager.IsEditing() && PointIsInEditBounds(point));
+        public bool PointIsInBounds(Vector3 point)
+        {
+            if (GameManager.instance) return (GameManager.IsPlaying() && PointIsInPlayBounds(point)) || (GameManager.IsEditing() && PointIsInEditBounds(point));
+            else return PointIsInPlayBounds(point);
+        }
         #endregion
 
         #region Pickup Placing
         /// <summary>
-        /// Places given pickup at the nearest coords around <paramref name="pickup"/>'s position
+        /// Places <paramref name="pickup"/> at the nearest coords around <paramref name="pickup"/>'s position
         /// </summary>
         /// <returns>The coords at which the pickup is move to</returns>
         public Vector3Int MovePickup(IPickupable pickup) => PlacePickup(pickup, Vector3Int.RoundToInt((pickup as Tile).transform.position), false);
@@ -520,10 +539,10 @@ namespace Overrailed.Terrain.Generation
         #endregion
 
         #region Spawning animation
-        public void AnimateNewChunk() => _ = StartCoroutine(AnimateChunk(chunks[chunks.Count - 1]));
-
-        private IEnumerator AnimateChunk(Transform chunk)
+        public void AnimateNewChunk() => _ = AnimateChunk(chunks.Count - 1);
+        public async Task AnimateChunk(int chunkIndex)
         {
+            var chunk = transform.GetChild(chunkIndex + 1);
             Transform ground = chunk.GetChild(0), obstacles = chunk.GetChild(1);
 
             // Hiding and moving station and checkpoint
@@ -536,7 +555,7 @@ namespace Overrailed.Terrain.Generation
             foreach (var obj in extras)
             {
                 extraStartPos.Add(obj.localPosition);
-                obj.localPosition -= spawnDelta;
+                obj.localPosition += spawnOffset;
 
                 obj.gameObject.SetActive(false);
                 foreach (var tile in obj.GetComponentsInChildren<Tile>()) tile.SetVisible(false);
@@ -545,45 +564,54 @@ namespace Overrailed.Terrain.Generation
             // Moving and hiding each row
             for (int i = 0; i < ground.childCount; i++)
             {
-                ground.GetChild(i).localPosition -= spawnDelta;
-                obstacles.GetChild(i).localPosition -= spawnDelta;
+                ground.GetChild(i).localPosition += spawnOffset;
+                obstacles.GetChild(i).localPosition += spawnOffset;
 
                 ground.GetChild(i).gameObject.SetActive(false);
                 // Hides obstacle graphics without affecting colliders
                 foreach (var tile in obstacles.GetChild(i).GetComponentsInChildren<Tile>()) tile.SetVisible(false);
             }
 
-            // Turning on and sliding each row into place
+            // Turning on and sliding each ground row into place
+            foreach (Transform groundRow in ground)
+            {
+                groundRow.gameObject.SetActive(true);
+
+                _ = AnimateSpawnSlide(groundRow, Vector3.zero);
+                await Task.Delay(Mathf.RoundToInt(1000 * rowSpawnInterval));
+            }
+
+            // Turning on and sliding each obstacle row into place
             for (int i = 0; i < ground.childCount; i++)
             {
-                Transform groundRow = ground.GetChild(i), obstacleRow = obstacles.GetChild(i);
-                groundRow.gameObject.SetActive(true);
-                // Shows obstacle graphics without affecting colliders
+                var obstacleRow = obstacles.GetChild(i);
                 foreach (var tile in obstacleRow.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
 
-                _ = StartCoroutine(AnimateSpawnSlide(groundRow, Vector3.zero));
-                _ = StartCoroutine(AnimateSpawnSlide(obstacleRow, Vector3.zero));
+                _ = AnimateSpawnSlide(obstacleRow, Vector3.zero);
 
-                yield return new WaitForSeconds(spawnTimeOffset);
+                if (obstacleRow.childCount == 0) continue;
+                await Task.Delay(Mathf.RoundToInt(1000 * rowSpawnInterval));
             }
 
             // Turning on and sliding station and checkpoint into place
-            foreach (var obj in extras)
+            foreach (var transform in extras)
             {
-                obj.gameObject.SetActive(true);
-                foreach (var tile in obj.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
+                transform.gameObject.SetActive(true);
+                foreach (var tile in transform.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
             }
-            _ = StartCoroutine(AnimateSpawnSlide(extras[0], extraStartPos[0]));
-            if (extras.Count > 1) _ = StartCoroutine(AnimateSpawnSlide(extras[1], extraStartPos[1]));
+            await AnimateSpawnSlide(extras[0], extraStartPos[0]);
+            if (extras.Count > 1) await AnimateSpawnSlide(extras[1], extraStartPos[1]);
+
+            OnFinishAnimateChunk?.Invoke();
         }
 
-        private IEnumerator AnimateSpawnSlide(Transform t, Vector3 destination)
+        private async Task AnimateSpawnSlide(Transform t, Vector3 destination)
         {
             while (t.localPosition != destination)
             {
-                t.localPosition = Vector3.MoveTowards(t.localPosition, destination, spawnSpeed * Time.deltaTime);
+                t.localPosition = Vector3.MoveTowards(t.localPosition, destination, slideSpeed * Time.deltaTime);
 
-                yield return null;
+                await Task.Yield();
             }
         }
         #endregion

@@ -94,13 +94,18 @@ namespace Overrailed.Terrain.Tiles
             toPickUp.transform.localRotation = Quaternion.identity;
 
             AudioManager.instance.PlaySound(PickupAudio, transform.position);
+            InvokeOnPickUp();
 
             return toPickUp;
         }
 
         public override bool OnTryDrop() => true;
 
-        public override void Drop(Vector3Int position) => AudioManager.instance.PlaySound(dropSound, position);
+        public override void Drop(Vector3Int position)
+        {
+            AudioManager.instance.PlaySound(dropSound, position);
+            InvokeOnDrop();
+        }
         
         /// <summary>
         /// Places this on stackBase if they have the same stackType

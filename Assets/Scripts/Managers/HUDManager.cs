@@ -12,6 +12,7 @@ namespace Overrailed.Managers
 {
     public class HUDManager : MonoBehaviour
     {
+        #region Inspector Variables
         [SerializeField] private MapManager map;
         [Header("Transforms")]
         [SerializeField] private Transform toolHUDParent;
@@ -30,6 +31,7 @@ namespace Overrailed.Managers
         [SerializeField] [Min(1)] private float warningBlinkSpeed = 2;
         [Header("Train Warnings")]
         [SerializeField] private GameObject warningHUDPrefab;
+        #endregion
 
         private List<ToolHUD> toolHUDs = new List<ToolHUD>();
         private int seedStartLength, speedStartLength, coinsStartLength;
@@ -37,16 +39,30 @@ namespace Overrailed.Managers
 
         private void Awake()
         {
-            foreach (var store in FindObjectsOfType<TrainStoreManager>()) store.OnCoinsChange += UpdateCoinsText;
-            foreach (var map in FindObjectsOfType<MapManager>()) map.OnFinishGeneratingMap += CreateHUDs;
-            map.OnSeedChange += UpdateSeedText;
+            if (GameManager.instance)
+            {
+                foreach (var store in FindObjectsOfType<TrainStoreManager>()) store.OnCoinsChange += UpdateCoinsText;
+                foreach (var map in FindObjectsOfType<MapManager>()) map.OnFinishAnimateChunk += CreateToolHUDs;
+                FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
+                map.OnSeedChange += UpdateSeedText;
 
-            seedStartLength = seedText.text.Length;
-            speedStartLength = speedText.text.Length;
-            coinsStartLength = coinsText.text.Length;
+                coinsStartLength = coinsText.text.Length;
+                speedStartLength = speedText.text.Length;
+                seedStartLength = seedText.text.Length;
+            }
+
+            foreach (var car in FindObjectsOfType<TrainCar>()) car.OnWarning += MakeWarningHUD;
         }
 
-        private void CreateHUDs()
+        #region Stat HUD Texts
+        public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
+        public void UpdateSpeedText(string newSpeed) => UpdateText(speedText, speedStartLength, newSpeed);
+        public void UpdateCoinsText(string newCoinCount) => UpdateText(coinsText, coinsStartLength, newCoinCount);
+        private void UpdateText(Text textElement, int baseLength, string newString) => textElement.text = textElement.text.Substring(0, baseLength) + newString;
+        #endregion
+
+        #region Tool HUDs
+        private void CreateToolHUDs()
         {
             var tools = FindObjectsOfType<Tool>();
             if (tools.Length == toolHUDs.Count && toolHUDs.TrueForAll(t => t.tool == tools[toolHUDs.IndexOf(t)])) return;
@@ -82,23 +98,9 @@ namespace Overrailed.Managers
                         toolType.ToolImage));
             }
 
-            foreach (var car in FindObjectsOfType<TrainCar>()) car.OnWarning += MakeWarningHUD;
-            FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
-
             _ = StartCoroutine(UpdateToolHUDs());
         }
 
-        #region Stat HUD Texts
-        public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
-        public void UpdateSpeedText(string newSpeed) => UpdateText(speedText, speedStartLength, newSpeed);
-        public void UpdateCoinsText(string newCoinCount) => UpdateText(coinsText, coinsStartLength, newCoinCount);
-        private void UpdateText(Text textElement, int baseLength, string newString)
-        {
-            textElement.text = textElement.text.Substring(0, baseLength) + newString;
-        }
-        #endregion
-
-        #region Tool HUDs
         private IEnumerator UpdateToolHUDs()
         {
             while (this)
@@ -135,7 +137,7 @@ namespace Overrailed.Managers
             else
             {
                 opacity = toolHUD.background.color.a;
-                
+
                 float toolToPlayerDst = PlayerController.MinDistanceToPlayer(toolHUD.tool.transform.position);
                 if (toolToPlayerDst < opacityDistance.x) opacity = Mathf.Clamp01(opacity - opacityFadeSpeed * Time.deltaTime);
                 else if (toolToPlayerDst > opacityDistance.y) opacity = Mathf.Clamp01(opacity + opacityFadeSpeed * Time.deltaTime);
@@ -187,8 +189,9 @@ namespace Overrailed.Managers
 
         private void MoveRectToWorldPosition(RectTransform rect, Vector3 position)
         {
-            rect.position = CameraManager.instance.Main.WorldToScreenPoint(position);
-            rect.rotation = Quaternion.Inverse(CameraManager.instance.Main.transform.rotation);
+            var cam = CameraManager.instance ? CameraManager.instance.Main : Camera.main;
+            rect.position = cam.WorldToScreenPoint(position);
+            rect.rotation = Quaternion.Inverse(cam.transform.rotation);
         }
 
         private void OnDestroy()

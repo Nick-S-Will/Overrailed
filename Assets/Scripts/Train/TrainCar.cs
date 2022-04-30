@@ -11,6 +11,7 @@ namespace Overrailed.Train
     public abstract class TrainCar : Tile, IPickupable, IInteractable
     {
         public event System.Action OnDeath;
+        public virtual event System.Action OnInteract;
         public virtual event System.Action<TrainCar> OnWarning;
         protected event System.Action OnStartDriving, OnPauseDriving;
 
@@ -66,7 +67,8 @@ namespace Overrailed.Train
                     // At middle of final checkpoint rail
                     if (currentRail.IsFinalCheckpoint && pathIndex == currentRail.Path.childCount / 2 + 1)
                     {
-                        GameManager.instance.ReachCheckpoint();
+                        if (GameManager.instance) GameManager.instance.ReachCheckpoint();
+                        else FindObjectOfType<TutorialManager>().ReachCheckpoint();
                     }
                     // Reached end of rail
                     else if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
@@ -131,6 +133,7 @@ namespace Overrailed.Train
             else if (item is Bucket bucket) return TryExtinguish(bucket) ? Interaction.Interacted : Interaction.None;
             else return Interaction.None;
         }
+        protected void InvokeOnInteract() => OnInteract?.Invoke();
         #endregion
 
         protected virtual bool TryUpgradeCar(TrainCar newCar)
@@ -147,26 +150,6 @@ namespace Overrailed.Train
 
             Die();
             return true;
-        }
-
-        /// <summary>
-        /// Puts out the fire on this car if buck has water
-        /// </summary>
-        /// <param name="bucket">Bucket used to put out the fire</param>
-        /// <returns>True if fire was put out, otherwise null</returns>
-        private bool TryExtinguish(Bucket bucket)
-        {
-            if (burningParticles && bucket.IsFull)
-            {
-                Destroy(burningParticles.gameObject, burningParticles.main.duration);
-                var emissionSettings = burningParticles.emission;
-                emissionSettings.enabled = false;
-                burningParticles = null;
-                bucket.IsFull = false;
-
-                return true;
-            }
-            else return false;
         }
 
         public virtual IEnumerator Ignite()
@@ -188,6 +171,26 @@ namespace Overrailed.Train
             }
         }
         
+        /// <summary>
+        /// Puts out the fire on this car if buck has water
+        /// </summary>
+        /// <param name="bucket">Bucket used to put out the fire</param>
+        /// <returns>True if fire was put out, otherwise null</returns>
+        private bool TryExtinguish(Bucket bucket)
+        {
+            if (burningParticles && bucket.IsFull)
+            {
+                Destroy(burningParticles.gameObject, burningParticles.main.duration);
+                var emissionSettings = burningParticles.emission;
+                emissionSettings.enabled = false;
+                burningParticles = null;
+                bucket.IsFull = false;
+
+                return true;
+            }
+            else return false;
+        }
+
         // TODO: Clean up how these work
         /// <summary>
         /// Places this train car on given rail tile

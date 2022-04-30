@@ -160,6 +160,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1803551191083341078}
+  rotateOnSpawn: 1
   pickupAudio: {fileID: 0}
   dropAudio: {fileID: 0}
   lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}

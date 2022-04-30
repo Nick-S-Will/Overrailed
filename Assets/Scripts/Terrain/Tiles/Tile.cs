@@ -6,16 +6,21 @@ namespace Overrailed.Terrain.Tiles
 {
     public class Tile : MonoBehaviour, IPickupable
     {
-        public Transform meshParent;
+        public event System.Action OnPickUp, OnDrop;
+
+        [SerializeField] private Transform meshParent;
+        [SerializeField] private bool rotateOnSpawn;
         [Space]
         [SerializeField] private AudioClip pickupAudio;
         [SerializeField] private AudioClip dropAudio;
 
+        public Transform MeshParent => meshParent;
         public Gradient MeshColorGradient { get; private set; }
         public AudioClip PickupAudio => pickupAudio;
         public AudioClip dropSound => dropAudio;
         public virtual bool CanPickUp => false;
         public virtual bool IsTwoHanded => true;
+        public bool RotateOnSpawn => rotateOnSpawn;
 
         protected virtual void Start()
         {
@@ -45,10 +50,12 @@ namespace Overrailed.Terrain.Tiles
         }
 
         public virtual IPickupable TryPickUp(Transform parent, int amount) => null;
-
+        protected void InvokeOnPickUp() => OnPickUp?.Invoke();
+        
         public virtual bool OnTryDrop() => true;
 
         public virtual void Drop(Vector3Int position) { }
+        protected void InvokeOnDrop() => OnDrop?.Invoke();
 
         public void SetVisible(bool isVisible) => meshParent.gameObject.SetActive(isVisible);
         

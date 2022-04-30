@@ -37,12 +37,13 @@ namespace Overrailed.Train
             OnStartDriving += StartEmittingSmoke;
             OnPauseDriving += StopEmittingSmoke;
             OnDeath += SpeedUp;
-            GameManager.instance.OnEndCheckpoint += SetToBaseSpeed;
+            if (GameManager.instance) GameManager.instance.OnEndCheckpoint += SetToBaseSpeed;
             
             base.Start();
 
             smokeParticles = Instantiate(smokeParticlePrefab, smokePoint);
-            SetToBaseSpeed();
+            if (GameManager.instance) SetToBaseSpeed();
+            else TrainSpeed = 1;
             SetEmitSmoke(false);
         }
 

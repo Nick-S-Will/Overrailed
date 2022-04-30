@@ -10,9 +10,6 @@ namespace Overrailed.Player
 {
     public class PlayerController : HumanoidControls
     {
-        [Space]
-        [SerializeField] private AudioClip dashSound;
-
         private PlayerInput playerInput;
 
         protected static List<PlayerController> players = new List<PlayerController>();
@@ -33,15 +30,19 @@ namespace Overrailed.Player
             players.Add(this);
         }
 
-        private void OnEnable() => playerInput.Enable();
-
         protected override void Start()
         {
-            GameManager.instance.OnCheckpoint += ForceDrop;
-            GameManager.instance.OnGameEnd += playerInput.Disable;
-            GameManager.instance.OnGameEnd += ForceDrop;
+            if (GameManager.instance)
+            {
+                GameManager.instance.OnCheckpoint += ForceDrop;
+                GameManager.instance.OnGameEnd += playerInput.Disable;
+                GameManager.instance.OnGameEnd += ForceDrop;
+            }
 
             base.Start();
+
+            DisableControls();
+            if (map) map.OnFinishAnimateChunk += EnableControls;
         }
 
         void Update()
@@ -52,12 +53,11 @@ namespace Overrailed.Player
             map.TryHighlightTile(tile);
         }
 
-        public void EnableControls() => SetControls(true);
-        public void DisableControls() => SetControls(false);
-        private void SetControls(bool enabled)
+        public void EnableControls() => enabled = true;
+        public void DisableControls()
         {
+            enabled = false;
             StopMovement();
-            this.enabled = false;
         }
 
         public static float MinDistanceToPlayer(Vector3 point)
@@ -73,7 +73,8 @@ namespace Overrailed.Player
             return minDst;
         }
 
-        private void OnDisable() => playerInput.Disable();
+        private void OnEnable() { if (playerInput != null) playerInput.Enable(); }
+        private void OnDisable() { if (playerInput != null) playerInput.Disable(); }
 
         private void OnDestroy()
         {

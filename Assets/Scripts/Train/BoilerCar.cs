@@ -13,6 +13,7 @@ namespace Overrailed.Train
         [SerializeField] private Transform liquid;
         [SerializeField] [Range(0, 1)] private float warningPercent = 0.2f;
 
+        private Coroutine liquidUse;
         private float liquidPercent = 1;
         private bool lowLiquidIsDisplayed;
 
@@ -31,7 +32,19 @@ namespace Overrailed.Train
         {
             base.Start();
 
-            if (currentRail) _ = StartCoroutine(UseLiquid());
+            if (currentRail && GameManager.instance) liquidUse = StartCoroutine(UseLiquid());
+        }
+
+        public void SetLiquidToWarningLevel()
+        {
+            LiquidPercent = warningPercent;
+            if (liquidUse == null) liquidUse = StartCoroutine(UseLiquid());
+        }
+
+        public void StopUsingLiquid()
+        {
+            StopCoroutine(liquidUse);
+            lowLiquidIsDisplayed = false;
         }
 
         private IEnumerator UseLiquid()
@@ -58,7 +71,7 @@ namespace Overrailed.Train
                 }
 
                 yield return new WaitForSeconds(1f);
-                yield return new WaitUntil(() => GameManager.IsPlaying());
+                yield return new WaitUntil(() => GameManager.IsPlaying() || GameManager.instance == null);
             }
         }
 
@@ -76,6 +89,7 @@ namespace Overrailed.Train
                     AudioManager.instance.PlaySound(refillSound, transform.position);
                 }
 
+                InvokeOnInteract();
                 return Interaction.Interacted;
             }
             else return Interaction.None;

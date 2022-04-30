@@ -79,22 +79,29 @@ namespace Overrailed.Train
             craftResultHolder.AddPartTile();
 
             // Variables for crafting animation
-            var craftResult = Instantiate(craftResultPrefab);
-            var craftMeshes = craftResult.GetComponentsInChildren<MeshRenderer>();
+            var product = Instantiate(craftResultPrefab);
+            var productMeshes = product.GetComponentsInChildren<MeshRenderer>();
             var ingredientMeshes = new List<MeshRenderer[]>();
             float percent = 0;
 
             // Disable craft's hitboxes
-            craftResult.GetComponent<BoxCollider>().enabled = false;
-            GameManager.MoveToLayer(craftResult.transform, LayerMask.NameToLayer("Train"));
+            product.GetComponent<BoxCollider>().enabled = false;
+            GameManager.MoveToLayer(product.transform, LayerMask.NameToLayer("Train"));
 
             // Parent craftResult to stack if there is one, otherwise parent it to craft spawnpoint
-            if (craftResultHolder.SpawnPoint.childCount == 0) ParentAToB(craftResult.transform, craftResultHolder.SpawnPoint);
-            else craftResult.TryStackOn(craftResultHolder.SpawnPoint.GetChild(0).GetComponent<StackTile>());
+            if (craftResultHolder.SpawnPoint.childCount == 0) ParentAToB(product.transform, craftResultHolder.SpawnPoint);
+            else product.TryStackOn(craftResultHolder.SpawnPoint.GetChild(0).GetComponent<StackTile>());
 
             // Get meshes to be animated
             foreach (var cp in craftPoints) ingredientMeshes.Add(cp.stackTop.GetComponentsInChildren<MeshRenderer>());
-            foreach (var mesh in craftMeshes) mesh.enabled = false;
+            foreach (var mesh in productMeshes) mesh.enabled = false;
+
+            // Instantly completes recipe
+            if (GameManager.instance == null || GameManager.IsEditing())
+            {
+                foreach (var mesh in productMeshes) mesh.enabled = true;
+                percent = 1;
+            }
 
             // Animate crafting
             while (percent < 1)
@@ -112,15 +119,10 @@ namespace Overrailed.Train
                 }
 
                 // Enables product meshes
-                onCount = (int)(percent * craftMeshes.Length);
-                if (onCount - (int)(oldPercent * craftMeshes.Length) == 1) craftMeshes[onCount - 1].enabled = true;
+                onCount = (int)(percent * productMeshes.Length);
+                if (onCount - (int)(oldPercent * productMeshes.Length) == 1) productMeshes[onCount - 1].enabled = true;
 
                 yield return null;
-                if (GameManager.IsEditing())
-                {
-                    foreach (var mesh in craftMeshes) mesh.enabled = true;
-                    break;
-                }
             }
 
             // Destroy top object of craft point stacks
@@ -139,8 +141,12 @@ namespace Overrailed.Train
 
         public override Interaction TryInteractUsing(IPickupable item)
         {
-            if (item is StackTile stack) return TryAddItem(stack) ? Interaction.Used : Interaction.None;
-            else return base.TryInteractUsing(item);
+            Interaction interaction;
+            if (item is StackTile stack) interaction = TryAddItem(stack) ? Interaction.Used : Interaction.None;
+            else interaction = base.TryInteractUsing(item);
+
+            if (interaction == Interaction.Used) InvokeOnInteract();
+            return interaction;
         }
 
         private bool TryAddItem(StackTile stack)

@@ -55,6 +55,7 @@ namespace Overrailed.Train
             holdCount = Mathf.Max(holdCount - amount, holdCount % 1);
 
             OnTaken?.Invoke();
+            InvokeOnPickUp();
             return holdersContent;
         }
 

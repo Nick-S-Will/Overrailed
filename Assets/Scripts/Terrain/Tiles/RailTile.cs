@@ -53,7 +53,7 @@ namespace Overrailed.Terrain.Tiles
                 UpdateConnections();
 
                 if (startsPowered) straightPower.SetActive(true);
-                else GameManager.instance.OnEndCheckpoint += ConvertToNonCheckpoint;
+                else if (GameManager.instance) GameManager.instance.OnEndCheckpoint += ConvertToNonCheckpoint;
             }
 
             base.Start();
@@ -143,8 +143,8 @@ namespace Overrailed.Terrain.Tiles
             foreach (var dir in mainDirections)
             {
                 var rail = TryGetAdjacentRail(dir, true);
-                // rail found, has a connection available, has no passenger or rail already pointing at this
-                if (rail && rail.NextRail == null && (rail.Passenger == null || rail.OutDirection == (transform.position - rail.transform.position)))
+                // rail found, has a connection available, isn't the final checkpoint, has no passenger or rail already pointing at this
+                if (rail && rail.NextRail == null && !rail.IsFinalCheckpoint && (rail.Passenger == null || rail.OutDirection == (transform.position - rail.transform.position)))
                 {
                     connectableRail = rail;
                     break;
@@ -189,7 +189,7 @@ namespace Overrailed.Terrain.Tiles
         #endregion
 
         #region Update State
-        // For preventing StackOverflow when rails connect consecutively
+        // Prevents StackOverflow when rails connect consecutively
         /// <summary>
         /// Waits a frame, then does SetState
         /// </summary>
@@ -251,45 +251,49 @@ namespace Overrailed.Terrain.Tiles
                 // Tries to connect this to proceeding rail
                 else
                 {
+                    RailTile nextRail = null;
                     // Iterates the local left, forward, then right to find an unpowered rail to connect to
                     Vector3Int dir = Vector3Int.RoundToInt(Quaternion.AngleAxis(-90, Vector3.up) * outDir);
                     for (int i = 0; i < 3; i++)
                     {
                         // Tries to get rail in currently iterated direction
-                        var nextRail = TryGetAdjacentRail(dir, false);
-                        if (nextRail && nextRail.NextInStack == null)
-                        {
-                            SetState(inDir, dir, nextRail);
-                            nextRail.PrevRail = this;
-
-                            // Checkpoint rails
-                            if (nextRail.isCheckpoint)
-                            {
-                                nextRail.DelaySetState(dir, nextRail.OutDirection, null);
-
-                                if (!isCheckpoint)
-                                {
-                                    // Speeds train to checkpoint
-                                    var prev = this;
-                                    do
-                                    {
-                                        prev = prev.PrevRail;
-                                        prev.hasBeenRidden = true;
-                                        if (prev.Passenger && prev.Passenger is Locomotive locomotive)
-                                        {
-                                            locomotive.SpeedUp();
-                                            break;
-                                        }
-                                    } while (prev);
-                                }
-                            }
-                            // Other rails
-                            else nextRail.DelaySetState(dir, dir, null);
-
-                            return;
-                        }
+                        nextRail = TryGetAdjacentRail(dir, false);
+                        if (nextRail && nextRail.NextInStack == null) break;
 
                         dir = Vector3Int.RoundToInt(Quaternion.AngleAxis(90, Vector3.up) * dir);
+                    }
+
+                    if (nextRail)
+                    {
+                        SetState(inDir, dir, nextRail);
+                        nextRail.PrevRail = this;
+
+                        // Checkpoint rails
+                        if (nextRail.isCheckpoint)
+                        {
+                            nextRail.DelaySetState(dir, nextRail.OutDirection, null);
+
+                            if (!isCheckpoint)
+                            {
+                                // Speeds train to checkpoint
+                                var prev = this;
+                                do
+                                {
+                                    prev = prev.PrevRail;
+                                    prev.hasBeenRidden = true;
+                                    if (prev.Passenger && prev.Passenger is Locomotive locomotive)
+                                    {
+                                        if (GameManager.instance) locomotive.SpeedUp();
+                                        else locomotive.StartTrain(); // For tutorial
+                                        break;
+                                    }
+                                } while (prev);
+                            }
+                        }
+                        // Other rails
+                        else nextRail.DelaySetState(dir, dir, null);
+
+                        return;
                     }
                 }
             }

@@ -13,6 +13,8 @@ namespace Overrailed.Mob
     [RequireComponent(typeof(CharacterController))]
     public abstract class HumanoidControls : MonoBehaviour
     {
+        public event System.Action OnMove;
+
         #region Inspector Variables
         [Header("Walk")]
         [SerializeField] private float moveSpeed = 5;
@@ -23,6 +25,7 @@ namespace Overrailed.Mob
         [Header("Dash")]
         [SerializeField] [Range(1, 10)] private float dashSpeedMultiplier = 2;
         [SerializeField] [Range(0, 1)] private float dashDuration = 1;
+        [SerializeField] protected AudioClip dashSound;
 
         [Header("Arms")]
         [SerializeField] private float armTurnSpeed = 180;
@@ -98,10 +101,12 @@ namespace Overrailed.Mob
 
                     // Moves character
                     if (map.PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
+
+                    OnMove?.Invoke();
                 }
 
                 yield return new WaitForSeconds(Time.fixedDeltaTime);
-                yield return new WaitUntil(() => enabled && !GameManager.IsPaused());
+                yield return new WaitUntil(() => enabled && (GameManager.instance == null || !GameManager.IsPaused()));
             }
         }
 
@@ -148,7 +153,7 @@ namespace Overrailed.Mob
             if (Time.time < lastInteractTime + interactInterval) return;
             lastInteractTime = Time.time;
 
-            var collisions = Physics.OverlapBox(transform.position + Vector3.up + lastInputDir, 0.1f * Vector3.one, Quaternion.identity, GameManager.instance.InteractMask);
+            var collisions = Physics.OverlapBox(transform.position + Vector3.up + lastInputDir, 0.1f * Vector3.one, Quaternion.identity, map.InteractMask);
             if (collisions.Length > 0)
             {
                 if (IsHoldingItem) TryUseHeldItemOn(collisions[0].transform.GetComponent<IInteractable>());
@@ -384,7 +389,7 @@ namespace Overrailed.Mob
             while (legL.localRotation != Quaternion.identity)
             {
                 float angle = Quaternion.Angle(legL.localRotation, Quaternion.identity);
-                float maxRadians = moveSpeed * legRaiseAngle * Time.deltaTime;
+                float maxRadians = moveSpeed * ((angle + legRaiseAngle) / 2)  * Time.deltaTime;
                 legL.localRotation = Quaternion.RotateTowards(legL.localRotation, Quaternion.identity, maxRadians);
                 legR.localRotation = Quaternion.RotateTowards(legR.localRotation, Quaternion.identity, maxRadians);
 

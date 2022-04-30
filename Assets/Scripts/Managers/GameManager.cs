@@ -17,13 +17,12 @@ namespace Overrailed.Managers
         public event System.Action<GameState> OnStateChange;
         public event System.Action OnCheckpoint, OnEndCheckpoint, OnGameEnd;
 
-        [SerializeField] private string gameSceneName = "TestScene";
+        [SerializeField] private string titleSceneName = "TitleScreenScene"/*, tutorialSceneName = "TutorialScene", gameSceneName = "GameScene"*/;
         [Space]
-        [SerializeField] private LayerMask interactMask;
         [SerializeField] [Min(0)] private float baseTrainSpeed = 0.05f, trainSpeedIncrement = 0.05f, speedUpMultiplier = 2;
         [SerializeField] [Min(5)] private float trainInitialDelay = 10;
         [Header("UI Buttons")]
-        [SerializeField] private TriggerButton checkpointContinueButton;
+        [SerializeField] private TriggerButton continueGameButton;
         [Space]
         public GameObject[] numbersPrefabs;
         [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
@@ -34,21 +33,20 @@ namespace Overrailed.Managers
         private int checkpointCount;
 
         public static Locomotive[] Locomotives => locomotives;
-        public static GameState CurrentState 
+        public static GameState CurrentState
         {
             get => instance.currentState;
-            private set 
+            private set
             {
                 instance.currentState = value;
                 instance.OnStateChange?.Invoke(value);
-            } 
+            }
         }
-        public LayerMask InteractMask => interactMask;
         public static float GetBaseTrainSpeed() => instance.baseTrainSpeed + instance.trainSpeedIncrement * instance.checkpointCount;
         public static float GetBoostTrainSpeed() => instance.speedUpMultiplier * (instance.baseTrainSpeed + instance.trainSpeedIncrement * instance.checkpointCount);
-        public static bool IsPlaying() => CurrentState == GameState.Play;
-        public static bool IsPaused() => CurrentState == GameState.Pause;
-        public static bool IsEditing() => CurrentState == GameState.Edit;
+        public static bool IsPlaying() => instance && CurrentState == GameState.Play;
+        public static bool IsPaused() => instance && CurrentState == GameState.Pause;
+        public static bool IsEditing() => instance && CurrentState == GameState.Edit;
 
         public static GameManager instance;
 
@@ -63,14 +61,13 @@ namespace Overrailed.Managers
 
             instance = this;
 
-            checkpointContinueButton.OnClick += ContinueFromCheckpoint;
-            checkpointContinueButton.GetComponent<BoxCollider>().enabled = false;
+            CurrentState = GameState.Play;
+            continueGameButton.OnClick += ContinueFromCheckpoint;
+            continueGameButton.GetComponent<BoxCollider>().enabled = false;
         }
 
         void Start()
         {
-            currentState = GameState.Play;
-            
             StartTrainsWithDelay(trainInitialDelay);
         }
 
@@ -82,7 +79,7 @@ namespace Overrailed.Managers
 
             locomotives = FindObjectsOfType<Locomotive>();
             foreach (var locomotive in locomotives) locomotive.OnDeath += EndGame;
-            
+
             for (int countDown = 5; countDown > 0; countDown--)
             {
                 yield return new WaitUntil(() => IsPlaying());
@@ -129,9 +126,9 @@ namespace Overrailed.Managers
             checkpointCount++;
 
             // Edit mode UI
-            Vector3 pos = checkpointContinueButton.transform.position;
-            checkpointContinueButton.GetComponent<BoxCollider>().enabled = true;
-            checkpointContinueButton.transform.position = new Vector3(pos.x, pos.y, locomotives[0].transform.position.z - 1);
+            Vector3 pos = continueGameButton.transform.position;
+            continueGameButton.GetComponent<BoxCollider>().enabled = true;
+            continueGameButton.transform.position = new Vector3(pos.x, pos.y, locomotives[0].transform.position.z - 1);
 
             OnCheckpoint?.Invoke();
         }
@@ -142,7 +139,7 @@ namespace Overrailed.Managers
             CurrentState = GameState.Play;
 
             // Edit mode UI
-            checkpointContinueButton.GetComponent<BoxCollider>().enabled = false;
+            continueGameButton.GetComponent<BoxCollider>().enabled = false;
 
             OnEndCheckpoint?.Invoke();
         }
@@ -159,7 +156,7 @@ namespace Overrailed.Managers
 
             if (Time.time > startTime + 2) await Task.Delay(2000);
 
-            if (instance) SceneManager.LoadScene(gameSceneName);
+            if (instance) SceneManager.LoadScene(titleSceneName);
         }
 
         // Mainly used method for edit cam to see tracks
@@ -185,8 +182,8 @@ namespace Overrailed.Managers
         private void OnDestroy()
         {
             instance = null;
-            
-            checkpointContinueButton.OnClick -= ContinueFromCheckpoint;
+
+            if (continueGameButton) continueGameButton.OnClick -= ContinueFromCheckpoint;
         }
     }
 }

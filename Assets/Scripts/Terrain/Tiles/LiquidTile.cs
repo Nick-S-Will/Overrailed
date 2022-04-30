@@ -9,6 +9,8 @@ namespace Overrailed.Terrain.Tiles
 {
     public class LiquidTile : Tile, IInteractable
     {
+        public System.Action OnBridge, OnRefill;
+
         [SerializeField] protected Transform liquid, surfacePoint;
         [SerializeField] private float waveHeight = 0.2f;
 
@@ -47,10 +49,15 @@ namespace Overrailed.Terrain.Tiles
             if (item is StackTile stack && stack.HasBridge)
             {
                 stack.BuildBridge(this);
+                OnBridge?.Invoke();
                 return stack.GetStackCount() == 1 ? Interaction.Used : Interaction.Interacted;
             }
+            else if (item is Bucket bucket)
+            {
+                bucket.Refill();
+                OnRefill?.Invoke();
+            }
             else if (item is Rod rod) rod.UseOn(this);
-            else if (item is Bucket bucket) bucket.Refill();
             else return Interaction.None;
 
             return Interaction.Interacted;
