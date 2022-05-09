@@ -1,9 +1,10 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
-using Overrailed.Player;
 using Overrailed.Terrain.Tools;
 using Overrailed.Terrain.Tiles;
 using Overrailed.Train;
@@ -13,6 +14,8 @@ namespace Overrailed.Managers
 {
     public class TutorialManager : MonoBehaviour
     {
+        public event System.Action OnShowInfo, OnCloseInfo;
+
         #region Inspector Variables
         [SerializeField] private string titleSceneName = "TitleScreenScene";
         [Header("Target Points")]
@@ -30,18 +33,30 @@ namespace Overrailed.Managers
         [SerializeField] private BreakableTile stonePrefab;
         [SerializeField] private LayerMask obstacleMask;
         [Header("HUD Elements")]
+        [SerializeField] private GameObject infoPanel;
+        [SerializeField] private TextMeshProUGUI infoTitle, info;
+        [Header("Pointer Values")]
         [SerializeField] private Transform pointer;
         [SerializeField] private Vector3 pointerOffset = Vector3.up;
         [SerializeField] private float pointerBobHeight = 0.25f, pointerBobSpeed = 1;
         [SerializeField] private int spinCycleInterval = 5;
+        [Space]
+        [SerializeField] private List<StepInfo> steps;
         #endregion
 
         private MapManager map;
         private Coroutine treeSpawning, stoneSpawning;
         private BreakableTile currentTree, currentStone;
         private Transform pointerTarget;
-        private string treeCode = "Tree", stoneCode = "Stone", woodType = "Wood", stoneType = "Stone";
-        private Step step;
+        private string treeBreakCode = "Tree", stoneBreakCode = "Stone", woodStackType = "Wood", stoneStackType = "Stone";
+        private int stepIndex;
+
+        public static bool Exists { get; private set; }
+
+        private void Awake()
+        {
+            Exists = true;
+        }
 
         void Start()
         {
@@ -57,12 +72,19 @@ namespace Overrailed.Managers
             else Debug.LogError("Pointer HUD element is set to null");
         }
 
+        public void CloseInfo() => infoPanel.SetActive(false);
         private void CompleteStep(Tool unused) => NextStep();
         private void CompleteStep(Tile unused) => NextStep();
-        private void NextStep() => step++;
+        private void NextStep()
+        {
+            stepIndex++;
+        }
         private void RewindStep(Tool unused) => PreviousStep();
         private void RewindStep(Tile unused) => PreviousStep();
-        private void PreviousStep() => step--;
+        private void PreviousStep()
+        {
+            stepIndex--;
+        }
 
         private void StartTutorial() => _ = StartCoroutine(TutorialRoutine());
         private IEnumerator TutorialRoutine()
@@ -71,103 +93,135 @@ namespace Overrailed.Managers
             BobPointer();
 
             // Pick up axe and break tree
-            yield return StartCoroutine(ToolAndTile(axe, Step.Axe, treePrefab, treePoint, Step.Tree));
+            yield return StartCoroutine(ToolAndTile(axe, treePrefab, treePoint, true));
 
             // Pick up wood and make bridge
             bridgeWaterPoint.OnBridge += NextStep;
-            yield return StartCoroutine(StackAndOther(woodType, Step.BridgeWood, bridgeWaterPoint.transform, Step.Bridge));
+            yield return StartCoroutine(StackAndOther(woodStackType, bridgeWaterPoint.transform, true));
 
             // Pick up bucket and fill it
             foreach (var water in FindObjectsOfType<LiquidTile>()) water.OnRefill += NextStep;
-            yield return StartCoroutine(ToolAndTile(bucket, Step.Bucket, bucketWaterPoint, null, Step.FillBucket));
+            yield return StartCoroutine(ToolAndTile(bucket, bucketWaterPoint, null, true));
             foreach (var water in FindObjectsOfType<LiquidTile>()) water.OnRefill -= NextStep;
 
             // Refill boiler
+            ShowCurrentStepInfo();
             boilerPoint.OnInteract += NextStep;
             boilerPoint.SetLiquidToWarningLevel();
             pointerTarget = boilerPoint.transform;
-            yield return new WaitUntil(() => step > Step.FillBoiler);
+            yield return new WaitUntil(() => stepIndex > 6);
             boilerPoint.OnInteract -= NextStep;
-            boilerPoint.StopUsingLiquid();
 
+            bool firstLoop = true;
             for (int i = 0; i < railPoints.Length; i++)
             {
                 // Pick up pick and break stone
-                yield return StartCoroutine(ToolAndTile(pick, Step.Pick, stonePrefab, stonePoint, Step.BreakStone));
+                yield return StartCoroutine(ToolAndTile(pick, stonePrefab, stonePoint, firstLoop));
 
                 // Pick up stone and place on craft
                 craftPoint.OnInteract += NextStep;
-                yield return StartCoroutine(StackAndOther(stoneType, Step.Stone, craftPoint.transform, Step.CraftStone));
+                yield return StartCoroutine(StackAndOther(stoneStackType, craftPoint.transform, firstLoop));
                 craftPoint.OnInteract -= NextStep;
 
                 // Pick up axe and break tree
-                yield return StartCoroutine(ToolAndTile(axe, Step.Axe2, treePrefab, treePoint, Step.Tree2));
+                yield return StartCoroutine(ToolAndTile(axe, treePrefab, treePoint, firstLoop));
 
                 // Pick up wood and place on craft
                 craftPoint.OnInteract += NextStep;
-                yield return StartCoroutine(StackAndOther(woodType, Step.Wood, craftPoint.transform, Step.CraftWood));
+                yield return StartCoroutine(StackAndOther(woodStackType, craftPoint.transform, firstLoop));
                 craftPoint.OnInteract -= NextStep;
 
                 // Pick up crafted rail
+                if (firstLoop) ShowCurrentStepInfo();
                 holderPoint.OnPickUp += NextStep;
                 pointerTarget = holderPoint.transform;
-                yield return new WaitUntil(() => step > Step.PickupHolder);
+                yield return new WaitUntil(() => stepIndex > 15);
                 holderPoint.OnPickUp -= NextStep;
 
                 // Place rail
+                if (firstLoop) ShowCurrentStepInfo();
                 pointerTarget = railPoints[i];
                 yield return new WaitUntil(() => Physics.CheckBox(pointerTarget.position, 0.4f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Rail")));
-                step = Step.Pick;
+
+                // Set values if there's another loop
+                if (railPoints.Length - i > 1)
+                {
+                    stepIndex = 7;
+                    firstLoop = false;
+                }
             }
 
-            step = Step.Complete;
+            pointer.gameObject.SetActive(false);
+        }
+
+        private void ShowCurrentStepInfo(float delay = 0) => _ = StartCoroutine(ShowInfoRoutine(steps[stepIndex], delay));
+        private IEnumerator ShowInfoRoutine(StepInfo stepInfo, float delay = 0)
+        {
+            if (stepInfo.Info == string.Empty) yield break;
+
+            if (delay > 0) yield return new WaitForSeconds(delay);
+
+            infoPanel.SetActive(true);
+            infoTitle.text = stepInfo.Title;
+            info.text = stepInfo.Info;
+
+            OnShowInfo?.Invoke();
+            yield return new WaitWhile(() => infoPanel.activeSelf);
+            OnCloseInfo?.Invoke();
         }
 
         /// <summary>
-        /// Alternates <see cref="step"/> between <paramref name="toolStep"/> and <paramref name="tileStep"/> when you pick up and drop <paramref name="tool"/>.
+        /// Alternates <see cref="stepIndex"/> between <paramref name="toolStepIndex"/> and <paramref name="tileStepIndex"/> when you pick up and drop <paramref name="tool"/>.
         /// Completes when <paramref name="tile"/> is interacted with
         /// </summary>
         /// <param name="tile">Tile that needs to be interacted with</param>
         /// <param name="tileParent">Transform <paramref name="tile"/> is parented to if necessary</param>
-        private IEnumerator ToolAndTile(Tool tool, Step toolStep, Tile tile, Transform tileParent, Step tileStep)
+        private IEnumerator ToolAndTile(Tool tool, Tile tile, Transform tileParent, bool showInfo)
         {
+            if (showInfo) ShowCurrentStepInfo();
+            int startIndex = stepIndex;
+            bool firstLoop = true;
+
             tool.OnPickup += CompleteStep;
             tool.OnDropTool += RewindStep;
-            while (step == toolStep)
+            while (stepIndex == startIndex)
             {
                 pointerTarget = tool.transform;
-                yield return new WaitUntil(() => step > toolStep);
+                yield return new WaitUntil(() => stepIndex > startIndex);
 
-                if (tile.name.Contains(treeCode))
+                if (firstLoop && showInfo) ShowCurrentStepInfo();
+
+                if (tile.name.Contains(treeBreakCode))
                 {
                     if (treeSpawning == null) treeSpawning = StartCoroutine(ContinuousSpawnResource((BreakableTile)tile, tileParent));
+                    if (firstLoop) currentTree.OnBreak += CompleteStep;
                     pointerTarget = currentTree.transform;
-                    currentTree.OnBreak += CompleteStep;
                 }
-                else if (tile.name.Contains(stoneCode))
+                else if (tile.name.Contains(stoneBreakCode))
                 {
                     if (stoneSpawning == null) stoneSpawning = StartCoroutine(ContinuousSpawnResource((BreakableTile)tile, tileParent));
+                    if (firstLoop) currentStone.OnBreak += CompleteStep;
                     pointerTarget = currentStone.transform;
-                    currentStone.OnBreak += CompleteStep;
                 }
                 else if (tile is LiquidTile liquid) pointerTarget = liquid.transform;
 
-                yield return new WaitWhile(() => step == tileStep);
+                yield return new WaitWhile(() => stepIndex == startIndex + 1);
+                firstLoop = false;
             }
             tool.OnPickup -= CompleteStep;
             tool.OnDropTool -= RewindStep;
         }
 
         /// <summary>
-        /// Alternates <see cref="step"/> between <paramref name="stackStep"/> and <paramref name="otherStep"/> when you pick up and drop stack of <paramref name="stackType"/>.
+        /// Alternates <see cref="stepIndex"/> between <paramref name="stackStepIndex"/> and <paramref name="otherStepIndex"/> when you pick up and drop stack of <paramref name="stackType"/>.
         /// Completes when stack is placed on <paramref name="otherTransform"/>
         /// </summary>
         /// <param name="stackType"></param>
-        /// <param name="stackStep"></param>
+        /// <param name="stackStepIndex"></param>
         /// <param name="otherTransform"></param>
-        /// <param name="otherStep"></param>
+        /// <param name="otherStepIndex"></param>
         /// <returns></returns>
-        private IEnumerator StackAndOther(string stackType, Step stackStep, Transform otherTransform, Step otherStep)
+        private IEnumerator StackAndOther(string stackType, Transform otherTransform, bool showInfo)
         {
             StackTile stack = null;
             foreach (var s in FindObjectsOfType<StackTile>())
@@ -179,15 +233,25 @@ namespace Overrailed.Managers
                 }
             }
 
+            if (showInfo) ShowCurrentStepInfo();
+            int startIndex = stepIndex;
+            bool firstLoop = true;
+
             stack.OnPickUp += NextStep;
             stack.OnDrop += PreviousStep;
-            while (step == stackStep)
+            while (stepIndex == startIndex)
             {
                 pointerTarget = stack.transform;
-                yield return new WaitUntil(() => step > stackStep);
+                yield return new WaitUntil(() => stepIndex > startIndex);
+
+                if (firstLoop)
+                {
+                    if (showInfo) ShowCurrentStepInfo();
+                    firstLoop = false;
+                }
 
                 pointerTarget = otherTransform;
-                yield return new WaitWhile(() => step == otherStep);
+                yield return new WaitWhile(() => stepIndex == startIndex + 1);
             }
             stack.OnPickUp -= NextStep;
             stack.OnDrop -= PreviousStep;
@@ -202,7 +266,7 @@ namespace Overrailed.Managers
             while (this)
             {
                 BreakableTile resource = Instantiate(resourcePrefab, parent);
-                if (resource.name.Contains(treeCode)) currentTree = resource;
+                if (resource.name.Contains(treeBreakCode)) currentTree = resource;
                 else currentStone = resource;
 
                 yield return new WaitUntil(() => resource == null);
@@ -226,13 +290,14 @@ namespace Overrailed.Managers
         }
 
         /// <summary>
-        /// Moves pointer up and down over <see cref="pointerTarget"/> and spins it every <see cref="spinCycleInterval"/> cycle
+        /// Moves <see cref="pointer"/> up and down over <see cref="pointerTarget"/> and spins it every <see cref="spinCycleInterval"/> cycle
         /// </summary>
         private async void BobPointer()
         {
             float startTime = Time.time;
 
-            while (pointer && Application.isPlaying && step < Step.Complete)
+            pointer.gameObject.SetActive(true);
+            while (pointer && Application.isPlaying && stepIndex < steps.Count - 1)
             {
                 Vector3 bobOffset = pointerBobHeight * Mathf.Sin(pointerBobSpeed * 2 * Time.time * Mathf.PI) * Vector3.up;
                 float cycleDuration = 1 / pointerBobSpeed;
@@ -246,15 +311,36 @@ namespace Overrailed.Managers
                 await Task.Yield();
             }
 
-            if (Application.isPlaying)
+            if (pointer && Application.isPlaying)
             {
                 pointer.position = Vector3.zero;
+                pointer.localRotation = Quaternion.identity;
                 pointer.gameObject.SetActive(false);
             }
         }
 
-        public void ReachCheckpoint() => SceneManager.LoadScene(titleSceneName);
+        public void ReachCheckpoint() => _ = StartCoroutine(EndTutorial());
+        private IEnumerator EndTutorial()
+        {
+            stepIndex = steps.Count - 1;
+            yield return ShowInfoRoutine(steps[stepIndex]);
+            SceneManager.LoadScene(titleSceneName);
+        }
 
-        private enum Step { Axe, Tree, BridgeWood, Bridge, Bucket, FillBucket, FillBoiler, Pick, BreakStone, Stone, CraftStone, Axe2, Tree2, Wood, CraftWood, PickupHolder, Rail, Complete }
+        private void OnDestroy()
+        {
+            Exists = false;
+        }
+
+        [System.Serializable]
+        private struct StepInfo
+        {
+            [SerializeField] private string title;
+            [TextArea(1, 10)]
+            [SerializeField] private string info;
+
+            public string Title => title;
+            public string Info => info;
+        }
     }
 }

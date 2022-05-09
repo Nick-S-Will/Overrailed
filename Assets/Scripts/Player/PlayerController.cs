@@ -24,8 +24,8 @@ namespace Overrailed.Player
             playerInput.Movement.Dash.started += ctx => HoldingDashKey = true;
             playerInput.Movement.Dash.canceled += ctx => HoldingDashKey = false;
 
-            playerInput.Interaction.InteractMain.performed += ctx => MainInteract();
-            playerInput.Interaction.InteractAlt.performed += ctx => AltInteract();
+            playerInput.Interaction.InteractMain.performed += ctx => InteractAll();
+            playerInput.Interaction.InteractAlt.performed += ctx => InteractSingle();
 
             players.Add(this);
         }
@@ -38,19 +38,27 @@ namespace Overrailed.Player
                 GameManager.instance.OnGameEnd += playerInput.Disable;
                 GameManager.instance.OnGameEnd += ForceDrop;
             }
+            else if (TutorialManager.Exists)
+            {
+                var tutorial = FindObjectOfType<TutorialManager>();
+                tutorial.OnShowInfo += DisableControls;
+                tutorial.OnCloseInfo += EnableControls;
+            }
+            else Debug.LogError("No GameManager or TutorialManager Found");
 
             base.Start();
 
             DisableControls();
-            if (map) map.OnFinishAnimateChunk += EnableControls;
+            if (Map) Map.OnFinishAnimateChunk += EnableControls;
         }
 
         void Update()
         {
             // Tile highlighting
-            var tile = map.GetTileAt(LookPoint);
-            if (tile == null) tile = map.GetTileAt(LookPoint + Vector3Int.down);
-            map.TryHighlightTile(tile);
+            _ = Physics.Raycast(transform.position + Vector3.up, LastInputDir, out RaycastHit hitInfo, 1, Map.InteractMask);
+            var tile = hitInfo.transform;
+            if (tile == null) tile = Map.GetTileAt(LookPoint + Vector3Int.down);
+            Map.TryHighlightTile(tile);
         }
 
         public void EnableControls() => enabled = true;

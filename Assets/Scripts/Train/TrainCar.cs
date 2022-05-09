@@ -68,7 +68,12 @@ namespace Overrailed.Train
                     if (currentRail.IsFinalCheckpoint && pathIndex == currentRail.Path.childCount / 2 + 1)
                     {
                         if (GameManager.instance) GameManager.instance.ReachCheckpoint();
-                        else FindObjectOfType<TutorialManager>().ReachCheckpoint();
+                        else if (TutorialManager.Exists)
+                        {
+                            FindObjectOfType<TutorialManager>().ReachCheckpoint();
+                            OnPauseDriving?.Invoke();
+                        }
+                        else Debug.LogError("No GameManager or TutorialManager Found");
                     }
                     // Reached end of rail
                     else if (pathIndex < 0 || currentRail.Path.childCount <= pathIndex)
@@ -100,6 +105,7 @@ namespace Overrailed.Train
                     OnStartDriving?.Invoke();
                 }
                 else if (GameManager.IsPaused()) yield return DriveWait();
+                else if (TutorialManager.Exists) yield return new WaitUntil(() => leaderLocomotive.IsDriving);
             }
         }
         private WaitUntil DriveWait() => new WaitUntil(() => this is Locomotive ? GameManager.IsPlaying() : leaderLocomotive.IsDriving);

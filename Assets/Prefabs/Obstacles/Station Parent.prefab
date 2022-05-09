@@ -295,6 +295,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2293133988917488064}
+  rotateOnSpawn: 0
   pickupAudio: {fileID: 0}
   dropAudio: {fileID: 0}
   leaderLocomotive: {fileID: 6227083247989688238}
@@ -307,8 +308,8 @@ MonoBehaviour:
   startRail: {fileID: 9060819590924108547}
   tier: 1
   isPermeable: 0
-  craftResultHolder: {fileID: 0}
-  craftResultPrefab: {fileID: 0}
+  craftProductHolder: {fileID: 0}
+  craftProductPrefab: {fileID: 0}
   craftPoints: []
 --- !u!54 &7214615065986362541
 Rigidbody:
@@ -2639,6 +2640,14 @@ PrefabInstance:
       propertyPath: craftResultHolder
       value: 
       objectReference: {fileID: 2155235525403436189}
+    - target: {fileID: 712608436525509803, guid: af4f03287f2c00e4eae9e2d25766d86e, type: 3}
+      propertyPath: craftProductHolder
+      value: 
+      objectReference: {fileID: 2155235525403436189}
+    - target: {fileID: 712608436525509803, guid: af4f03287f2c00e4eae9e2d25766d86e, type: 3}
+      propertyPath: craftProductPrefab
+      value: 
+      objectReference: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
     - target: {fileID: 712608436525509804, guid: af4f03287f2c00e4eae9e2d25766d86e, type: 3}
       propertyPath: m_Name
       value: Craft Car

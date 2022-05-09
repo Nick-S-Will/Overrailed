@@ -11,8 +11,8 @@ namespace Overrailed.Train
     public class CraftCar : TrainCar
     {
         [Space]
-        [SerializeField] private HolderCar craftResultHolder;
-        [SerializeField] private StackTile craftResultPrefab;
+        [SerializeField] private HolderCar craftProductHolder;
+        [SerializeField] private StackTile craftProductPrefab;
         [SerializeField] private StackPoint[] craftPoints;
 
         private bool isCrafting;
@@ -23,14 +23,14 @@ namespace Overrailed.Train
             {
                 if (isCrafting) return false;
                 foreach (StackPoint cp in craftPoints) if (!cp.IsHolding) return false;
-                return craftResultHolder.HasSpace;
+                return craftProductHolder.HasSpace;
             }
         }
         public override bool IsWarning => false;
 
         override protected void Start()
         {
-            if (craftResultHolder) AddToHolderEvents();
+            if (craftProductHolder) AddToHolderEvents();
 
             base.Start();
         }
@@ -40,22 +40,22 @@ namespace Overrailed.Train
         {
             if (base.TryUpgradeCar(newCar))
             {
-                ((CraftCar)newCar).craftResultHolder = craftResultHolder;
-                craftResultHolder.OnTaken += ((CraftCar)newCar).ProductTaken;
-                craftResultHolder.OnUpgrade += ((CraftCar)newCar).UpdateHolder;
+                ((CraftCar)newCar).craftProductHolder = craftProductHolder;
+                craftProductHolder.OnTaken += ((CraftCar)newCar).ProductTaken;
+                craftProductHolder.OnUpgrade += ((CraftCar)newCar).UpdateHolder;
                 return true;
             }
             else return false;
         }
         private void UpdateHolder(HolderCar newHolder) 
         { 
-            craftResultHolder = newHolder;
+            craftProductHolder = newHolder;
             AddToHolderEvents();
         }
         private void AddToHolderEvents()
         {
-            craftResultHolder.OnTaken += ProductTaken;
-            craftResultHolder.OnUpgrade += UpdateHolder;
+            craftProductHolder.OnTaken += ProductTaken;
+            craftProductHolder.OnUpgrade += UpdateHolder;
         }
         #endregion
 
@@ -76,10 +76,10 @@ namespace Overrailed.Train
         protected IEnumerator Craft()
         {
             isCrafting = true;
-            craftResultHolder.AddPartTile();
+            craftProductHolder.AddPartTile();
 
             // Variables for crafting animation
-            var product = Instantiate(craftResultPrefab);
+            var product = Instantiate(craftProductPrefab);
             var productMeshes = product.GetComponentsInChildren<MeshRenderer>();
             var ingredientMeshes = new List<MeshRenderer[]>();
             float percent = 0;
@@ -88,9 +88,9 @@ namespace Overrailed.Train
             product.GetComponent<BoxCollider>().enabled = false;
             GameManager.MoveToLayer(product.transform, LayerMask.NameToLayer("Train"));
 
-            // Parent craftResult to stack if there is one, otherwise parent it to craft spawnpoint
-            if (craftResultHolder.SpawnPoint.childCount == 0) ParentAToB(product.transform, craftResultHolder.SpawnPoint);
-            else product.TryStackOn(craftResultHolder.SpawnPoint.GetChild(0).GetComponent<StackTile>());
+            // Parent product to stack if there is one, otherwise parent it to craft spawnpoint
+            if (craftProductHolder.SpawnPoint.childCount == 0) ParentAToB(product.transform, craftProductHolder.SpawnPoint);
+            else product.TryStackOn(craftProductHolder.SpawnPoint.GetChild(0).GetComponent<StackTile>());
 
             // Get meshes to be animated
             foreach (var cp in craftPoints) ingredientMeshes.Add(cp.stackTop.GetComponentsInChildren<MeshRenderer>());
@@ -133,7 +133,7 @@ namespace Overrailed.Train
                 cp.stackTop = newStackTop;
             }
 
-            craftResultHolder.AddPartTile();
+            craftProductHolder.AddPartTile();
             isCrafting = false;
 
             yield return null; // Required for destroy cleanup
@@ -191,10 +191,10 @@ namespace Overrailed.Train
 
         private void OnDestroy()
         {
-            if (craftResultHolder)
+            if (craftProductHolder)
             {
-                craftResultHolder.OnTaken -= ProductTaken;
-                craftResultHolder.OnUpgrade -= UpdateHolder;
+                craftProductHolder.OnTaken -= ProductTaken;
+                craftProductHolder.OnUpgrade -= UpdateHolder;
             }
         }
     }

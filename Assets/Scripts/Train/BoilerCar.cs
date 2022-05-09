@@ -38,7 +38,8 @@ namespace Overrailed.Train
         public void SetLiquidToWarningLevel()
         {
             LiquidPercent = warningPercent;
-            if (liquidUse == null) liquidUse = StartCoroutine(UseLiquid());
+            lowLiquidIsDisplayed = true;
+            MakeWarning();
         }
 
         public void StopUsingLiquid()
@@ -64,7 +65,7 @@ namespace Overrailed.Train
                     yield return new WaitWhile(() => LiquidPercent == 0);
                     liquid.gameObject.SetActive(true);
                 }
-                else if (LiquidPercent < warningPercent && !lowLiquidIsDisplayed)
+                else if (LiquidPercent <= warningPercent && !lowLiquidIsDisplayed)
                 {
                     lowLiquidIsDisplayed = true;
                     MakeWarning();

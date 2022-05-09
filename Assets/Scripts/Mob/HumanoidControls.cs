@@ -38,12 +38,9 @@ namespace Overrailed.Mob
         [SerializeField] private Transform armR, legL, legR, calfL, calfR, toolHolder, pickupHolder;
         #endregion
 
-        protected MapManager map;
         private CharacterController controller;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
         private Coroutine toolSwinging, legSwinging;
-        private IPickupable heldItem;
-        private Vector3 lastInputDir;
         private float lastDashTime, lastInteractTime;
         /// <summary>
         /// True if player was moving in the previous update, used to start leg swinging
@@ -54,10 +51,13 @@ namespace Overrailed.Mob
         /// </summary>
         private bool isMoving;
 
-        public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + Vector3.up + lastInputDir);
+        protected MapManager Map { get; private set; }
+        protected IPickupable HeldItem { get; private set; }
+        protected Vector3 LastInputDir { get; private set; }
+        public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + Vector3.up + LastInputDir);
         protected Vector2 InputDir { private get; set; }
         public int Strength { get; private set; } = 2;
-        public bool IsHoldingItem => heldItem != null;
+        public bool IsHoldingItem => HeldItem != null;
         protected bool HoldingDashKey { private get; set; }
 
         protected virtual void Start()
@@ -65,7 +65,7 @@ namespace Overrailed.Mob
             transform.parent = null;
             transform.position = new Vector3(transform.position.x, 0, transform.position.z);
 
-            try { map = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Ground"))[0].transform.parent.GetComponent<MapManager>(); }
+            try { Map = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Ground"))[0].transform.parent.GetComponent<MapManager>(); }
             catch (IndexOutOfRangeException) 
             {
                 enabled = false;
@@ -85,22 +85,22 @@ namespace Overrailed.Mob
             {
                 var inputDir = new Vector3(InputDir.x, 0, InputDir.y);
 
-                transform.forward = Vector3.RotateTowards(transform.forward, lastInputDir, turnSpeed * Time.fixedDeltaTime, 0);
+                transform.forward = Vector3.RotateTowards(transform.forward, LastInputDir, turnSpeed * Time.fixedDeltaTime, 0);
                 if (UpdateMovingStates(inputDir))
                 {
                     Vector3 deltaPos;
-                    if (inputDir == Vector3.zero) deltaPos = moveSpeed * lastInputDir * Time.fixedDeltaTime;
+                    if (inputDir == Vector3.zero) deltaPos = moveSpeed * LastInputDir * Time.fixedDeltaTime;
                     else
                     {
                         deltaPos = moveSpeed * inputDir * Time.fixedDeltaTime;
-                        lastInputDir = inputDir;
+                        LastInputDir = inputDir;
                     }
 
                     if (HoldingDashKey) lastDashTime = Time.time;
                     if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
 
                     // Moves character
-                    if (map.PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
+                    if (Map.PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
 
                     OnMove?.Invoke();
                 }
@@ -146,18 +146,17 @@ namespace Overrailed.Mob
         #endregion
 
         #region Interact
-        protected void MainInteract() => TryInteract(TryToPickUpAll, TryDropAll);
-        protected void AltInteract() => TryInteract(TryToPickUpSingle, TryDropSingle);
+        protected void InteractAll() => TryInteract(TryToPickUpAll, TryDropAll);
+        protected void InteractSingle() => TryInteract(TryToPickUpSingle, TryDropSingle);
         private void TryInteract(Func<IPickupable, bool> pickup, Func<bool> drop)
         {
             if (Time.time < lastInteractTime + interactInterval) return;
             lastInteractTime = Time.time;
 
-            var collisions = Physics.OverlapBox(transform.position + Vector3.up + lastInputDir, 0.1f * Vector3.one, Quaternion.identity, map.InteractMask);
-            if (collisions.Length > 0)
+            if (Physics.Raycast(transform.position + Vector3.up, LastInputDir, out RaycastHit hitInfo, 1, Map.InteractMask))
             {
-                if (IsHoldingItem) TryUseHeldItemOn(collisions[0].transform.GetComponent<IInteractable>());
-                else _ = pickup(collisions[0].transform.GetComponent<IPickupable>());
+                if (IsHoldingItem) TryUseHeldItemOn(hitInfo.transform.GetComponent<IInteractable>());
+                else _ = pickup(hitInfo.transform.GetComponent<IPickupable>());
             }
             else _ = drop();
         }
@@ -173,37 +172,37 @@ namespace Overrailed.Mob
             if (pickup == null) return false;
 
             bool bothHands = pickup.IsTwoHanded;
-            heldItem = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, amount);
+            HeldItem = pickup.TryPickUp(bothHands ? pickupHolder : toolHolder, amount);
             if (IsHoldingItem) RaiseArms(bothHands);
 
             return IsHoldingItem;
         }
 
         /// <summary>
-        /// Uses <see cref="heldItem"/> on the given Tile if not swinging
+        /// Uses <see cref="HeldItem"/> on the given Tile if not swinging
         /// </summary>
         private void TryUseHeldItemOn(IInteractable interactable)
         {
             if (!IsHoldingItem || toolSwinging != null || interactable == null) return;
 
-            var interaction = interactable.TryInteractUsing(heldItem);
+            var interaction = interactable.TryInteractUsing(HeldItem);
             if (interaction == Interaction.None)
             {
                 if (!TrySwapHeldWith(interactable)) _ = TryReplaceWithHeld(interactable as Tile);
             }
             else if (interaction == Interaction.Used)
             {
-                LowerArms(heldItem.IsTwoHanded);
-                heldItem = null;
+                LowerArms(HeldItem.IsTwoHanded);
+                HeldItem = null;
             }
             else if (interaction == Interaction.Interacted)
             {
-                if (heldItem is Tool) toolSwinging = StartCoroutine(SwingTool());
+                if (HeldItem is Tool) toolSwinging = StartCoroutine(SwingTool());
             }
         }
 
         /// <summary>
-        /// Swaps the <see cref="heldItem"/> and the <paramref name="interactable"/>'s positions
+        /// Swaps the <see cref="HeldItem"/> and the <paramref name="interactable"/>'s positions
         /// </summary>
         /// <returns>True if they swapped successfully</returns>
         private bool TrySwapHeldWith(IInteractable interactable)
@@ -216,8 +215,8 @@ namespace Overrailed.Mob
             if (!(interactTile is StackTile stackTile) || stackTile.GetStackCount() <= Strength)
             {
                 _ = interactTile.TryPickUp(interactTile.IsTwoHanded ? pickupHolder : toolHolder, Strength);
-                map.PlacePickup(heldItem, stackPos);
-                heldItem = interactTile;
+                Map.PlacePickup(HeldItem, stackPos);
+                HeldItem = interactTile;
                 return true;
             }
 
@@ -225,7 +224,7 @@ namespace Overrailed.Mob
         }
 
         /// <summary>
-        /// Moves <paramref name="toReplace"/> to the nearest viable position then puts <see cref="heldItem"/> where <paramref name="toReplace"/> was
+        /// Moves <paramref name="toReplace"/> to the nearest viable position then puts <see cref="HeldItem"/> where <paramref name="toReplace"/> was
         /// </summary>
         /// <returns>True if the objects were moved successfully</returns>
         private bool TryReplaceWithHeld(IPickupable toReplace)
@@ -233,39 +232,39 @@ namespace Overrailed.Mob
             if (!IsHoldingItem || !toReplace.CanPickUp) return false;
 
             var replacePos = Vector3Int.RoundToInt((toReplace as MonoBehaviour).transform.position);
-            _ = map.MovePickup(toReplace);
-            map.ForcePlacePickup(heldItem, replacePos);
+            _ = Map.MovePickup(toReplace);
+            Map.ForcePlacePickup(HeldItem, replacePos);
 
-            LowerArms(heldItem.IsTwoHanded);
-            heldItem = null;
+            LowerArms(HeldItem.IsTwoHanded);
+            HeldItem = null;
 
             return true;
         }
 
         /// <summary>
-        /// Places <see cref="heldItem"/> on the ground if it's not null
+        /// Places <see cref="HeldItem"/> on the ground if it's not null
         /// </summary>
-        /// <returns>True if <see cref="heldItem"/> was placed</returns>
+        /// <returns>True if <see cref="HeldItem"/> was placed</returns>
         private bool TryDropAll() => TryDrop(false);
         /// <summary>
-        /// Places <see cref="heldItem"/> on the ground, or a single tile if it's a stack, if <see cref="heldItem"/> isn't null
+        /// Places <see cref="HeldItem"/> on the ground, or a single tile if it's a stack, if <see cref="HeldItem"/> isn't null
         /// </summary>
-        /// <returns>True if <see cref="heldItem"/>'s entire stack was placed</returns>
+        /// <returns>True if <see cref="HeldItem"/>'s entire stack was placed</returns>
         private bool TryDropSingle() => TryDrop(true);
         private bool TryDrop(bool single)
         {
             Vector3Int coords = LookPoint;
-            if (!IsHoldingItem || toolSwinging != null || !map.PointIsInPlayBounds(coords) || !heldItem.OnTryDrop()) return false;
+            if (!IsHoldingItem || toolSwinging != null || !Map.PointIsInPlayBounds(coords) || !HeldItem.OnTryDrop()) return false;
 
-            if (single && heldItem is StackTile stack && stack.GetStackCount() > 1)
+            if (single && HeldItem is StackTile stack && stack.GetStackCount() > 1)
             {
-                map.PlacePickup(stack.TryPickUp(null, 1), coords);
+                Map.PlacePickup(stack.TryPickUp(null, 1), coords);
             }
             else
             {
-                map.PlacePickup(heldItem, coords);
-                LowerArms(heldItem.IsTwoHanded);
-                heldItem = null;
+                Map.PlacePickup(HeldItem, coords);
+                LowerArms(HeldItem.IsTwoHanded);
+                HeldItem = null;
 
                 return true;
             }
@@ -277,9 +276,9 @@ namespace Overrailed.Mob
         {
             if (!IsHoldingItem) return;
 
-            map.PlacePickup(heldItem, Vector3Int.RoundToInt(transform.position + Vector3.up));
-            LowerArms(heldItem.IsTwoHanded);
-            heldItem = null;
+            Map.PlacePickup(HeldItem, Vector3Int.RoundToInt(transform.position + Vector3.up));
+            LowerArms(HeldItem.IsTwoHanded);
+            HeldItem = null;
         }
         #endregion
 

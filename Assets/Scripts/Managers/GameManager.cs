@@ -17,14 +17,12 @@ namespace Overrailed.Managers
         public event System.Action<GameState> OnStateChange;
         public event System.Action OnCheckpoint, OnEndCheckpoint, OnGameEnd;
 
-        [SerializeField] private string titleSceneName = "TitleScreenScene"/*, tutorialSceneName = "TutorialScene", gameSceneName = "GameScene"*/;
+        [SerializeField] private string titleSceneName = "TitleScreenScene";
         [Space]
         [SerializeField] [Min(0)] private float baseTrainSpeed = 0.05f, trainSpeedIncrement = 0.05f, speedUpMultiplier = 2;
         [SerializeField] [Min(5)] private float trainInitialDelay = 10;
-        [Header("UI Buttons")]
-        [SerializeField] private TriggerButton continueGameButton;
         [Space]
-        public GameObject[] numbersPrefabs;
+        [SerializeField] private GameObject[] numbersPrefabs;
         [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
         [SerializeField] private AudioClip numberSpawnSound;
 
@@ -62,8 +60,6 @@ namespace Overrailed.Managers
             instance = this;
 
             CurrentState = GameState.Play;
-            continueGameButton.OnClick += ContinueFromCheckpoint;
-            continueGameButton.GetComponent<BoxCollider>().enabled = false;
         }
 
         void Start()
@@ -125,21 +121,12 @@ namespace Overrailed.Managers
             CurrentState = GameState.Edit;
             checkpointCount++;
 
-            // Edit mode UI
-            Vector3 pos = continueGameButton.transform.position;
-            continueGameButton.GetComponent<BoxCollider>().enabled = true;
-            continueGameButton.transform.position = new Vector3(pos.x, pos.y, locomotives[0].transform.position.z - 1);
-
             OnCheckpoint?.Invoke();
         }
 
         public void ContinueFromCheckpoint()
         {
-            // Managers
             CurrentState = GameState.Play;
-
-            // Edit mode UI
-            continueGameButton.GetComponent<BoxCollider>().enabled = false;
 
             OnEndCheckpoint?.Invoke();
         }
@@ -182,8 +169,6 @@ namespace Overrailed.Managers
         private void OnDestroy()
         {
             instance = null;
-
-            if (continueGameButton) continueGameButton.OnClick -= ContinueFromCheckpoint;
         }
     }
 }

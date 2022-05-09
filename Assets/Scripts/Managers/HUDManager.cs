@@ -7,6 +7,7 @@ using Overrailed.Terrain.Generation;
 using Overrailed.Terrain.Tools;
 using Overrailed.Player;
 using Overrailed.Train;
+using Overrailed.UI;
 
 namespace Overrailed.Managers
 {
@@ -20,7 +21,7 @@ namespace Overrailed.Managers
         [Header("Texts")]
         [SerializeField] private Text seedText;
         [SerializeField] private Text speedText, coinsText;
-        [Header("Tools")]
+        [Header("Tool HUDs")]
         [SerializeField] private GameObject toolHUDPrefab;
         [SerializeField] private ToolType[] toolTypes;
         [SerializeField] private Vector2 opacityDistance = new Vector2(2, 4);
@@ -31,6 +32,8 @@ namespace Overrailed.Managers
         [SerializeField] [Min(1)] private float warningBlinkSpeed = 2;
         [Header("Train Warnings")]
         [SerializeField] private GameObject warningHUDPrefab;
+        [Header("UI Buttons")]
+        [SerializeField] private TriggerButton continueGameButton;
         #endregion
 
         private List<ToolHUD> toolHUDs = new List<ToolHUD>();
@@ -49,6 +52,13 @@ namespace Overrailed.Managers
                 coinsStartLength = coinsText.text.Length;
                 speedStartLength = speedText.text.Length;
                 seedStartLength = seedText.text.Length;
+
+                continueGameButton.OnClick += GameManager.instance.ContinueFromCheckpoint;
+                continueGameButton.GetComponent<BoxCollider>().enabled = false;
+
+                GameManager.instance.OnCheckpoint += AlignContinueWithLocomotiveZ;
+                GameManager.instance.OnCheckpoint += EnableContinueButton;
+                GameManager.instance.OnEndCheckpoint += DisableContinueButton;
             }
 
             foreach (var car in FindObjectsOfType<TrainCar>()) car.OnWarning += MakeWarningHUD;
@@ -173,6 +183,7 @@ namespace Overrailed.Managers
         private IEnumerator ManageWarningHUD(TrainCar car)
         {
             var warningHUD = Instantiate(warningHUDPrefab, warningHUDParent).GetComponent<RectTransform>();
+            warningHUD.SetAsFirstSibling();
             var image = warningHUD.GetComponentInChildren<Image>();
 
             while (car.IsWarning)
@@ -185,6 +196,21 @@ namespace Overrailed.Managers
 
             Destroy(warningHUD.gameObject);
         }
+        #endregion
+
+        #region UI Buttons
+        private void AlignContinueWithLocomotiveZ()
+        {
+            Vector3 pos = continueGameButton.transform.position;
+            continueGameButton.transform.position = new Vector3(pos.x, pos.y, GameManager.Locomotives[0].transform.position.z - 1);
+        }
+
+        private void SetButtonActive(TriggerButton button, bool enabled)
+        {
+            button.gameObject.SetActive(enabled);
+        }
+        private void EnableContinueButton() => SetButtonActive(continueGameButton, true);
+        private void DisableContinueButton() => SetButtonActive(continueGameButton, false);
         #endregion
 
         private void MoveRectToWorldPosition(RectTransform rect, Vector3 position)
