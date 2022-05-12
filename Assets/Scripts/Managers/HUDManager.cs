@@ -53,7 +53,7 @@ namespace Overrailed.Managers
                 speedStartLength = speedText.text.Length;
                 seedStartLength = seedText.text.Length;
 
-                continueGameButton.OnClick += GameManager.instance.ContinueFromCheckpoint;
+                continueGameButton.OnPress += GameManager.instance.ContinueFromCheckpoint;
                 continueGameButton.GetComponent<BoxCollider>().enabled = false;
 
                 GameManager.instance.OnCheckpoint += AlignContinueWithLocomotiveZ;

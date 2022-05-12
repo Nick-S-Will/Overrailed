@@ -10,9 +10,10 @@ namespace Overrailed.UI
     [RequireComponent(typeof(SpriteRenderer))]
     public class TriggerButton : MonoBehaviour
     {
-        public event System.Action OnClick;
+        public event System.Action OnPress;
 
         [SerializeField] private Transform buttonFill, loadingBar;
+        [SerializeField] private RectTransform text;
         [SerializeField] private Vector2 buttonSize = Vector2.one;
         [SerializeField] private float loadTime = 2f;
 
@@ -20,6 +21,8 @@ namespace Overrailed.UI
 
         private IEnumerator LoadAction()
         {
+            if (barLoading != null) yield break;
+
             float percent = 0;
 
             while (percent < 1)
@@ -31,27 +34,24 @@ namespace Overrailed.UI
             }
 
             barLoading = null;
-            OnClick?.Invoke();
+            OnPress?.Invoke();
 
             loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.tag.Equals("Player") && !other.GetComponent<PlayerController>().IsHoldingItem) barLoading = StartCoroutine(LoadAction());
+            if (other.tag.Equals("Player") && !other.GetComponent<PlayerController>().IsHoldingItem ) barLoading = StartCoroutine(LoadAction());
         }
 
         private void OnTriggerExit(Collider other)
         {
             if (other.tag.Equals("Player"))
             {
-                if (barLoading != null)
-                {
-                    StopCoroutine(barLoading);
-                    barLoading = null;
+                StopCoroutine(barLoading);
+                barLoading = null;
 
-                    loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
-                }
+                loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
             }
         }
 
@@ -61,8 +61,10 @@ namespace Overrailed.UI
             {
                 GetComponent<BoxCollider>().size = new Vector3(buttonSize.x, buttonSize.y, 0.25f);
                 GetComponent<SpriteRenderer>().size = buttonSize;
+
                 buttonFill.localScale = buttonSize;
                 loadingBar.localPosition = new Vector3(-buttonSize.x / 2, loadingBar.localPosition.y);
+                text.sizeDelta = buttonSize;
             }
         }
     }
