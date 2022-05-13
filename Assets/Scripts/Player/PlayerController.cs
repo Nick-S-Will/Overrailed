@@ -8,6 +8,7 @@ using Overrailed.Mob;
 
 namespace Overrailed.Player
 {
+    [SelectionBase]
     public class PlayerController : HumanoidControls
     {
         private PlayerInput playerInput;
@@ -44,7 +45,7 @@ namespace Overrailed.Player
                 tutorial.OnShowInfo += DisableControls;
                 tutorial.OnCloseInfo += EnableControls;
             }
-            else Debug.LogError("No GameManager or TutorialManager Found");
+            else if (!MainMenuManager.Exists) Debug.LogError("No GameManager or TutorialManager Found");
 
             base.Start();
 

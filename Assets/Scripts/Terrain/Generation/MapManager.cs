@@ -9,6 +9,7 @@ using Overrailed.Terrain.Tiles;
 
 namespace Overrailed.Terrain.Generation
 {
+    [SelectionBase]
     public class MapManager : MonoBehaviour
     {
         public event System.Action<string> OnSeedChange;
@@ -26,6 +27,7 @@ namespace Overrailed.Terrain.Generation
         [Header("Biomes")]
         [SerializeField] private Biome currentBiome;
         [SerializeField] private Color highlightColor = Color.white;
+        [SerializeField] private bool highlightEnabled = true;
 
         [Header("Stations")]
         [SerializeField] private GameObject stationPrefab;
@@ -79,16 +81,10 @@ namespace Overrailed.Terrain.Generation
                 GameManager.instance.OnGameEnd += ShowAllChunks;
             }
 
-            if (transform.childCount == 0)  GenerateMap();
+            if (transform.childCount == 0) GenerateMap();
             AnimateNewChunk();
-        }
 
-        void LateUpdate()
-        {
-            RemoveOldHighlights();
-            AddHighlights();
-
-            newHighlights.Clear();
+            if (highlightEnabled) _ = StartCoroutine(TileHighlighting());
         }
 
         #region Generation
@@ -358,6 +354,19 @@ namespace Overrailed.Terrain.Generation
                 else renderers[i].material.color = originalColors[i];
             }
         }
+
+        private IEnumerator TileHighlighting()
+        {
+            while (this)
+            {
+                RemoveOldHighlights();
+                AddHighlights();
+
+                newHighlights.Clear();
+
+                yield return new WaitForEndOfFrame();
+            }
+        }
         #endregion
 
         #region Getting Map Points/Tiles
@@ -388,8 +397,8 @@ namespace Overrailed.Terrain.Generation
                 var row = GetParentAt(point);
 
                 try { return row.GetChild(point.z); }
-                catch (UnityException) 
-                { 
+                catch (UnityException)
+                {
                     Debug.LogError("Invalid point on map " + point);
                     return null;
                 }
