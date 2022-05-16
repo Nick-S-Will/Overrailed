@@ -9,7 +9,7 @@ namespace Overrailed.Managers
     {
         public event System.Action OnVolumeChange;
 
-        [SerializeField] [Range(0, 1)] private float masterVolume = 1, soundVolume = 1, musicVolume = 1;
+        [SerializeField] [Range(0, 1)] private float masterVolume = 0.5f, soundVolume = 0.5f, musicVolume = 0.5f;
         [Space]
         [SerializeField] private AudioClip startingMusic;
         [SerializeField] private AudioGroup[] audioGroups;

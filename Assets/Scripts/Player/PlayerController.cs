@@ -9,7 +9,7 @@ using Overrailed.Mob;
 namespace Overrailed.Player
 {
     [SelectionBase]
-    public class PlayerController : HumanoidControls
+    public class PlayerController : HumanoidController
     {
         private PlayerInput playerInput;
 
@@ -45,28 +45,27 @@ namespace Overrailed.Player
                 tutorial.OnShowInfo += DisableControls;
                 tutorial.OnCloseInfo += EnableControls;
             }
-            else if (!MainMenuManager.Exists) Debug.LogError("No GameManager or TutorialManager Found");
+            else if (!MainMenuManager.Exists) Debug.LogError("No Manager Found");
 
             base.Start();
 
             DisableControls();
-            if (Map) Map.OnFinishAnimateChunk += EnableControls;
+            if (Map)
+            {
+                Map.OnFinishAnimateChunk += EnableControls;
+                if (Map.HighlightEnabled) _ = StartCoroutine(TileHighlighting());
+            }
         }
 
-        void Update()
+        private IEnumerator TileHighlighting()
         {
             // Tile highlighting
             _ = Physics.Raycast(transform.position + Vector3.up, LastInputDir, out RaycastHit hitInfo, 1, Map.InteractMask);
             var tile = hitInfo.transform;
             if (tile == null) tile = Map.GetTileAt(LookPoint + Vector3Int.down);
             Map.TryHighlightTile(tile);
-        }
 
-        public void EnableControls() => enabled = true;
-        public void DisableControls()
-        {
-            enabled = false;
-            StopMovement();
+            yield return null;
         }
 
         public static float MinDistanceToPlayer(Vector3 point)
@@ -82,8 +81,25 @@ namespace Overrailed.Player
             return minDst;
         }
 
-        private void OnEnable() { if (playerInput != null) playerInput.Enable(); }
-        private void OnDisable() { if (playerInput != null) playerInput.Disable(); }
+        public void EnableControls() => enabled = true;
+        public void DisableControls() => enabled = false;
+        
+        private void OnEnable()
+        {
+            if (playerInput != null)
+            {
+                playerInput.Enable();
+                _ = StartCoroutine(HandleMovement());
+            }
+        }
+        private void OnDisable()
+        {
+            if (playerInput != null)
+            {
+                playerInput.Disable();
+                StopMovement();
+            }
+        }
 
         private void OnDestroy()
         {

@@ -40,8 +40,8 @@ namespace Overrailed.Terrain.Generation
 
         [Header("Animation")]
         [SerializeField] private Vector3 spawnOffset = 10 * Vector3.down;
+        [SerializeField] [Min(0)] private float rowSpawnInterval = 0.2f, bounceHeight = 1;
         [SerializeField] [Min(1)] private float slideSpeed = 100;
-        [SerializeField] [Min(0)] private float rowSpawnInterval = 0.2f;
         #endregion
 
         [SerializeField] [HideInInspector] private List<Transform> chunks = new List<Transform>();
@@ -51,6 +51,7 @@ namespace Overrailed.Terrain.Generation
 
         private List<Transform> newHighlights = new List<Transform>(), highlights = new List<Transform>();
         private Vector3Int IntPos => Vector3Int.RoundToInt(transform.position);
+        public bool HighlightEnabled => highlightEnabled;
 
         public LayerMask InteractMask => interactMask;
         public int Seed
@@ -208,7 +209,7 @@ namespace Overrailed.Terrain.Generation
                     // Spawn tile
                     var tileObj = Instantiate(tilePrefab, newPos, Quaternion.identity, rowParent);
                     tileObj.name = string.Format("{0} {1}", tileObj.name.Substring(0, tileObj.name.Length - 7), z);
-                    if (tileObj.RotateOnSpawn) tileObj.MeshParent.localRotation = Quaternion.Euler(0, Random.Range(-15, 15), 0);
+                    if (tileObj.RotateOnSpawn) tileObj.MeshParent.localRotation = Quaternion.Euler(0, Random.Range(-45, 45), 0);
 
                     if (bridge)
                     {
@@ -586,7 +587,7 @@ namespace Overrailed.Terrain.Generation
             {
                 groundRow.gameObject.SetActive(true);
 
-                _ = AnimateSpawnSlide(groundRow, Vector3.zero);
+                _ = AnimateSlideAndBounce(groundRow, Vector3.zero);
                 await Task.Delay(Mathf.RoundToInt(1000 * rowSpawnInterval));
             }
 
@@ -596,10 +597,10 @@ namespace Overrailed.Terrain.Generation
                 var obstacleRow = obstacles.GetChild(i);
                 foreach (var tile in obstacleRow.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
 
-                _ = AnimateSpawnSlide(obstacleRow, Vector3.zero);
+                _ = AnimateSlideAndBounce(obstacleRow, Vector3.zero);
 
                 if (obstacleRow.childCount == 0) continue;
-                await Task.Delay(Mathf.RoundToInt(1000 * rowSpawnInterval));
+                await Task.Delay(Mathf.RoundToInt(500 * rowSpawnInterval));
             }
 
             // Turning on and sliding station and checkpoint into place
@@ -608,13 +609,13 @@ namespace Overrailed.Terrain.Generation
                 transform.gameObject.SetActive(true);
                 foreach (var tile in transform.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
             }
-            await AnimateSpawnSlide(extras[0], extraStartPos[0]);
-            if (extras.Count > 1) await AnimateSpawnSlide(extras[1], extraStartPos[1]);
+            await AnimateSlide(extras[0], extraStartPos[0]);
+            if (extras.Count > 1) await AnimateSlide(extras[1], extraStartPos[1]);
 
             OnFinishAnimateChunk?.Invoke();
         }
 
-        private async Task AnimateSpawnSlide(Transform t, Vector3 destination)
+        private async Task AnimateSlide(Transform t, Vector3 destination)
         {
             while (t.localPosition != destination)
             {
@@ -622,6 +623,21 @@ namespace Overrailed.Terrain.Generation
 
                 await Task.Yield();
             }
+        }
+
+        private async Task AnimateSlideAndBounce(Transform t, Vector3 destination)
+        {
+            await AnimateSlide(t, destination);
+
+            var startTime = Time.time;
+            while (Time.time - startTime <= 1)
+            {
+                t.localPosition = destination + bounceHeight * new Vector3(0, Mathf.Sin(2 * Mathf.PI * (Time.time - startTime)), 0);
+
+                await Task.Yield();
+            }
+
+            t.localPosition = destination;
         }
         #endregion
 

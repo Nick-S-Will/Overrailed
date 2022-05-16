@@ -15,6 +15,7 @@ namespace Overrailed.Editors
 
             if (GUILayout.Button("Generate Map")) ((MapManager)target).GenerateMap();
             if (GUILayout.Button("Add Chunk")) ((MapManager)target).AddChunk();
+            if (GUILayout.Button("Animate Spawn")) ((MapManager)target).AnimateNewChunk();
         }
     }
 }

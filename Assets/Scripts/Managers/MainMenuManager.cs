@@ -1,7 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using TMPro;
 
 using Overrailed.Terrain.Generation;
 using Overrailed.Player;
@@ -11,6 +12,7 @@ namespace Overrailed.Managers
 {
     public class MainMenuManager : MonoBehaviour
     {
+        #region Inspector Variables
         [SerializeField] private string gameSceneName = "GameScene", tutorialSceneName = "TutorialScene";
         [Space]
         [SerializeField] private PlayerController player;
@@ -27,21 +29,35 @@ namespace Overrailed.Managers
         [SerializeField] private Transform mainCamTransform;
         [Header("Options Menu Settings")]
         [SerializeField] private Transform optionsTitle;
-        [Space]
         [SerializeField] private TriggerButton skinsButton;
-        [SerializeField] private TriggerButton volumeButton, seedButton, returnButton;
+        [Space]
+        [SerializeField] private TriggerButton volumeButton;
+        [SerializeField] private Slider[] volumeSliders;
+        [SerializeField] private ClickButton volumeSaveButton;
+        [Space]
+        [SerializeField] private TriggerButton seedButton;
+        [SerializeField] private TextMeshPro seedText;
+        [SerializeField] private ClickButton seedSaveButton;
+        [Space]
+        [SerializeField] private TriggerButton returnButton;
         [SerializeField] private Vector3 optionsSlideOffset = 10 * Vector3.right;
         [Header("Skins Menu Settings")]
-        [SerializeField] private Button doneButton;
-        [SerializeField] private Transform skinCamTransform;
+        [SerializeField] private GameObject skinMenuCanvasParent;
+        [SerializeField] private Transform skinCamTransform, skinsParent;
+        [SerializeField] private Vector3 spaceBetweenSkins = 2 * Vector3.right;
+        [SerializeField] private float skinTurnSpeed = 5;
         [Header("Slide Settings")]
         [SerializeField] [Min(1)] private float slideSpeed = 100;
         [SerializeField] [Min(0)] private float elementSlideInterval = 0.2f;
         [Header("Cam Settings")]
         [SerializeField] private float camMoveSpeed = 10;
         [SerializeField] private float camAngularSpeed = 45;
+        #endregion
 
-        private Transform[] mainElements, optionsElements;
+        private Transform[] mainElements, optionsElements, volumeElements, seedElements;
+        private Coroutine rotateSkins;
+        private Vector3 playerLastPosition;
+        private int currentSkin = 0;
 
         public static bool Exists { get; private set; }
 
@@ -57,13 +73,22 @@ namespace Overrailed.Managers
             optionsButton.OnPress += SlideToOptions;
 
             skinsButton.OnPress += SwapToSkinsMenu;
+            volumeButton.OnPress += SlideInVolumeSliders;
+            seedButton.OnPress += SlideInSeedSliders;
             returnButton.OnPress += SlideFromOptions;
 
-            mainElements = new Transform[] { mainTitle, controls, optionsButton.transform, tutorialButton.transform, playButton.transform };
+            volumeSaveButton.OnClick += SlideOutVolumeSliders;
+            seedSaveButton.OnClick += SlideOutSeedSliders;
+
+            mainElements = new Transform[] { mainTitle, optionsButton.transform, tutorialButton.transform, playButton.transform, controls };
             optionsElements = new Transform[] { optionsTitle, returnButton.transform, seedButton.transform, volumeButton.transform, skinsButton.transform };
+            volumeElements = new Transform[] { volumeSliders[0].transform.parent, volumeSliders[1].transform.parent, volumeSliders[2].transform.parent, volumeSaveButton.transform };
+            seedElements = new Transform[] { seedText.transform, seedSaveButton.transform };
 
             foreach (var element in mainElements) element.position += mainSlideOffset;
             foreach (var element in optionsElements) element.position += optionsSlideOffset;
+            foreach (var element in volumeElements) element.position += optionsSlideOffset;
+            foreach (var element in seedElements) element.position += optionsSlideOffset;
 
             map.OnFinishAnimateChunk += StartSlideMainElements;
         }
@@ -117,6 +142,49 @@ namespace Overrailed.Managers
             yield return SlideElementsRoutine(optionsSlideOffset, optionsElements);
             yield return SlideElementsRoutine(optionsSlideOffset, mainElements);
         }
+
+        private IEnumerator UpdateVolumes()
+        {
+            var audioManager = FindObjectOfType<AudioManager>();
+
+            while (!player.enabled)
+            {
+                audioManager.MasterVolume = volumeSliders[0].ReadValue();
+                audioManager.SoundVolume = volumeSliders[1].ReadValue();
+                audioManager.MusicVolume = volumeSliders[2].ReadValue();
+
+                yield return null;
+            }
+        }
+        private void SlideInVolumeSliders()
+        {
+            player.DisableControls();
+            _ = StartCoroutine(SlideElementsRoutine(-optionsSlideOffset, volumeElements));
+            Slider.StartClickCheck(this, cam, Mouse.current);
+            ClickButton.StartClickCheck(this, cam, Mouse.current);
+
+            _ = StartCoroutine(UpdateVolumes());
+        }
+        private void SlideOutVolumeSliders()
+        {
+            ClickButton.StopClickCheck(this);
+            Slider.StopClickCheck(this);
+            _ = StartCoroutine(SlideElementsRoutine(optionsSlideOffset, volumeElements));
+            player.EnableControls();
+        }
+
+        private void SlideInSeedSliders()
+        {
+            player.DisableControls();
+            _ = StartCoroutine(SlideElementsRoutine(-optionsSlideOffset, seedElements));
+            ClickButton.StartClickCheck(this, cam, Mouse.current);
+        }
+        private void SlideOutSeedSliders()
+        {
+            ClickButton.StopClickCheck(this);
+            _ = StartCoroutine(SlideElementsRoutine(optionsSlideOffset, seedElements));
+            player.EnableControls();
+        }
         #endregion
 
         #region Skins Menu
@@ -128,18 +196,61 @@ namespace Overrailed.Managers
             _ = StartCoroutine(SlideElementsRoutine(-optionsSlideOffset, optionsElements));
             yield return StartCoroutine(MoveCamTo(skinCamTransform));
 
-            doneButton.gameObject.SetActive(true);
+            playerLastPosition = player.transform.position;
+            player.transform.parent = skinsParent.GetChild(currentSkin);
+            player.transform.localPosition = Vector3.zero;
+            player.transform.localRotation = Quaternion.identity;
+
+            skinsParent.gameObject.SetActive(true);
+            skinMenuCanvasParent.SetActive(true);
+            rotateSkins = StartCoroutine(RotateSkins());
         }
-        // Used by canvas button
-        public void SwapFromSkinsMenu() => _ = StartCoroutine(SwapFromSkinsMenuRoutine());
+        public void SwapFromSkinsMenu() => _ = StartCoroutine(SwapFromSkinsMenuRoutine()); // Used by canvas button
         private IEnumerator SwapFromSkinsMenuRoutine()
         {
-            doneButton.gameObject.SetActive(false);
+            StopCoroutine(rotateSkins);
+            skinMenuCanvasParent.SetActive(false);
+            skinsParent.gameObject.SetActive(false);
+
+            player = skinsParent.GetChild(currentSkin).GetComponentInChildren<PlayerController>();
 
             _ = StartCoroutine(SlideElementsRoutine(optionsSlideOffset, optionsElements));
             yield return MoveCamTo(mainCamTransform);
 
+            player.transform.parent = null;
+            player.transform.position = playerLastPosition;
+            player.transform.localRotation = Quaternion.identity;
+
             player.EnableControls();
+        }
+
+        private IEnumerator RotateSkins()
+        {
+            var yRotation = 0f;
+
+            while (this)
+            {
+                yRotation += skinTurnSpeed * Time.deltaTime;
+                var rotation = Quaternion.Euler(0, yRotation, 0);
+                foreach (Transform t in skinsParent) t.GetChild(0).localRotation = rotation;
+
+                yield return null;
+            }
+        }
+
+        public void ScrollSkinMenuLeft() // Used by canvas button
+        {
+            if (currentSkin == 0) return;
+
+            _ = StartCoroutine(SlideElement(spaceBetweenSkins, skinsParent));
+            currentSkin--;
+        }
+        public void ScrollSkinMenuRight() // Used by canvas button
+        {
+            if (currentSkin == skinsParent.childCount - 1) return;
+
+            _ = StartCoroutine(SlideElement(-spaceBetweenSkins, skinsParent));
+            currentSkin++;
         }
         #endregion
 

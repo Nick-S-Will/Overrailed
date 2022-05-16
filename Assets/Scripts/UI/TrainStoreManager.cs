@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Overrailed.Managers;
 using Overrailed.Train;
-using Overrailed.UI;
 
-namespace Overrailed.Managers
+namespace Overrailed.UI
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class TrainStoreManager : MonoBehaviour

@@ -13,6 +13,7 @@ namespace Overrailed.UI
     {
         public event System.Action OnPress;
 
+        [SerializeField] private System.Action Press;
         [SerializeField] private Transform buttonFill, loadingBar;
         [SerializeField] private RectTransform text;
         [SerializeField] private Vector2 buttonSize = Vector2.one;
