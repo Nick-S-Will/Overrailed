@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Overrailed.Managers
+namespace Overrailed.Managers.Audio
 {
     public class AudioManager : MonoBehaviour
     {
@@ -78,13 +78,13 @@ namespace Overrailed.Managers
             if (startingMusic) PlayMusic(startingMusic, true);
         }
 
-        private void AddSoundSource()
+        private static void AddSoundSource()
         {
-            var soundSource = new GameObject("Sound Source " + (soundSources.Count + 1));
-            soundSource.transform.parent = transform;
-            soundSource.transform.SetSiblingIndex(soundSources.Count);
+            var soundSource = new GameObject("Sound Source " + (instance.soundSources.Count + 1));
+            soundSource.transform.parent = instance.transform;
+            soundSource.transform.SetSiblingIndex(instance.soundSources.Count);
 
-            soundSources.Add(soundSource.AddComponent<AudioSource>());
+            instance.soundSources.Add(soundSource.AddComponent<AudioSource>());
         }
 
         private void UpdateAudioSourceVolumes()
@@ -93,16 +93,18 @@ namespace Overrailed.Managers
             foreach (var source in musicSources) source.volume = masterVolume * musicVolume;
         }
 
-        public async void PlaySound(AudioClip clip, Vector3 position)
+        public static async void PlaySound(AudioClip clip, Vector3 position)
         {
+            if (instance == null) return;
+
             if (clip)
             {
                 AudioSource source = null;
-                foreach (var s in soundSources) if (s.clip == null) source = s;
+                foreach (var s in instance.soundSources) if (s.clip == null) source = s;
                 if (source == null)
                 {
                     AddSoundSource();
-                    source = soundSources[soundSources.Count - 1];
+                    source = instance.soundSources[instance.soundSources.Count - 1];
                 }
 
                 source.transform.position = position;

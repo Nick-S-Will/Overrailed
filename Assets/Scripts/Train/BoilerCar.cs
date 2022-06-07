@@ -2,6 +2,7 @@
 using UnityEngine;
 
 using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 using Overrailed.Terrain.Tools;
 
 namespace Overrailed.Train
@@ -32,14 +33,14 @@ namespace Overrailed.Train
         {
             base.Start();
 
-            if (currentRail && GameManager.instance) liquidUse = StartCoroutine(UseLiquid());
+            if (currentRail && Manager.instance is GameManager) LeaderLocomotive.OnStartTrain += StartUsingLiquid;
         }
 
         public void SetLiquidToWarningLevel()
         {
             LiquidPercent = warningPercent;
             lowLiquidIsDisplayed = true;
-            MakeWarning();
+            StartWarning();
         }
 
         public void StopUsingLiquid()
@@ -48,7 +49,8 @@ namespace Overrailed.Train
             lowLiquidIsDisplayed = false;
         }
 
-        private IEnumerator UseLiquid()
+        public void StartUsingLiquid() => liquidUse = StartCoroutine(UseLiquidRoutine());
+        private IEnumerator UseLiquidRoutine()
         {
             while (liquid)
             {
@@ -61,18 +63,18 @@ namespace Overrailed.Train
 
                 if (LiquidPercent == 0)
                 {
-                    _ = StartCoroutine(Ignite());
+                    Ignite();
                     yield return new WaitWhile(() => LiquidPercent == 0);
                     liquid.gameObject.SetActive(true);
                 }
                 else if (LiquidPercent <= warningPercent && !lowLiquidIsDisplayed)
                 {
                     lowLiquidIsDisplayed = true;
-                    MakeWarning();
+                    StartWarning();
                 }
 
                 yield return new WaitForSeconds(1f);
-                yield return new WaitUntil(() => GameManager.IsPlaying() || GameManager.instance == null);
+                yield return new WaitUntil(() => Manager.IsPlaying());
             }
         }
 
@@ -87,7 +89,7 @@ namespace Overrailed.Train
                 {
                     bucket.IsFull = false;
 
-                    AudioManager.instance.PlaySound(refillSound, transform.position);
+                    AudioManager.PlaySound(refillSound, transform.position);
                 }
 
                 InvokeOnInteract();

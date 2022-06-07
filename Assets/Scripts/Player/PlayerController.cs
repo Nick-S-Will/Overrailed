@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 using Overrailed.Mob;
 
 namespace Overrailed.Player
@@ -20,52 +22,48 @@ namespace Overrailed.Player
             playerInput = new PlayerInput();
 
             playerInput.Movement.Walk.performed += ctx => InputDir = ctx.ReadValue<Vector2>();
-            playerInput.Movement.Walk.canceled += ctx => InputDir = Vector2.zero;
-            playerInput.Movement.Dash.started += ctx => AudioManager.instance.PlaySound(dashSound, transform.position);
-            playerInput.Movement.Dash.started += ctx => HoldingDashKey = true;
-            playerInput.Movement.Dash.canceled += ctx => HoldingDashKey = false;
+            playerInput.Movement.Walk.canceled += _ => InputDir = Vector2.zero;
+            playerInput.Movement.Dash.started += _ => AudioManager.PlaySound(dashSound, transform.position);
+            playerInput.Movement.Dash.started += _ => HoldingDashKey = true;
+            playerInput.Movement.Dash.canceled += _ => HoldingDashKey = false;
 
-            playerInput.Interaction.InteractMain.performed += ctx => InteractAll();
-            playerInput.Interaction.InteractAlt.performed += ctx => InteractSingle();
+            playerInput.Interaction.InteractMain.performed += _ => InteractAll();
+            playerInput.Interaction.InteractAlt.performed += _ => InteractSingle();
 
             players.Add(this);
         }
 
         protected override void Start()
         {
-            if (GameManager.instance)
+            if (Manager.instance is GameManager gm)
             {
-                GameManager.instance.OnCheckpoint += ForceDrop;
-                GameManager.instance.OnGameEnd += playerInput.Disable;
-                GameManager.instance.OnGameEnd += ForceDrop;
+                gm.OnCheckpoint += ForceDrop;
+                gm.OnGameEnd += DisableControls;
+                gm.OnGameEnd += ForceDrop;
             }
-            else if (TutorialManager.Exists)
+            else if (Manager.instance is TutorialManager tm)
             {
-                var tutorial = FindObjectOfType<TutorialManager>();
-                tutorial.OnShowInfo += DisableControls;
-                tutorial.OnCloseInfo += EnableControls;
+                tm.OnShowInfo += DisableControls;
+                tm.OnCloseInfo += EnableControls;
             }
-            else if (!MainMenuManager.Exists) Debug.LogError("No Manager Found");
+            else if (!Manager.Exists) Debug.LogError("No Manager Found");
 
             base.Start();
 
-            DisableControls();
-            if (Map)
-            {
-                Map.OnFinishAnimateChunk += EnableControls;
-                if (Map.HighlightEnabled) _ = StartCoroutine(TileHighlighting());
-            }
+            if (Map.HighlightEnabled) TileHighlighting();
         }
 
-        private IEnumerator TileHighlighting()
+        private async void TileHighlighting()
         {
-            // Tile highlighting
-            _ = Physics.Raycast(transform.position + Vector3.up, LastInputDir, out RaycastHit hitInfo, 1, Map.InteractMask);
-            var tile = hitInfo.transform;
-            if (tile == null) tile = Map.GetTileAt(LookPoint + Vector3Int.down);
-            Map.TryHighlightTile(tile);
+            while (this && Map)
+            {
+                _ = Physics.Raycast(transform.position + Vector3.up, LastInputDir, out RaycastHit hitInfo, 1, Map.InteractMask);
+                var tile = hitInfo.transform;
+                if (tile == null) tile = Map.GetTileAt(LookPoint + Vector3Int.down);
+                Map.TryHighlightTile(tile);
 
-            yield return null;
+                await Task.Yield();
+            }
         }
 
         public static float MinDistanceToPlayer(Vector3 point)
@@ -81,35 +79,53 @@ namespace Overrailed.Player
             return minDst;
         }
 
-        public void EnableControls() => enabled = true;
-        public void DisableControls() => enabled = false;
-        
-        private void OnEnable()
+        public static void SetAllControls(bool enabled)
+        {
+            if (enabled) foreach (var player in players) player.EnableControls();
+            else foreach (var player in players) player.DisableControls();
+        }
+
+        private void SetControls(Action setEnable, Action moveHandling)
         {
             if (playerInput != null)
             {
-                playerInput.Enable();
-                _ = StartCoroutine(HandleMovement());
+                setEnable();
+                moveHandling();
             }
         }
-        private void OnDisable()
+
+        public void EnableControls()
         {
-            if (playerInput != null)
+            if (enabled)
             {
-                playerInput.Disable();
-                StopMovement();
+                if (movementHandling == null) SetControls(() => playerInput.Enable(), () => movementHandling = StartCoroutine(HandleMovement()));
             }
+            else enabled = true;
         }
+        public void DisableControls()
+        {
+            if (enabled) enabled = false;
+            else if (movementHandling != null) SetControls(() => playerInput.Disable(), () => StopMovement());
+        }
+
+        private void OnEnable() => EnableControls();
+        private void OnDisable() => DisableControls();
 
         private void OnDestroy()
         {
-            if (GameManager.instance)
+            if (Manager.instance is GameManager gm)
             {
-                GameManager.instance.OnCheckpoint -= ForceDrop;
-                GameManager.instance.OnGameEnd -= playerInput.Disable;
-                GameManager.instance.OnGameEnd -= ForceDrop;
+                gm.OnCheckpoint -= ForceDrop;
+                gm.OnGameEnd -= playerInput.Disable;
+                gm.OnGameEnd -= ForceDrop;
+            }
+            else if (Manager.instance is TutorialManager tm)
+            {
+                tm.OnShowInfo -= DisableControls;
+                tm.OnCloseInfo -= EnableControls;
             }
 
+            if (playerInput != null) playerInput.Disable();
             players.Remove(this);
         }
     }

@@ -20,17 +20,17 @@ MonoBehaviour:
       obstacleTile: {fileID: 0}
       groundColor: {r: 0.35094336, g: 0.8773585, b: 0.35617244, a: 1}
       obstacleColor: {r: 1, g: 1, b: 1, a: 1}
-      percent: 0.26002505
+      percent: 0.3478261
     - groundTile: {fileID: -7425801750402064875, guid: 75d9ba06777051847b35c0ebf768ce27, type: 3}
       obstacleTile: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
       groundColor: {r: 0.35094336, g: 0.8773585, b: 0.35617244, a: 1}
       obstacleColor: {r: 0.4811321, g: 0.37895122, b: 0.20606974, a: 1}
-      percent: 0.4135338
+      percent: 0.5072464
     - groundTile: {fileID: -7425801750402064875, guid: 75d9ba06777051847b35c0ebf768ce27, type: 3}
       obstacleTile: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
       groundColor: {r: 0.35094336, g: 0.8773585, b: 0.35617244, a: 1}
       obstacleColor: {r: 0.4811321, g: 0.37895122, b: 0.20606974, a: 1}
-      percent: 0.70175433
+      percent: 0.81884056
     - groundTile: {fileID: -7425801750402064875, guid: 75d9ba06777051847b35c0ebf768ce27, type: 3}
       obstacleTile: {fileID: 6852729824771472296, guid: 80a3c00f0991a7b44a347be58a9edea9, type: 3}
       groundColor: {r: 0.35094336, g: 0.8773585, b: 0.35617244, a: 1}
@@ -41,17 +41,17 @@ MonoBehaviour:
       obstacleTile: {fileID: 0}
       groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
       obstacleColor: {r: 1, g: 1, b: 1, a: 1}
-      percent: 0.335213
+      percent: 0.4347826
     - groundTile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
       obstacleTile: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
       groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
       obstacleColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
-      percent: 0.46365914
+      percent: 0.5905797
     - groundTile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
       obstacleTile: {fileID: 5595235350578854948, guid: 7cd57254a1d987446ae012b3567db32d, type: 3}
       groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
       obstacleColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
-      percent: 0.6766917
+      percent: 0.76811594
     - groundTile: {fileID: 8098470855400629273, guid: e6c316f1f2fb5214887a84b4c26f697a, type: 3}
       obstacleTile: {fileID: 653283158049739767, guid: bbaf1adf628cfd74c9a1e7faab9c6b5c, type: 3}
       groundColor: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}

@@ -570,6 +570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 302751317951372012}
+  rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 0}
@@ -584,6 +585,9 @@ MonoBehaviour:
   isPermeable: 0
   smokeParticlePrefab: {fileID: 6533771927518338995, guid: efc91acb8022878479d4693d7a331c87, type: 3}
   smokePoint: {fileID: 136240898462007237}
+  baseSpeed: 0.05
+  speedIncrement: 0.03
+  speedUpMultiplier: 40
 --- !u!54 &1793097900723884497
 Rigidbody:
   m_ObjectHideFlags: 0

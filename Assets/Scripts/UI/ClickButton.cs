@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
 using UnityEngine;
 
 namespace Overrailed.UI
@@ -8,7 +9,7 @@ namespace Overrailed.UI
     [RequireComponent(typeof(SpriteRenderer))]
     public class ClickButton : MonoBehaviour
     {
-        public System.Action OnClick;
+        public UnityEvent OnClick;
 
         [SerializeField] private float clickInterval = 1f;
 

@@ -59,17 +59,14 @@ namespace Overrailed.Train
         }
         #endregion
 
-        private void ProductTaken()
-        {
-            if (CanCraft) _ = StartCoroutine(TryCraft());
-        }
-
+        private void ProductTaken() => _ = StartCoroutine(TryCraft());
+        
         protected IEnumerator TryCraft()
         {
             while (CanCraft)
             {
                 yield return StartCoroutine(Craft());
-                yield return new WaitUntil(() => GameManager.IsPlaying());
+                yield return new WaitUntil(() => Manager.IsPlaying());
             }
         }
 
@@ -86,7 +83,7 @@ namespace Overrailed.Train
 
             // Disable craft's hitboxes
             product.GetComponent<BoxCollider>().enabled = false;
-            GameManager.MoveToLayer(product.transform, LayerMask.NameToLayer("Train"));
+            Utils.MoveToLayer(product.transform, LayerMask.NameToLayer("Train"));
 
             // Parent product to stack if there is one, otherwise parent it to craft spawnpoint
             if (craftProductHolder.SpawnPoint.childCount == 0) ParentAToB(product.transform, craftProductHolder.SpawnPoint);
@@ -97,7 +94,7 @@ namespace Overrailed.Train
             foreach (var mesh in productMeshes) mesh.enabled = false;
 
             // Instantly completes recipe
-            if (GameManager.instance == null || GameManager.IsEditing())
+            if (Manager.IsEditing() || Manager.instance is TutorialManager)
             {
                 foreach (var mesh in productMeshes) mesh.enabled = true;
                 percent = 1;
@@ -123,6 +120,7 @@ namespace Overrailed.Train
                 if (onCount - (int)(oldPercent * productMeshes.Length) == 1) productMeshes[onCount - 1].enabled = true;
 
                 yield return null;
+                yield return new WaitUntil(() => Manager.IsPlaying());
             }
 
             // Destroy top object of craft point stacks
@@ -166,7 +164,7 @@ namespace Overrailed.Train
 
             // Add stack to point
             ParentAToB(stack.transform, craftPoint.Transform);
-            GameManager.MoveToLayer(stack.transform, LayerMask.NameToLayer("Train"));
+            Utils.MoveToLayer(stack.transform, LayerMask.NameToLayer("Train"));
 
             // Stack point's previous stack on given stack. Must be added beneath for when new tiles are added during craft, the top one is always the one being used
             if (craftPoint.Transform.childCount == 2) craftPoint.Transform.GetChild(0).GetComponent<StackTile>().TryStackOn(stack);

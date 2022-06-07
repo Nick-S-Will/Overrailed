@@ -12,12 +12,11 @@ using Overrailed.Terrain.Generation;
 
 namespace Overrailed.Managers
 {
-    public class TutorialManager : MonoBehaviour
+    public class TutorialManager : Manager
     {
         public event System.Action OnShowInfo, OnCloseInfo;
 
         #region Inspector Variables
-        [SerializeField] private string titleSceneName = "TitleScreenScene";
         [Header("Target Points")]
         [SerializeField] private BreakTool axe;
         [SerializeField] private BreakTool pick;
@@ -51,12 +50,7 @@ namespace Overrailed.Managers
         private string treeBreakCode = "Tree", stoneBreakCode = "Stone", woodStackType = "Wood", stoneStackType = "Stone";
         private int stepIndex;
 
-        public static bool Exists { get; private set; }
-
-        private void Awake()
-        {
-            Exists = true;
-        }
+        protected override void Awake() => base.Awake();
 
         void Start()
         {
@@ -69,23 +63,10 @@ namespace Overrailed.Managers
                 pointer.parent = transform;
                 pointer.localPosition = Vector3.zero;
             }
-            else Debug.LogError("Pointer HUD element is set to null");
+            else Debug.LogError("Pointer HUD element is null");
         }
 
-        public void CloseInfo() => infoPanel.SetActive(false);
-        private void CompleteStep(Tool unused) => NextStep();
-        private void CompleteStep(Tile unused) => NextStep();
-        private void NextStep()
-        {
-            stepIndex++;
-        }
-        private void RewindStep(Tool unused) => PreviousStep();
-        private void RewindStep(Tile unused) => PreviousStep();
-        private void PreviousStep()
-        {
-            stepIndex--;
-        }
-
+        #region Tutorial Routines
         private void StartTutorial() => _ = StartCoroutine(TutorialRoutine());
         private IEnumerator TutorialRoutine()
         {
@@ -152,22 +133,6 @@ namespace Overrailed.Managers
             }
 
             pointer.gameObject.SetActive(false);
-        }
-
-        private void ShowCurrentStepInfo(float delay = 0) => _ = StartCoroutine(ShowInfoRoutine(steps[stepIndex], delay));
-        private IEnumerator ShowInfoRoutine(StepInfo stepInfo, float delay = 0)
-        {
-            if (stepInfo.Info == string.Empty) yield break;
-
-            if (delay > 0) yield return new WaitForSeconds(delay);
-
-            infoPanel.SetActive(true);
-            infoTitle.text = stepInfo.Title;
-            info.text = stepInfo.Info;
-
-            OnShowInfo?.Invoke();
-            yield return new WaitWhile(() => infoPanel.activeSelf);
-            OnCloseInfo?.Invoke();
         }
 
         /// <summary>
@@ -288,20 +253,63 @@ namespace Overrailed.Managers
                 });
             }
         }
+        #endregion
+
+        #region Change Step
+        private void CompleteStep(Tool unused) => NextStep();
+        private void CompleteStep(Tile unused) => NextStep();
+        private void NextStep()
+        {
+            stepIndex++;
+        }
+        private void RewindStep(Tool unused) => PreviousStep();
+        private void RewindStep(Tile unused) => PreviousStep();
+        private void PreviousStep()
+        {
+            stepIndex--;
+        }
+        #endregion
+
+        #region Step Info HUD
+        private void ShowCurrentStepInfo(float delay = 0) => _ = StartCoroutine(ShowInfoRoutine(steps[stepIndex], delay));
+        private IEnumerator ShowInfoRoutine(StepInfo stepInfo, float delay = 0)
+        {
+            if (stepInfo.Info == string.Empty) yield break;
+
+            if (delay > 0) yield return new WaitForSeconds(delay);
+
+            infoPanel.SetActive(true);
+            infoTitle.text = stepInfo.Title;
+            info.text = stepInfo.Info;
+
+            Pausing.ForcePause();
+
+            OnShowInfo?.Invoke();
+            yield return new WaitWhile(() => infoPanel.activeSelf);
+            OnCloseInfo?.Invoke();
+        }
+
+        // Used by Canvas Button
+        public void CloseInfo()
+        {
+            infoPanel.SetActive(false);
+            Pausing.ForceResume();
+        }
+        #endregion
 
         /// <summary>
         /// Moves <see cref="pointer"/> up and down over <see cref="pointerTarget"/> and spins it every <see cref="spinCycleInterval"/> cycle
         /// </summary>
         private async void BobPointer()
         {
-            float startTime = Time.time;
+            float time = 0;
 
             pointer.gameObject.SetActive(true);
             while (pointer && Application.isPlaying && stepIndex < steps.Count - 1)
             {
-                Vector3 bobOffset = pointerBobHeight * Mathf.Sin(pointerBobSpeed * 2 * Time.time * Mathf.PI) * Vector3.up;
+                Vector3 bobOffset = pointerBobHeight * Mathf.Sin(pointerBobSpeed * 2 * time * Mathf.PI) * Vector3.up;
                 float cycleDuration = 1 / pointerBobSpeed;
-                float cycleProgress = (Time.time - startTime) / cycleDuration;
+                float cycleProgress = time / cycleDuration;
                 int cycleCount = Mathf.FloorToInt(cycleProgress);
                 bool nthCycle = cycleCount % spinCycleInterval == 0;
 
@@ -309,6 +317,8 @@ namespace Overrailed.Managers
                 pointer.localRotation = nthCycle ? Quaternion.Euler(0, Mathf.Lerp(0, 360, cycleProgress - cycleCount), 0) : Quaternion.identity;
 
                 await Task.Yield();
+                time += Time.deltaTime;
+                await Pause;
             }
 
             if (pointer && Application.isPlaying)
@@ -322,15 +332,14 @@ namespace Overrailed.Managers
         public void ReachCheckpoint() => _ = StartCoroutine(EndTutorial());
         private IEnumerator EndTutorial()
         {
+            CurrentState = GameState.Edit;
+
             stepIndex = steps.Count - 1;
             yield return ShowInfoRoutine(steps[stepIndex]);
             SceneManager.LoadScene(titleSceneName);
         }
 
-        private void OnDestroy()
-        {
-            Exists = false;
-        }
+        protected override void OnDestroy() => base.OnDestroy();
 
         [System.Serializable]
         private struct StepInfo

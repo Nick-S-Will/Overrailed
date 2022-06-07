@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 
 namespace Overrailed.Terrain.Tools
 {
@@ -24,7 +24,7 @@ namespace Overrailed.Terrain.Tools
 
         public void Refill()
         {
-            AudioManager.instance.PlaySound(InteractSound, transform.position);
+            AudioManager.PlaySound(InteractSound, transform.position);
             IsFull = true;
         }
     }

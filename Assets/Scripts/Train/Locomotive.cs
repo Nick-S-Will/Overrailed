@@ -14,10 +14,19 @@ namespace Overrailed.Train
         [Space]
         [SerializeField] private ParticleSystem smokeParticlePrefab;
         [SerializeField] private Transform smokePoint;
+        [Space]
+        [SerializeField] [Min(0)] private float baseSpeed = 0.05f;
+        [SerializeField] [Min(0)] private float speedIncrement = 0.03f, speedUpMultiplier = 40;
 
         protected ParticleSystem smokeParticles;
+        /// <summary>
+        /// For setting speed discreetly
+        /// </summary>
         private float trainSpeed;
 
+        /// <summary>
+        /// For setting speed and invoking <see cref="OnSpeedChange"/> event 
+        /// </summary>
         public float TrainSpeed
         {
             get { return trainSpeed; }
@@ -29,26 +38,34 @@ namespace Overrailed.Train
         }
         public int MaxCarCount => 4 + 2 * tier;
         public int CarCount { get; private set; } = 4;
-        public bool IsDriving => smokeParticles.emission.enabled;
+        public bool IsDriving => smokeParticles.emission.enabled && smokeParticles.isPlaying;
         public override bool IsWarning => false;
 
         protected override void Start()
         {
-            OnStartDriving += StartEmittingSmoke;
-            OnPauseDriving += StopEmittingSmoke;
+            OnStartTrain += StartEmittingSmoke;
             OnDeath += SpeedUp;
-            if (GameManager.instance) GameManager.instance.OnEndCheckpoint += SetToBaseSpeed;
+            if (Manager.instance is GameManager gm)
+            {
+                gm.OnEndCheckpoint += SetToBaseSpeed;
+                gm.OnCheckpoint += StopEmittingSmoke;
+                gm.OnEndCheckpoint += StartEmittingSmoke;
+            }
             
             base.Start();
 
             smokeParticles = Instantiate(smokeParticlePrefab, smokePoint);
-            if (GameManager.instance) SetToBaseSpeed();
+            if (Manager.instance is GameManager) SetToBaseSpeed();
             else TrainSpeed = 1;
             SetEmitSmoke(false);
+
+            Manager.OnPause += PauseSmokeParticles;
+            Manager.OnResume += ResumeSmokeParticles;
         }
 
         public void StartTrain() => OnStartTrain?.Invoke();
 
+        #region Smoke Particles
         protected void StartEmittingSmoke() => SetEmitSmoke(true);
         protected void StopEmittingSmoke() => SetEmitSmoke(false);
         private void SetEmitSmoke(bool emit)
@@ -57,21 +74,27 @@ namespace Overrailed.Train
             emissionSettings.enabled = emit;
         }
 
-        public override IEnumerator Ignite()
+        protected void PauseSmokeParticles() => smokeParticles.Pause();
+        protected void ResumeSmokeParticles() => smokeParticles.Play();
+        #endregion
+
+        public override async void Ignite()
         {
-            _ = StartCoroutine(base.Ignite());
-            yield return new WaitForSeconds(6);
+            base.Ignite();
+            await Manager.Delay(5);
 
             if (burningParticles) Die();
         }
 
-        /// <summary>
-        /// Gives train temporary speed buff until it reaches the next checkpoint
-        /// </summary>
-        public void SpeedUp() => trainSpeed = GameManager.GetBoostTrainSpeed();
+        private float GetSpeed()
+        {
+            float increase = speedIncrement * (Manager.instance is GameManager gm ? gm.CheckpointCount : 0);
+            return baseSpeed + increase;
+        }
+        public void SpeedUp() => trainSpeed = speedUpMultiplier * GetSpeed();
+        public void SetToBaseSpeed() => TrainSpeed = GetSpeed();
         
-        public void SetToBaseSpeed() => TrainSpeed = GameManager.GetBaseTrainSpeed();
-        
+        // TODO: Implement usage in edit mode
         public bool TryAddCar()
         {
             if (CarCount < MaxCarCount)
@@ -83,5 +106,18 @@ namespace Overrailed.Train
         }
 
         public void RemoveCar() => CarCount--;
+
+        private void OnDestroy()
+        {
+            if (Manager.instance is GameManager gm)
+            {
+                gm.OnEndCheckpoint -= SetToBaseSpeed;
+                gm.OnCheckpoint -= StopEmittingSmoke;
+                gm.OnEndCheckpoint -= StartEmittingSmoke;
+            }
+
+            Manager.OnPause -= PauseSmokeParticles;
+            Manager.OnResume -= ResumeSmokeParticles;
+        }
     }
 }

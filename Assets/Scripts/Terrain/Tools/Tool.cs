@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 using Overrailed.Terrain.Tiles;
 
 namespace Overrailed.Terrain.Tools
@@ -38,7 +38,7 @@ namespace Overrailed.Terrain.Tools
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
 
-            AudioManager.instance.PlaySound(PickupAudio, transform.position);
+            AudioManager.PlaySound(PickupAudio, transform.position);
 
             OnPickup?.Invoke(this);
             return this;
@@ -48,7 +48,7 @@ namespace Overrailed.Terrain.Tools
 
         public override void Drop(Vector3Int position)
         {
-            AudioManager.instance.PlaySound(dropSound, transform.position);
+            AudioManager.PlaySound(dropSound, transform.position);
 
             OnDropTool?.Invoke(this);
         }

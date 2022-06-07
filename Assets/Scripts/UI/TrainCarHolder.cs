@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 using Overrailed.Train;
 
 namespace Overrailed.UI
@@ -29,11 +29,11 @@ namespace Overrailed.UI
             var car = heldCar.TryPickUp(parent, 1) as TrainCar;
             if (car && manager.Coins >= car.Tier)
             {
-                GameManager.MoveToLayer(car.transform, LayerMask.NameToLayer("Train"));
+                Utils.MoveToLayer(car.transform, LayerMask.NameToLayer("Train"));
                 heldCar.GetComponent<BoxCollider>().enabled = true;
                 manager.Coins -= car.Tier;
 
-                AudioManager.instance.PlaySound(PickupAudio, transform.position);
+                AudioManager.PlaySound(PickupAudio, transform.position);
 
                 return car;
             }
@@ -52,7 +52,7 @@ namespace Overrailed.UI
                 car.transform.localPosition = 1.1f * Vector3.up;
                 car.transform.localRotation = Quaternion.identity;
 
-                GameManager.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));
+                Utils.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));
                 heldCar = car;
 
                 return true;
@@ -65,7 +65,7 @@ namespace Overrailed.UI
             {
                 if (car == heldCar && TryPlaceCar(car))
                 {
-                    AudioManager.instance.PlaySound(dropSound, transform.position);
+                    AudioManager.PlaySound(dropSound, transform.position);
                     manager.Coins += car.Tier;
                     return Interaction.Used;
                 }

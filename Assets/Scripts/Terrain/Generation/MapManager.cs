@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using UnityEngine.InputSystem;
 using UnityEngine;
 
 using Overrailed.Managers;
 using Overrailed.Terrain.Tiles;
+using Overrailed.Train;
 
 namespace Overrailed.Terrain.Generation
 {
@@ -22,7 +24,6 @@ namespace Overrailed.Terrain.Generation
         [SerializeField] [Min(1)] private float noiseScale = 10;
         [SerializeField] private Vector2 noiseOffset;
         [Range(10, 1000)] [SerializeField] private int chunkLength = 25, mapWidth = 19;
-        [SerializeField] private bool showBounds;
 
         [Header("Biomes")]
         [SerializeField] private Biome currentBiome;
@@ -31,8 +32,10 @@ namespace Overrailed.Terrain.Generation
 
         [Header("Stations")]
         [SerializeField] private GameObject stationPrefab;
+        [SerializeField] private MonoBehaviour defaultPlayerPrefab;
         [SerializeField] private Tile stationBridge;
         [SerializeField] private Vector2Int stationSize = 5 * Vector2Int.one;
+        [SerializeField] [Min(5)] private float trainInitialDelay = 10;
         [SerializeField] private bool startBonus = false;
         [Space]
         [SerializeField] private GameObject checkpointPrefab;
@@ -42,18 +45,28 @@ namespace Overrailed.Terrain.Generation
         [SerializeField] private Vector3 spawnOffset = 10 * Vector3.down;
         [SerializeField] [Min(0)] private float rowSpawnInterval = 0.2f, bounceHeight = 1;
         [SerializeField] [Min(1)] private float slideSpeed = 100;
+        [Space]
+        [SerializeField] private GameObject[] numbersPrefabs;
+        [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
+        [SerializeField] private AudioClip numberSpawnSound;
+
+        [Header("Visualizer Tools")]
+        [SerializeField] private Material[] visualizerMaterials;
+        [SerializeField] private bool generateHeightVisualizer, visualizeBounds;
         #endregion
 
         [SerializeField] [HideInInspector] private List<Transform> chunks = new List<Transform>();
         [SerializeField] [HideInInspector] private Transform groundParent, groundCollider, obstacleParent;
         [SerializeField] [HideInInspector] private Vector3Int stationPos;
         [SerializeField] [HideInInspector] private System.Random rng;
-
         private List<Transform> newHighlights = new List<Transform>(), highlights = new List<Transform>();
-        private Vector3Int IntPos => Vector3Int.RoundToInt(transform.position);
-        public bool HighlightEnabled => highlightEnabled;
+        private List<Vector2> randomNoiseOffsets;
+        private static List<Locomotive> locomotives = new List<Locomotive>();
 
+        public static Locomotive[] Locomotives => locomotives.ToArray();
+        public Vector3Int IntPos => Vector3Int.RoundToInt(transform.position);
         public LayerMask InteractMask => interactMask;
+        public bool HighlightEnabled => highlightEnabled;
         public int Seed
         {
             get { return seed; }
@@ -67,32 +80,54 @@ namespace Overrailed.Terrain.Generation
         private void Awake()
         {
             transform.position = IntPos;
-            rng = new System.Random(seed);
-            OnSeedChange?.Invoke(seed.ToString());
         }
 
         private void Start()
         {
-            if (GameManager.instance)
+            if (Manager.instance is GameManager gm)
             {
-                GameManager.instance.OnCheckpoint += DisableObstacles;
-                GameManager.instance.OnEndCheckpoint += EnableObstacles;
-                GameManager.instance.OnEndCheckpoint += AddChunk;
-                GameManager.instance.OnEndCheckpoint += AnimateNewChunk;
-                GameManager.instance.OnGameEnd += ShowAllChunks;
+                gm.OnCheckpoint += DisableObstacles;
+                gm.OnEndCheckpoint += EnableObstacles;
+                gm.OnEndCheckpoint += AddChunk;
+                gm.OnEndCheckpoint += AnimateNewChunk;
+                gm.OnGameEnd += ShowAllChunks;
+                OnFinishAnimateChunk += SpawnPlayer;
+                OnFinishAnimateChunk += StartTrain;
+
+                GenerateMap();
+            }
+            else if (Manager.instance is MainMenuManager mm)
+            {
+                OnFinishAnimateChunk += mm.SlideInMainElements;
+                OnFinishAnimateChunk += mm.MoveSelectedSkinToGame;
+            }
+            else if (Manager.instance is TutorialManager)
+            {
+                var station = GameObject.Find(stationPrefab.name).transform;
+                stationPos = Vector3Int.RoundToInt(station.position);
+                OnFinishAnimateChunk += SpawnPlayer;
             }
 
-            if (transform.childCount == 0) GenerateMap();
             AnimateNewChunk();
 
             if (highlightEnabled) _ = StartCoroutine(TileHighlighting());
+        }
+
+        public void SpawnPlayer()
+        {
+            MonoBehaviour playerPrefab = Manager.GetSkin();
+            if (playerPrefab == null) playerPrefab = defaultPlayerPrefab;
+
+            var player = Instantiate(playerPrefab).transform;
+            player.parent = null;
+            player.position = stationPos;
         }
 
         #region Generation
         /// <summary>
         /// Clears current map and generates the first chunk of a new one
         /// </summary>
-        public void GenerateMap()
+        public async void GenerateMap()
         {
             transform.position = IntPos;
 
@@ -101,9 +136,27 @@ namespace Overrailed.Terrain.Generation
             System.Action<Object> DestroyType = DestroyImmediate;
             if (Application.isPlaying) DestroyType = Destroy;
             foreach (Transform t in transform.Cast<Transform>().ToList()) DestroyType(t.gameObject);
+
+            if (Application.isPlaying) seed = int.Parse(PlayerPrefs.GetString(Manager.SeedKey, "0"));
             rng = new System.Random(seed);
+            randomNoiseOffsets = new List<Vector2>();
+            for (int i = 0; i < currentBiome.Regions.Length + 2; i++) randomNoiseOffsets.Add(new Vector2(rng.Next(-100000, 100000), rng.Next(-100000, 100000)));
+            OnSeedChange?.Invoke(seed.ToString());
+
+            groundCollider = new GameObject("Ground Collider").transform;
+            groundCollider.parent = transform;
+            groundCollider.gameObject.layer = LayerMask.NameToLayer("Ground");
+            groundCollider.gameObject.AddComponent<BoxCollider>();
 
             AddChunk();
+
+            await Task.Yield();
+            if (Manager.Exists && Manager.instance is GameManager gm)
+            {
+                var locomotive = GetComponentInChildren<Locomotive>();
+                locomotive.OnDeath += gm.EndGame;
+                locomotives.Add(GetComponentInChildren<Locomotive>());
+            }
         }
 
         /// <summary>
@@ -111,16 +164,21 @@ namespace Overrailed.Terrain.Generation
         /// </summary>
         public void AddChunk()
         {
-            if (Application.isPlaying)
+            if (Application.isPlaying && chunks.Count > 1) chunks[chunks.Count - 2].gameObject.SetActive(false);
+            if (rng == null)
             {
-                OnSeedChange?.Invoke(seed.ToString());
-
-                if (chunks.Count > 1) chunks[chunks.Count - 2].gameObject.SetActive(false);
+                Debug.LogWarning("Script was reloaded. Generate map first");
+                return;
             }
 
+            // Ground collider
+            var mapLength = (chunks.Count + 1) * chunkLength;
+            groundCollider.GetComponent<BoxCollider>().size = new Vector3(mapLength, 1, mapWidth);
+            groundCollider.position = IntPos + new Vector3(mapLength / 2f - 0.5f, -0.5f, mapWidth / 2f - 0.5f);
+
             var newChunk = new GameObject("Chunk " + chunks.Count).transform;
+            newChunk.parent = transform;
             chunks.Add(newChunk);
-            var mapLength = chunks.Count * chunkLength;
 
             // Station info
             int halfX = stationSize.x / 2, halfZ = stationSize.y / 2;
@@ -131,27 +189,16 @@ namespace Overrailed.Terrain.Generation
             Vector3Int checkpointPos = IntPos + new Vector3Int(mapLength - halfX - 1, 0, rng.Next(halfZ, mapWidth - halfZ));
             BoundsInt checkpointBounds = new BoundsInt(checkpointPos - new Vector3Int(halfX, 0, halfZ), new Vector3Int(checkpointSize.x, 3, checkpointSize.y));
 
-            // Ground collider
-            if (groundCollider == null)
-            {
-                groundCollider = new GameObject("Ground Collider").transform;
-                groundCollider.parent = transform;
-                groundCollider.gameObject.layer = LayerMask.NameToLayer("Ground");
-                groundCollider.gameObject.AddComponent<BoxCollider>();
-            }
-            groundCollider.GetComponent<BoxCollider>().size = new Vector3(mapLength, 1, mapWidth);
-            groundCollider.position = IntPos + new Vector3(mapLength / 2f - 0.5f, -0.5f, mapWidth / 2f - 0.5f);
-
             // Tiles
-            var sectionTiles = GenerateMapTiles(GenerateHeightMap());
+            var sectionTiles = GenerateMapTiles();
             // Ground tiles
             groundParent = new GameObject("Ground").transform;
             groundParent.parent = newChunk;
-            GenerateSection(sectionTiles.Item1, groundParent, stationBounds, checkpointBounds, true);
+            GenerateSection(sectionTiles.Item1, groundParent, new BoundsInt[] { stationBounds, checkpointBounds }, true);
             // Obstacle tiles
             obstacleParent = new GameObject("Obstacles").transform;
             obstacleParent.parent = newChunk;
-            GenerateSection(sectionTiles.Item2, obstacleParent, stationBounds, checkpointBounds, false);
+            GenerateSection(sectionTiles.Item2, obstacleParent, new BoundsInt[] { stationBounds, checkpointBounds }, false);
 
             // Spawn station and checkpoint
             if (chunks.Count == 1)
@@ -160,8 +207,6 @@ namespace Overrailed.Terrain.Generation
                 station.Find("Bonus").gameObject.SetActive(startBonus);
             }
             _ = Instantiate(checkpointPrefab, checkpointPos, Quaternion.identity, obstacleParent);
-
-            newChunk.parent = transform;
         }
 
         /// <summary>
@@ -172,7 +217,7 @@ namespace Overrailed.Terrain.Generation
         /// <param name="station">Bounds where the station resides if there is one in the chunk</param>
         /// <param name="checkpoint">Bounds where the checkpoint of the chunk resides</param>
         /// <param name="isGround">True if the desired section is ground tiles</param>
-        private void GenerateSection(Tile[,] tiles, Transform parent, BoundsInt station, BoundsInt checkpoint, bool isGround)
+        private void GenerateSection(Tile[,] tiles, Transform parent, BoundsInt[] obstructions, bool isGround)
         {
             int mapLength = chunks.Count * chunkLength;
 
@@ -195,7 +240,7 @@ namespace Overrailed.Terrain.Generation
 
                     // Modifies station and checkpoint areas
                     Tile bridge = null;
-                    if (station.Contains(newPos) || checkpoint.Contains(newPos))
+                    if (obstructions.Any(bounds => bounds.Contains(newPos)))
                     {
                         if (isGround)
                         {
@@ -223,77 +268,106 @@ namespace Overrailed.Terrain.Generation
         /// <summary>
         /// Generates 2D perlin noise based on generation variables
         /// </summary>
-        /// <param name="noiseScale"></param>
-        /// <returns></returns>
-        private float[,] GenerateHeightMap()
+        private float[,] GenerateHeightMap(Vector2 offset)
         {
-            int mapLength = (chunks.Count + 1) * chunkLength;
+            int mapLength = chunks.Count * chunkLength;
             float[,] heightMap = new float[mapLength, mapWidth];
-            Vector2 offset = new Vector2(rng.Next(-100000, 100000), rng.Next(-100000, 100000));
 
             for (int y = 0; y < mapWidth; y++)
             {
                 for (int x = 0; x < mapLength; x++)
                 {
-                    heightMap[x, y] = Mathf.Clamp01(Mathf.PerlinNoise(x / noiseScale + offset.x + noiseOffset.x, y / noiseScale + offset.y + noiseOffset.y));
+                    heightMap[x, y] = Mathf.Clamp01(Mathf.PerlinNoise(
+                        x / noiseScale + offset.x + noiseOffset.x,
+                        y / noiseScale + offset.y + noiseOffset.y)
+                    );
+                    heightMap[x, y] = Mathf.Pow(heightMap[x, y], Mathf.Lerp(1.5f, 0.5f, heightMap[x, y]));
                 }
             }
 
             return heightMap;
         }
 
-        private int MaxHeightAt((int, int) coords, List<float[,]> obstacleHeightMaps)
-        {
-            var maxValue = float.MinValue;
-            var maxIndex = 0;
-
-            for (int i = 0; i < obstacleHeightMaps.Count; i++)
-            {
-                if (obstacleHeightMaps[i][coords.Item1, coords.Item2] > maxValue)
-                {
-                    maxValue = obstacleHeightMaps[i][coords.Item1, coords.Item2];
-                    maxIndex = i;
-                }
-            }
-
-            return maxIndex;
-        }
-
         /// <summary>
         /// Generates ground and obstacle tiles from biome data
         /// </summary>
-        /// <param name="heightMap">height map splits terrain into liquid and ground sections</param>
         /// <returns>The ground and obstacle tiles of the map</returns>
-        private (Tile[,], Tile[,]) GenerateMapTiles(float[,] heightMap)
+        private (Tile[,], Tile[,]) GenerateMapTiles()
         {
-            var obstacleSampleMaps = new List<float[,]>();
-            var obstacleHeightMaps = new List<float[,]>();
-            for (int i = 0; i < currentBiome.Regions.Length; i++)
-            {
-                obstacleSampleMaps.Add(GenerateHeightMap());
-                obstacleHeightMaps.Add(GenerateHeightMap());
-            }
+            float[,] liquidTerrainMap = GenerateHeightMap(randomNoiseOffsets[randomNoiseOffsets.Count - 1]);
+            float[,] regionMaps = GenerateHeightMap(randomNoiseOffsets[randomNoiseOffsets.Count - 2]);
+            var heightMaps = new List<float[,]>();
+            for (int i = 0; i < currentBiome.Regions.Length; i++) heightMaps.Add(GenerateHeightMap(randomNoiseOffsets[i]));
 
-            var groundTiles = new Tile[heightMap.GetLength(0), mapWidth];
-            var obstacleTiles = new Tile[heightMap.GetLength(0), mapWidth];
-
-            for (int y = 0; y < mapWidth; y++)
+            var groundTiles = new Tile[liquidTerrainMap.GetLength(0), mapWidth];
+            var obstacleTiles = new Tile[liquidTerrainMap.GetLength(0), mapWidth];
+            for (int x = 0; x < liquidTerrainMap.GetLength(0); x++)
             {
-                for (int x = 0; x < heightMap.GetLength(0); x++)
+                for (int z = 0; z < mapWidth; z++)
                 {
-                    if (heightMap[x, y] >= currentBiome.MinObstaclePercentage)
+                    if (liquidTerrainMap[x, z] >= currentBiome.MinObstaclePercentage)
                     {
-                        int mapIndex = MaxHeightAt((x, y), obstacleHeightMaps);
-                        var tiles = currentBiome.Regions[mapIndex].GetTiles(obstacleSampleMaps[mapIndex][x, y]);
+                        int regionIndex = Mathf.FloorToInt(currentBiome.Regions.Length * regionMaps[x, z]);
+                        float tileHeight = heightMaps[regionIndex][x, z];
 
-                        groundTiles[x, y] = tiles.Item1;
-                        obstacleTiles[x, y] = tiles.Item2;
+                        (groundTiles[x, z], obstacleTiles[x, z]) = currentBiome.Regions[regionIndex].GetTiles(tileHeight);
                     }
-                    else groundTiles[x, y] = currentBiome.LiquidTile;
+                    else groundTiles[x, z] = currentBiome.LiquidTile;
                 }
             }
 
+            if (!Application.isPlaying && generateHeightVisualizer) VisualizeHeightMaps(liquidTerrainMap, heightMaps);
+
             return (groundTiles, obstacleTiles);
+        }
+
+        private void VisualizeHeightMaps(float[,] liquidMap, List<float[,]> heightMaps)
+        {
+            var visualizer = new List<(Vector3, Material)>();
+            int mapLength = chunks.Count * chunkLength;
+            for (int x = mapLength - chunkLength; x < mapLength; x++)
+            {
+                for (int z = 0; z < mapWidth; z++)
+                {
+                    if (liquidMap[x, z] < currentBiome.MinObstaclePercentage) visualizer.Add((new Vector3(x, 0, z), visualizerMaterials[visualizerMaterials.Length - 1]));
+                    else for (int i = 0; i < heightMaps.Count; i++) visualizer.Add((new Vector3(x, 10 * heightMaps[i][x, z], z), visualizerMaterials[i]));
+                }
+            }
+            visualizer.Add((10 * Vector3.up, visualizerMaterials[visualizerMaterials.Length - 1]));
+
+            var visualizerParent = new GameObject("Visualizer " + (chunks.Count - 1)).transform;
+            visualizerParent.parent = transform;
+            foreach (var tile in visualizer)
+            {
+                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
+                cube.name = tile.Item2.name + " at " + tile.Item1.ToString();
+                cube.gameObject.layer = LayerMask.NameToLayer("TransparentFX");
+
+                cube.parent = visualizerParent;
+                cube.position = tile.Item1 + 5 * Vector3.up;
+
+                cube.GetComponent<MeshRenderer>().material = tile.Item2;
+            }
+        }
+        #endregion
+
+        #region Train Starting
+        public void StartTrain() => StartTrain(trainInitialDelay);
+        private async void StartTrain(float delay)
+        {
+            await Task.Delay(Mathf.RoundToInt(1000 * (delay - 5)));
+
+            var locomotive = GetComponentInChildren<Locomotive>();
+            if (locomotive == null) Debug.LogError("Map has no Locomotive");
+
+            for (int countDown = 5; countDown > 0; countDown--)
+            {
+                Utils.FadeObject(numbersPrefabs[countDown], locomotive.transform.position + Vector3.up, numberFadeSpeed, numberFadeDuration);
+
+                await Manager.Delay(1);
+            }
+
+            locomotive.StartTrain();
         }
         #endregion
 
@@ -336,6 +410,8 @@ namespace Overrailed.Terrain.Generation
         /// </summary>
         private IEnumerator HightlightTile(Transform tile)
         {
+            if (tile == null) yield break;
+
             var renderers = tile.GetComponentsInChildren<MeshRenderer>();
             var originalColors = new Color[renderers.Length];
 
@@ -440,7 +516,7 @@ namespace Overrailed.Terrain.Generation
         /// </summary>
         public bool PointIsInBounds(Vector3 point)
         {
-            if (GameManager.instance) return (GameManager.IsPlaying() && PointIsInPlayBounds(point)) || (GameManager.IsEditing() && PointIsInEditBounds(point));
+            if (Manager.Exists) return (Manager.IsPlaying() && PointIsInPlayBounds(point)) || (Manager.IsEditing() && PointIsInEditBounds(point));
             else return PointIsInPlayBounds(point);
         }
         #endregion
@@ -552,8 +628,13 @@ namespace Overrailed.Terrain.Generation
         public void AnimateNewChunk() => _ = AnimateChunk(chunks.Count - 1);
         public async Task AnimateChunk(int chunkIndex)
         {
+            await Task.Delay(1000);
+            OnFinishAnimateChunk?.Invoke();
+            return;
+
             var chunk = transform.GetChild(chunkIndex + 1);
             Transform ground = chunk.GetChild(0), obstacles = chunk.GetChild(1);
+            print(1);
 
             // Hiding and moving station and checkpoint
             var extras = new List<Transform>();
@@ -561,7 +642,7 @@ namespace Overrailed.Terrain.Generation
             // Adds station to extras
             if (obstacles.childCount - ground.childCount == 2) extras.Add(obstacles.GetChild(obstacles.childCount - 2));
             // Adds checkpoint to extras
-            extras.Add(obstacles.GetChild(obstacles.childCount - 1));
+            if (obstacles.childCount - ground.childCount >= 1) extras.Add(obstacles.GetChild(obstacles.childCount - 1));
             foreach (var obj in extras)
             {
                 extraStartPos.Add(obj.localPosition);
@@ -570,7 +651,7 @@ namespace Overrailed.Terrain.Generation
                 obj.gameObject.SetActive(false);
                 foreach (var tile in obj.GetComponentsInChildren<Tile>()) tile.SetVisible(false);
             }
-
+            print(ground.childCount);
             // Moving and hiding each row
             for (int i = 0; i < ground.childCount; i++)
             {
@@ -581,16 +662,19 @@ namespace Overrailed.Terrain.Generation
                 // Hides obstacle graphics without affecting colliders
                 foreach (var tile in obstacles.GetChild(i).GetComponentsInChildren<Tile>()) tile.SetVisible(false);
             }
-
+            print(3);
             // Turning on and sliding each ground row into place
             foreach (Transform groundRow in ground)
             {
                 groundRow.gameObject.SetActive(true);
 
+                print("bruh");
                 _ = AnimateSlideAndBounce(groundRow, Vector3.zero);
+                print("bruh2");
                 await Task.Delay(Mathf.RoundToInt(1000 * rowSpawnInterval));
+                print("bruh3");
             }
-
+            print(4);
             // Turning on and sliding each obstacle row into place
             for (int i = 0; i < ground.childCount; i++)
             {
@@ -602,15 +686,19 @@ namespace Overrailed.Terrain.Generation
                 if (obstacleRow.childCount == 0) continue;
                 await Task.Delay(Mathf.RoundToInt(500 * rowSpawnInterval));
             }
-
+            print(5);
             // Turning on and sliding station and checkpoint into place
             foreach (var transform in extras)
             {
                 transform.gameObject.SetActive(true);
                 foreach (var tile in transform.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
             }
-            await AnimateSlide(extras[0], extraStartPos[0]);
-            if (extras.Count > 1) await AnimateSlide(extras[1], extraStartPos[1]);
+            if (extras.Count > 0)
+            {
+                await AnimateSlide(extras[0], extraStartPos[0]);
+                if (extras.Count > 1) await AnimateSlide(extras[1], extraStartPos[1]);
+            }
+            print(6);
 
             OnFinishAnimateChunk?.Invoke();
         }
@@ -658,7 +746,7 @@ namespace Overrailed.Terrain.Generation
 
         private void OnDrawGizmos()
         {
-            if (showBounds)
+            if (visualizeBounds)
             {
                 var bounds = GetPlayBounds();
                 Gizmos.DrawCube(bounds.center, bounds.size);
@@ -667,12 +755,30 @@ namespace Overrailed.Terrain.Generation
 
         void OnDestroy()
         {
-            if (GameManager.instance == null) return;
+            if (!Manager.Exists) return;
 
-            GameManager.instance.OnCheckpoint -= AddChunk;
-            GameManager.instance.OnCheckpoint -= DisableObstacles;
-            GameManager.instance.OnEndCheckpoint -= EnableObstacles;
-            GameManager.instance.OnEndCheckpoint -= AnimateNewChunk;
+            if (Manager.instance is GameManager gm)
+            {
+                gm.OnCheckpoint -= AddChunk;
+                gm.OnCheckpoint -= DisableObstacles;
+                gm.OnEndCheckpoint -= EnableObstacles;
+                gm.OnEndCheckpoint -= AnimateNewChunk;
+                gm.OnGameEnd -= ShowAllChunks;
+                OnFinishAnimateChunk -= SpawnPlayer;
+                OnFinishAnimateChunk -= StartTrain;
+            }
+            else if (Manager.instance is MainMenuManager mm)
+            {
+                OnFinishAnimateChunk -= mm.SlideInMainElements;
+                OnFinishAnimateChunk -= mm.MoveSelectedSkinToGame;
+            }
+            else if (Manager.instance is TutorialManager)
+            {
+                OnFinishAnimateChunk -= SpawnPlayer;
+            }
+
+            var locomotive = GetComponentInChildren<Locomotive>();
+            if (locomotive) locomotives.Remove(locomotive);
         }
     }
 }

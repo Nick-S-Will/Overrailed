@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 using Overrailed.Train;
 
 namespace Overrailed.Terrain.Tiles
@@ -40,7 +41,7 @@ namespace Overrailed.Terrain.Tiles
 
         private void Awake()
         {
-            if (startsPowered) GameManager.MoveToLayer(transform, LayerMask.NameToLayer("Rail"));
+            if (startsPowered) Utils.MoveToLayer(transform, LayerMask.NameToLayer("Rail"));
         }
 
         protected override void Start()
@@ -53,7 +54,7 @@ namespace Overrailed.Terrain.Tiles
                 UpdateConnections();
 
                 if (startsPowered) straightPower.SetActive(true);
-                else if (GameManager.instance) GameManager.instance.OnEndCheckpoint += ConvertToNonCheckpoint;
+                else if (Manager.instance is GameManager gm) gm.OnEndCheckpoint += ConvertToNonCheckpoint;
             }
 
             base.Start();
@@ -78,7 +79,7 @@ namespace Overrailed.Terrain.Tiles
             {
                 isCheckpoint = false;
                 UpdateConnections();
-                GameManager.instance.OnEndCheckpoint -= ConvertToNonCheckpoint;
+                if (Manager.instance is GameManager gm) gm.OnEndCheckpoint -= ConvertToNonCheckpoint;
             }
         }
 
@@ -134,7 +135,7 @@ namespace Overrailed.Terrain.Tiles
             // Doesn't connect to tracks if in a stack
             if (NextInStack)
             {
-                AudioManager.instance.PlaySound(dropSound, coords);
+                AudioManager.PlaySound(dropSound, coords);
                 return;
             }
 
@@ -162,9 +163,9 @@ namespace Overrailed.Terrain.Tiles
                 PrevRail = connectableRail;
                 SetState(dirToThis, dirToThis, null);
 
-                AudioManager.instance.PlaySound(connectSound, transform.position);
+                AudioManager.PlaySound(connectSound, transform.position);
             }
-            else AudioManager.instance.PlaySound(dropSound, transform.position);
+            else AudioManager.PlaySound(dropSound, transform.position);
         }
         #endregion
 
@@ -283,8 +284,8 @@ namespace Overrailed.Terrain.Tiles
                                     prev.hasBeenRidden = true;
                                     if (prev.Passenger && prev.Passenger is Locomotive locomotive)
                                     {
-                                        if (GameManager.instance) locomotive.SpeedUp();
-                                        else locomotive.StartTrain(); // For tutorial
+                                        if (Manager.instance is GameManager) locomotive.SpeedUp();
+                                        else if (Manager.instance is TutorialManager) locomotive.StartTrain();
                                         break;
                                     }
                                 } while (prev);
@@ -301,7 +302,7 @@ namespace Overrailed.Terrain.Tiles
             InDirection = inDir;
             OutDirection = outDir;
 
-            GameManager.MoveToLayer(transform, PrevRail ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default"));
+            Utils.MoveToLayer(transform, PrevRail ? LayerMask.NameToLayer("Rail") : LayerMask.NameToLayer("Default"));
         }
         #endregion
 

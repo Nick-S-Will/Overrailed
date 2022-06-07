@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
@@ -23,10 +24,11 @@ namespace Overrailed.UI
         public void Slide(Vector3 point)
         {
             float distance = Vector3.Distance(knobParent.position, point);
-            knob.localPosition = new Vector3(distance / transform.localScale.x, 0, 0);
+            knob.localPosition = (float)Math.Round(distance / transform.localScale.x, 1) * Vector3.right;
         }
 
         public float ReadValue() => knob.localPosition.x;
+        public void WriteValue(float value) => knob.localPosition = value * Vector3.right;
 
         public static void StartClickCheck(MonoBehaviour routineAnchor, Camera cam, Mouse mouse)
         {

@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine.Events;
 using UnityEngine;
 
+using Overrailed.Managers;
 using Overrailed.Player;
 
 namespace Overrailed.UI
@@ -11,45 +13,41 @@ namespace Overrailed.UI
     [RequireComponent(typeof(SpriteRenderer))]
     public class TriggerButton : MonoBehaviour
     {
-        public event System.Action OnPress;
+        public UnityEvent OnPress;
 
-        [SerializeField] private System.Action Press;
+        [SerializeField] private string collisionTag = "Player";
         [SerializeField] private Transform buttonFill, loadingBar;
         [SerializeField] private RectTransform text;
         [SerializeField] private Vector2 buttonSize = Vector2.one;
         [SerializeField] private float loadTime = 2f;
         [SerializeField] private bool requireEmptyHand;
 
-        private Coroutine barLoading;
+        private BoxCollider boxCollider;
+        private bool barIsLoading = false;
 
-        private IEnumerator LoadAction()
+        private void Start() => boxCollider = GetComponent<BoxCollider>();
+
+        private async void LoadAction()
         {
-            if (barLoading != null) yield break;
+            if (barIsLoading) return;
 
             float percent = 0;
+            barIsLoading = true;
 
-            while (percent < 1)
+            while (percent < 1 && barIsLoading)
             {
-                yield return null;
+                await Manager.Pause;
+                await Task.Yield();
 
                 percent += Time.deltaTime / loadTime;
                 loadingBar.localScale = new Vector3(Mathf.Lerp(0, buttonSize.x, percent), loadingBar.localScale.y, loadingBar.localScale.z);
             }
 
-            barLoading = null;
+            loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
+            if (!barIsLoading) return;
+
+            barIsLoading = false;
             OnPress?.Invoke();
-
-            loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
-        }
-
-        private void CancelLoading()
-        {
-            if (barLoading == null) return;
-
-            StopCoroutine(barLoading);
-            barLoading = null;
-
-            loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
         }
 
         private async void UpdateSize()
@@ -66,12 +64,15 @@ namespace Overrailed.UI
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.tag.Equals("Player") && (!other.GetComponent<PlayerController>().IsHoldingItem )) barLoading = StartCoroutine(LoadAction());
+            if (other.tag.Equals(collisionTag) && (!other.GetComponent<PlayerController>().IsHoldingItem )) LoadAction();
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (other.tag.Equals("Player")) CancelLoading();
+            var overlaps = Physics.OverlapBox(transform.position, boxCollider.size / 2, transform.rotation);
+            foreach (var collider in overlaps) if (collider.tag == collisionTag) return;
+
+            barIsLoading = false;
         }
 
         private void OnValidate()

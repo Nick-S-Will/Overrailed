@@ -2,6 +2,7 @@
 using UnityEngine;
 
 using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 using Overrailed.Terrain.Tools;
 using Overrailed.Terrain.Tiles;
 
@@ -12,8 +13,8 @@ namespace Overrailed.Train
     {
         public event System.Action OnDeath;
         public virtual event System.Action OnInteract;
-        public virtual event System.Action<TrainCar> OnWarning;
-        protected event System.Action OnStartDriving, OnPauseDriving;
+        public static event System.Action<TrainCar> OnWarning;
+        protected event System.Action OnStartDriving;
 
         [SerializeField] private Locomotive leaderLocomotive;
         [Space]
@@ -33,6 +34,7 @@ namespace Overrailed.Train
         protected RailTile currentRail;
         private int pathIndex, pathDir;
 
+        public Locomotive LeaderLocomotive => leaderLocomotive;
         public int Tier => tier;
         public bool HasRail => currentRail;
         public override bool IsTwoHanded => true;
@@ -67,12 +69,8 @@ namespace Overrailed.Train
                     // At middle of final checkpoint rail
                     if (currentRail.IsFinalCheckpoint && pathIndex == currentRail.Path.childCount / 2 + 1)
                     {
-                        if (GameManager.instance) GameManager.instance.ReachCheckpoint();
-                        else if (TutorialManager.Exists)
-                        {
-                            FindObjectOfType<TutorialManager>().ReachCheckpoint();
-                            OnPauseDriving?.Invoke();
-                        }
+                        if (Manager.instance is GameManager gm) gm.ReachCheckpoint();
+                        else if (Manager.instance is TutorialManager tm) tm.ReachCheckpoint();
                         else Debug.LogError("No GameManager or TutorialManager Found");
                     }
                     // Reached end of rail
@@ -98,17 +96,13 @@ namespace Overrailed.Train
                 transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
                 yield return null;
-                if (GameManager.IsEditing())
+                if (!Manager.IsPlaying())
                 {
-                    OnPauseDriving?.Invoke();
-                    yield return DriveWait();
+                    yield return new WaitUntil(() => Manager.IsPlaying() && leaderLocomotive.IsDriving);
                     OnStartDriving?.Invoke();
                 }
-                else if (GameManager.IsPaused()) yield return DriveWait();
-                else if (TutorialManager.Exists) yield return new WaitUntil(() => leaderLocomotive.IsDriving);
             }
         }
-        private WaitUntil DriveWait() => new WaitUntil(() => this is Locomotive ? GameManager.IsPlaying() : leaderLocomotive.IsDriving);
 
         #region IPickupable and IInteractable implementations
         /// <summary>
@@ -124,18 +118,18 @@ namespace Overrailed.Train
             transform.localPosition = Vector3.up;
             transform.localRotation = Quaternion.identity;
 
-            AudioManager.instance.PlaySound(PickupAudio, transform.position);
+            AudioManager.PlaySound(PickupAudio, transform.position);
 
             return this;
         }
 
         public override bool OnTryDrop() => false;
 
-        public override void Drop(Vector3Int position) => AudioManager.instance.PlaySound(dropSound, transform.position);
+        public override void Drop(Vector3Int position) => AudioManager.PlaySound(dropSound, transform.position);
 
         public virtual Interaction TryInteractUsing(IPickupable item)
         {
-            if (GameManager.IsEditing() && item is TrainCar car) return TryUpgradeCar(car) ? Interaction.Used : Interaction.None;
+            if (Manager.IsEditing() && item is TrainCar car) return TryUpgradeCar(car) ? Interaction.Used : Interaction.None;
             else if (item is Bucket bucket) return TryExtinguish(bucket) ? Interaction.Interacted : Interaction.None;
             else return Interaction.None;
         }
@@ -151,30 +145,35 @@ namespace Overrailed.Train
                 newCar.leaderLocomotive = leaderLocomotive;
                 newCar.StartDriving();
 
-                AudioManager.instance.PlaySound(dropSound, transform.position);
+                AudioManager.PlaySound(dropSound, transform.position);
             }
 
             Die();
             return true;
         }
 
-        public virtual IEnumerator Ignite()
+        public virtual async void Ignite()
         {
             burningParticles = Instantiate(burningParticlePrefab, burnPoint);
-            AudioManager.instance.PlaySound(igniteSound, transform.position);
+            AudioManager.PlaySound(igniteSound, transform.position);
+            Manager.OnPause += burningParticles.Pause;
+            Manager.OnResume += burningParticles.Play;
 
             while (burningParticles)
             {
-                yield return new WaitForSeconds(6);
+                await Manager.Delay(5);
 
-                if (!burningParticles) yield break;
+                if (!burningParticles) return;
 
                 var carF = TryGetAdjacentCar(transform.position, transform.forward);
                 var carB = TryGetAdjacentCar(transform.position, -transform.forward);
 
-                if (carF && !carF.burningParticles && carF.currentRail) _ = StartCoroutine(carF.Ignite());
-                if (carB && !carB.burningParticles && carB.currentRail) _ = StartCoroutine(carB.Ignite());
+                if (carF && !carF.burningParticles && carF.currentRail) carF.Ignite();
+                if (carB && !carB.burningParticles && carB.currentRail) carB.Ignite();
             }
+
+            Manager.OnPause -= burningParticles.Pause;
+            Manager.OnResume -= burningParticles.Play;
         }
         
         /// <summary>
@@ -261,12 +260,12 @@ namespace Overrailed.Train
             else return null;
         }
 
-        protected void MakeWarning() => OnWarning?.Invoke(this);
+        protected void StartWarning() => OnWarning?.Invoke(this);
         
         protected virtual void Die()
         {
             BreakIntoParticles(breakParticlePrefab, MeshColorGradient, transform.position);
-            AudioManager.instance.PlaySound(explosionSound, transform.position);
+            AudioManager.PlaySound(explosionSound, transform.position);
 
             var waterColliders = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Water"));
             if (waterColliders.Length > 0) Destroy(Instantiate(splashParticlePrefab, waterColliders[0].transform.position, Quaternion.identity), splashParticlePrefab.main.startLifetime.constant);

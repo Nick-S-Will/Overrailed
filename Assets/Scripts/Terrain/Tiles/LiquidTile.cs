@@ -38,7 +38,7 @@ namespace Overrailed.Terrain.Tiles
                     time += Time.deltaTime;
                 }
                 yield return null;
-                yield return new WaitUntil(() => GameManager.IsPlaying() || TutorialManager.Exists);
+                yield return new WaitUntil(() => Manager.IsPlaying());
             }
 
             liquid.localScale = Vector3.one;

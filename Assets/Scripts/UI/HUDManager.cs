@@ -1,15 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
+using Overrailed.Managers;
 using Overrailed.Terrain.Generation;
 using Overrailed.Terrain.Tools;
 using Overrailed.Player;
 using Overrailed.Train;
-using Overrailed.UI;
 
-namespace Overrailed.Managers
+namespace Overrailed.UI
 {
     public class HUDManager : MonoBehaviour
     {
@@ -42,26 +43,25 @@ namespace Overrailed.Managers
 
         private void Awake()
         {
-            if (GameManager.instance)
+            if (Manager.instance is GameManager gm)
             {
-                foreach (var store in FindObjectsOfType<TrainStoreManager>()) store.OnCoinsChange += UpdateCoinsText;
-                foreach (var map in FindObjectsOfType<MapManager>()) map.OnFinishAnimateChunk += CreateToolHUDs;
-                FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
+                foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
+                map.OnFinishAnimateChunk += CreateToolHUDs;
                 map.OnSeedChange += UpdateSeedText;
+                FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
 
                 coinsStartLength = coinsText.text.Length;
                 speedStartLength = speedText.text.Length;
                 seedStartLength = seedText.text.Length;
 
-                continueGameButton.OnPress += GameManager.instance.ContinueFromCheckpoint;
                 continueGameButton.GetComponent<BoxCollider>().enabled = false;
 
-                GameManager.instance.OnCheckpoint += AlignContinueWithLocomotiveZ;
-                GameManager.instance.OnCheckpoint += EnableContinueButton;
-                GameManager.instance.OnEndCheckpoint += DisableContinueButton;
+                gm.OnCheckpoint += AlignContinueWithLocomotiveZ;
+                gm.OnCheckpoint += EnableContinueButton;
+                gm.OnEndCheckpoint += DisableContinueButton;
             }
 
-            foreach (var car in FindObjectsOfType<TrainCar>()) car.OnWarning += MakeWarningHUD;
+            TrainCar.OnWarning += MakeWarningHUD;
         }
 
         #region Stat HUD Texts
@@ -125,11 +125,11 @@ namespace Overrailed.Managers
                 }
 
                 yield return null;
-                if (!GameManager.IsPlaying())
+                if (!Manager.IsPlaying())
                 {
                     foreach (var toolHUD in toolHUDs) SetToolHUD(toolHUD.tool, false);
 
-                    yield return new WaitUntil(() => GameManager.IsPlaying());
+                    yield return new WaitUntil(() => Manager.IsPlaying());
 
                     foreach (var toolHUD in toolHUDs) SetToolHUD(toolHUD.tool, true);
                 }
@@ -179,8 +179,7 @@ namespace Overrailed.Managers
         #endregion
 
         #region Train Warning HUDs
-        private void MakeWarningHUD(TrainCar car) => _ = StartCoroutine(ManageWarningHUD(car));
-        private IEnumerator ManageWarningHUD(TrainCar car)
+        private async void MakeWarningHUD(TrainCar car)
         {
             var warningHUD = Instantiate(warningHUDPrefab, warningHUDParent).GetComponent<RectTransform>();
             warningHUD.SetAsFirstSibling();
@@ -191,7 +190,8 @@ namespace Overrailed.Managers
                 MoveRectToWorldPosition(warningHUD, car.transform.position);
                 image.color = Color.Lerp(Color.white, Color.red, Mathf.PingPong(warningBlinkSpeed * Time.time, 1));
 
-                yield return null;
+                await Task.Yield();
+                await Manager.Pause;
             }
 
             Destroy(warningHUD.gameObject);
@@ -202,7 +202,7 @@ namespace Overrailed.Managers
         private void AlignContinueWithLocomotiveZ()
         {
             Vector3 pos = continueGameButton.transform.position;
-            continueGameButton.transform.position = new Vector3(pos.x, pos.y, GameManager.Locomotives[0].transform.position.z - 1);
+            continueGameButton.transform.position = new Vector3(pos.x, pos.y, FindObjectOfType<Locomotive>().transform.position.z - 1);
         }
 
         private void SetButtonActive(TriggerButton button, bool enabled)
@@ -215,15 +215,28 @@ namespace Overrailed.Managers
 
         private void MoveRectToWorldPosition(RectTransform rect, Vector3 position)
         {
-            var cam = CameraManager.instance ? CameraManager.instance.Main : Camera.main;
+            var cam = Camera.main;
             rect.position = cam.WorldToScreenPoint(position);
             rect.rotation = Quaternion.Inverse(cam.transform.rotation);
         }
 
         private void OnDestroy()
         {
-            if (map) map.OnSeedChange -= UpdateSeedText;
-            foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange -= UpdateCoinsText;
+            if (Manager.instance is GameManager gm)
+            {
+                foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange -= UpdateCoinsText;
+                if (map)
+                {
+                    map.OnFinishAnimateChunk -= CreateToolHUDs;
+                    map.OnSeedChange -= UpdateSeedText;
+                }
+
+                gm.OnCheckpoint -= AlignContinueWithLocomotiveZ;
+                gm.OnCheckpoint -= EnableContinueButton;
+                gm.OnEndCheckpoint -= DisableContinueButton;
+            }
+
+            TrainCar.OnWarning -= MakeWarningHUD;
         }
 
         [System.Serializable]

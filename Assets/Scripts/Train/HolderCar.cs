@@ -31,7 +31,7 @@ namespace Overrailed.Train
 
         public override IPickupable TryPickUp(Transform parent, int amount)
         {
-            if (GameManager.IsEditing()) return base.TryPickUp(parent, amount);
+            if (Manager.IsEditing()) return base.TryPickUp(parent, amount);
             else return TryPickupCraftedTile(parent, amount);
         }
 
@@ -51,7 +51,7 @@ namespace Overrailed.Train
                 extraStack.transform.localPosition = Vector3.zero;
             }
 
-            GameManager.MoveToLayer(holdersContent.transform, LayerMask.NameToLayer("Default"));
+            Utils.MoveToLayer(holdersContent.transform, LayerMask.NameToLayer("Default"));
             holdCount = Mathf.Max(holdCount - amount, holdCount % 1);
 
             OnTaken?.Invoke();

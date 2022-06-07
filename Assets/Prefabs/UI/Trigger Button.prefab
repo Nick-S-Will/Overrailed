@@ -307,6 +307,7 @@ MonoBehaviour:
   text: {fileID: 1021879577615299789}
   buttonSize: {x: 3, y: 1}
   loadTime: 2
+  requireEmptyHand: 0
 --- !u!65 &7164010559780666879
 BoxCollider:
   m_ObjectHideFlags: 0

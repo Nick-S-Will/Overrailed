@@ -23,7 +23,7 @@ namespace Overrailed.UI
             set
             {
                 coins = value;
-                OnCoinsChange(coins.ToString());
+                OnCoinsChange?.Invoke(coins.ToString());
             }
         }
 
@@ -43,11 +43,14 @@ namespace Overrailed.UI
                 carTypes[i].holder.transform.position = transform.position + xOffset * Vector3.right;
                 carTypes[i].holder.transform.rotation = Quaternion.identity;
 
-                carTypes[i].holder.gameObject.SetActive(GameManager.IsEditing());
+                carTypes[i].holder.gameObject.SetActive(Manager.IsEditing());
             }
 
-            GameManager.instance.OnCheckpoint += UpdateHoldersCars;
-            GameManager.instance.OnEndCheckpoint += UpdateHolderVisibility;
+            if (Manager.instance is GameManager gm)
+            {
+                gm.OnCheckpoint += UpdateHoldersCars;
+                gm.OnEndCheckpoint += UpdateHolderVisibility;
+            }
         }
 
         private void UpdateHoldersCars()
@@ -59,15 +62,15 @@ namespace Overrailed.UI
 
         private void UpdateHolderVisibility()
         {
-            foreach (var type in carTypes) type.holder.gameObject.SetActive(GameManager.IsEditing());
+            foreach (var type in carTypes) type.holder.gameObject.SetActive(Manager.IsEditing());
         }
 
         void OnDestroy()
         {
-            if (GameManager.instance)
+            if (Manager.instance is GameManager gm)
             {
-                GameManager.instance.OnCheckpoint -= UpdateHoldersCars;
-                GameManager.instance.OnEndCheckpoint -= UpdateHolderVisibility;
+                gm.OnCheckpoint -= UpdateHoldersCars;
+                gm.OnEndCheckpoint -= UpdateHolderVisibility;
             }
         }
 
@@ -84,7 +87,7 @@ namespace Overrailed.UI
                 if (nextIndex == tierPrefabs.Length || holder.CanPickUp) return false;
 
                 var car = Instantiate(tierPrefabs[nextIndex]);
-                GameManager.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));
+                Utils.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));
                 car.GetComponent<BoxCollider>().enabled = false;
 
                 nextIndex++;

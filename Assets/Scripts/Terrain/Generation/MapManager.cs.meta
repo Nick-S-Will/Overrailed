@@ -3,7 +3,16 @@ guid: b17c4edce4d1da844baf51a961b87bbe
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - currentBiome: {instanceID: 0}
+  - stationPrefab: {fileID: 7779122044187992337, guid: a402d09a7bba5e2469788096bbd61a1f, type: 3}
+  - defaultPlayerPrefab: {fileID: 2264036827029980985, guid: 37c883f1cd71af545b1a14781b5c8f5e, type: 3}
+  - stationBridge: {fileID: 8000788900880814408, guid: 38de585089c892f4d93cb9f74028c9a4, type: 3}
+  - checkpointPrefab: {fileID: 1580210741119697212, guid: 033414354565bb844b88b39dd9838ec0, type: 3}
+  - numberSpawnSound: {instanceID: 0}
+  - groundParent: {instanceID: 0}
+  - groundCollider: {instanceID: 0}
+  - obstacleParent: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

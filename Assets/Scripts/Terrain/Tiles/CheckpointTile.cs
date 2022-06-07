@@ -10,8 +10,9 @@ namespace Overrailed.Terrain.Tiles
     {
         override protected void Start()
         {
-            GameManager.instance.OnCheckpoint += ReachCheckpoint;
-            GameManager.instance.OnEndCheckpoint += EndCheckpoint;
+            var gm = Manager.instance as GameManager;
+            gm.OnCheckpoint += ReachCheckpoint;
+            gm.OnEndCheckpoint += EndCheckpoint;
         }
 
         protected virtual void ReachCheckpoint()
@@ -23,10 +24,11 @@ namespace Overrailed.Terrain.Tiles
 
         protected virtual void OnDestroy()
         {
-            if (GameManager.instance)
+            if (Manager.Exists)
             {
-                GameManager.instance.OnCheckpoint -= ReachCheckpoint;
-                GameManager.instance.OnEndCheckpoint -= EndCheckpoint;
+                var gm = Manager.instance as GameManager;
+                gm.OnCheckpoint -= ReachCheckpoint;
+                gm.OnEndCheckpoint -= EndCheckpoint;
             }
         }
     }

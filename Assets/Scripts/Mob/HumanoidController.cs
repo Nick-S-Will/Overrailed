@@ -53,6 +53,7 @@ namespace Overrailed.Mob
         /// </summary>
         private bool isMoving;
 
+        protected Coroutine movementHandling;
         protected MapManager Map => map;
         protected IPickupable HeldItem { get; private set; }
         protected Vector3 LastInputDir { get; private set; }
@@ -73,9 +74,11 @@ namespace Overrailed.Mob
                     throw new Exception("Character spawned in without a map beneath it");
                 }
             }
-            
+
             controller = GetComponent<CharacterController>();
             lastDashTime = -dashDuration;
+
+            movementHandling = StartCoroutine(HandleMovement());
         }
 
         #region Movement
@@ -85,7 +88,7 @@ namespace Overrailed.Mob
 
             while (this && enabled)
             {
-                var inputDir = new Vector3(InputDir.x, 0, InputDir.y);
+                var inputDir = new Vector3(InputDir.x, 0, InputDir.y).normalized;
 
                 transform.forward = Vector3.RotateTowards(transform.forward, LastInputDir, turnSpeed * Time.fixedDeltaTime, 0);
                 if (UpdateMovingStates(inputDir))
@@ -101,14 +104,16 @@ namespace Overrailed.Mob
                     if (HoldingDashKey) lastDashTime = Time.time;
                     if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
 
-                    // Moves character
-                    if (Map.PointIsInBounds(transform.position + deltaPos)) controller.Move(deltaPos);
+                    if (Map.PointIsInBounds(transform.position + deltaPos))
+                    {
+                        controller.Move(deltaPos);
+                    }
 
                     OnMove?.Invoke();
                 }
 
                 yield return new WaitForSeconds(Time.fixedDeltaTime);
-                yield return new WaitUntil(() => GameManager.instance == null || !GameManager.IsPaused());
+                yield return new WaitUntil(() => Manager.IsPlaying() || !(this && enabled));
             }
         }
 
@@ -142,6 +147,7 @@ namespace Overrailed.Mob
 
         protected void StopMovement()
         {
+            movementHandling = null;
             wasMoving = false;
             isMoving = false;
         }
@@ -339,6 +345,7 @@ namespace Overrailed.Mob
             while (percent < 1)
             {
                 yield return null;
+                yield return new WaitUntil(() => Manager.IsPlaying());
 
                 percent += animSpeed * Time.deltaTime;
                 arm.localRotation = Quaternion.Lerp(from, to, percent);
@@ -383,7 +390,9 @@ namespace Overrailed.Mob
                 }
 
                 time += legSwingCoefficient * moveSpeed * legRaiseAngle * Time.deltaTime;
+
                 yield return null;
+                yield return new WaitUntil(() => Manager.IsPlaying());
             }
 
             // Return to base position
@@ -404,6 +413,7 @@ namespace Overrailed.Mob
                 }
 
                 yield return null;
+                yield return new WaitUntil(() => Manager.IsPlaying());
             }
 
             legR.localRotation = Quaternion.identity;

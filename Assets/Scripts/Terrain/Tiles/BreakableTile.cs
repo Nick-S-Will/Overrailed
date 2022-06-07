@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 using Overrailed.Terrain.Tools;
 
 namespace Overrailed.Terrain.Tiles
@@ -40,8 +40,8 @@ namespace Overrailed.Terrain.Tiles
                 if (toSpawn is BreakableTile t)
                 {
                     BreakIntoParticles(breakParticlePrefab, toSpawn.MeshColorGradient, transform.position);
-                    AudioManager.instance.PlaySound(tool.InteractSound, transform.position);
-                    AudioManager.instance.PlaySound(breakAudio, transform.position);
+                    AudioManager.PlaySound(tool.InteractSound, transform.position);
+                    AudioManager.PlaySound(breakAudio, transform.position);
                     
                     toSpawn = t.lowerTier;
                 }

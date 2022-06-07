@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Overrailed.Managers;
+using Overrailed.Managers.Audio;
 
 namespace Overrailed.Terrain.Tiles
 {
@@ -93,7 +93,7 @@ namespace Overrailed.Terrain.Tiles
             toPickUp.transform.localPosition = Vector3.up;
             toPickUp.transform.localRotation = Quaternion.identity;
 
-            AudioManager.instance.PlaySound(PickupAudio, transform.position);
+            AudioManager.PlaySound(PickupAudio, transform.position);
             InvokeOnPickUp();
 
             return toPickUp;
@@ -103,7 +103,7 @@ namespace Overrailed.Terrain.Tiles
 
         public override void Drop(Vector3Int position)
         {
-            AudioManager.instance.PlaySound(dropSound, position);
+            AudioManager.PlaySound(dropSound, position);
             InvokeOnDrop();
         }
         
@@ -129,7 +129,7 @@ namespace Overrailed.Terrain.Tiles
             transform.rotation = stackBase.transform.parent.rotation;
             transform.localRotation = Quaternion.Euler(0, Random.Range(-5, 5f), 0);
 
-            AudioManager.instance.PlaySound(dropSound, transform.position);
+            AudioManager.PlaySound(dropSound, transform.position);
 
             return true;
         }
@@ -156,7 +156,7 @@ namespace Overrailed.Terrain.Tiles
             _ = Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform);
             Destroy(GetStackTop().gameObject);
 
-            AudioManager.instance.PlaySound(bridgeBuildAudio, liquid.transform.position);
+            AudioManager.PlaySound(bridgeBuildAudio, liquid.transform.position);
 
             Destroy(liquid.GetComponent<BoxCollider>());
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 using Overrailed.Terrain.Tiles;
 
-namespace Overrailed.Managers
+namespace Overrailed.Mob
 {
     public class MobManager : MonoBehaviour
     {
@@ -14,11 +14,7 @@ namespace Overrailed.Managers
 
         void Awake()
         {
-            if (instance)
-            {
-                Destroy(gameObject);
-                Debug.LogError("Multiple MobManagers Found");
-            }
+            if (instance) Debug.LogError("Multiple MobManagers Found");
             else instance = this; 
         }
 
