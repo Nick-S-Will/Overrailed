@@ -1142,9 +1142,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5bc3fde89a1cce40bc9af37fda50b2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  map: {fileID: 0}
   moveSpeed: 7
   turnSpeed: 15
-  legSwingCoefficient: 0.04
+  legSwingCoefficient: 0.09
   legRaiseAngle: 45
   dashSpeedMultiplier: 2.25
   dashDuration: 0.2

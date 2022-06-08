@@ -8,7 +8,7 @@ using TMPro;
 using Overrailed.Terrain.Tools;
 using Overrailed.Terrain.Tiles;
 using Overrailed.Train;
-using Overrailed.Terrain.Generation;
+using Overrailed.Terrain;
 
 namespace Overrailed.Managers
 {

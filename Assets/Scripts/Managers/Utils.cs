@@ -1,6 +1,9 @@
 using System.Threading.Tasks;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem;
 using UnityEngine;
 
 public static class Utils
@@ -23,9 +26,9 @@ public static class Utils
         return averageCoord;
     }
 
-    public static async Task MoveTransformTo(MonoBehaviour routineAnchor, Transform transform, Transform destination, float moveSpeed, float angularSpeed)
+    public static async Task MoveTransformTo(Transform transform, Transform destination, float moveSpeed, float angularSpeed)
     {
-        while (routineAnchor && (transform.position != destination.position || transform.rotation != destination.rotation))
+        while (Application.isPlaying && (transform.position != destination.position || transform.rotation != destination.rotation))
         {
             transform.position = Vector3.MoveTowards(transform.position, destination.position, moveSpeed * Time.deltaTime);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, destination.rotation, angularSpeed * Time.deltaTime);
@@ -80,5 +83,11 @@ public static class Utils
             currentTarget.gameObject.layer = layer;
             foreach (Transform child in currentTarget) moveTargets.Push(child);
         }
+    }
+
+    private static readonly KeyControl[] numberKeys = new KeyControl[] { Keyboard.current.digit0Key, Keyboard.current.digit1Key, Keyboard.current.digit2Key, Keyboard.current.digit3Key, Keyboard.current.digit4Key, Keyboard.current.digit5Key, Keyboard.current.digit6Key, Keyboard.current.digit7Key, Keyboard.current.digit8Key, Keyboard.current.digit9Key };
+    public static void AddNumbersThisFrame(ref StringBuilder sb)
+    {
+        foreach (KeyControl key in numberKeys) if (key.wasPressedThisFrame) sb.Append(key.name);
     }
 }

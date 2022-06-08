@@ -27,7 +27,7 @@ namespace Overrailed.Train
         [SerializeField] private Transform burnPoint;
         [SerializeField] private RailTile startRail;
         [SerializeField] protected int tier = 1;
-        [SerializeField] protected bool isPermeable;
+        [SerializeField] protected bool isTangible = true;
 
         protected ParticleSystem burningParticles;
         private Rigidbody rb;
@@ -215,7 +215,7 @@ namespace Overrailed.Train
             transform.position = pos;
             transform.forward = dir;
 
-            GetComponent<BoxCollider>().enabled = !isPermeable;
+            GetComponent<BoxCollider>().enabled = isTangible;
 
             return true;
         }

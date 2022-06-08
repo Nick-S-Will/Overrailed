@@ -2893,6 +2893,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 37c883f1cd71af545b1a14781b5c8f5e, type: 3}
+--- !u!114 &679342495 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2264036827029980985, guid: 37c883f1cd71af545b1a14781b5c8f5e, type: 3}
+  m_PrefabInstance: {fileID: 679342494}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5bc3fde89a1cce40bc9af37fda50b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &680329822
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3996,41 +4007,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b17c4edce4d1da844baf51a961b87bbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultPlayerPrefab: {fileID: 679342495}
   interactMask:
     serializedVersion: 2
-    m_Bits: 0
-  seed: 5
-  noiseScale: 10
-  noiseOffset: {x: 0, y: 0}
-  chunkLength: 20
-  mapWidth: 19
-  currentBiome: {fileID: 0}
+    m_Bits: 6929
   highlightColor: {r: 1, g: 1, b: 1, a: 1}
   highlightEnabled: 0
-  stationPrefab: {fileID: 0}
-  defaultPlayerPrefab: {fileID: 0}
-  stationBridge: {fileID: 0}
-  stationSize: {x: 5, y: 5}
-  trainInitialDelay: 10
-  startBonus: 1
-  checkpointPrefab: {fileID: 0}
-  checkpointSize: {x: 3, y: 3}
+  visualizeBounds: 0
   spawnOffset: {x: 0, y: -10, z: 0}
-  rowSpawnInterval: 0.15
+  rowSpawnInterval: 0.16
   bounceHeight: 0.5
   slideSpeed: 50
-  numbersPrefabs: []
-  numberFadeSpeed: 0.5
-  numberFadeDuration: 1.25
-  numberSpawnSound: {fileID: 0}
-  visualizerMaterials: []
-  generateHeightVisualizer: 0
-  visualizeBounds: 0
-  chunks:
-  - {fileID: 0}
-  groundParent: {fileID: 0}
-  groundCollider: {fileID: 0}
-  obstacleParent: {fileID: 0}
   stationPos: {x: 2, y: 0, z: 7}
 --- !u!4 &815364586
 Transform:
@@ -12081,7 +12068,7 @@ BoxCollider:
   m_GameObject: {fileID: 2138848451}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 12, y: 1, z: 8}
   m_Center: {x: 0, y: 0, z: 0}

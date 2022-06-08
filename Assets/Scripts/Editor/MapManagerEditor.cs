@@ -1,20 +1,18 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEditor;
 
-using Overrailed.Terrain.Generation;
+using Overrailed.Terrain;
 
 namespace Overrailed.Editors
 {
     [CustomEditor(typeof(MapManager))]
-    public class MapEditor : Editor
+    public class MapManagerEditor : Editor
     {
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
             GUILayout.Space(15);
 
-            if (GUILayout.Button("Generate Map")) ((MapManager)target).GenerateMap();
-            if (GUILayout.Button("Add Chunk")) ((MapManager)target).AddChunk();
             if (GUILayout.Button("Animate Spawn")) ((MapManager)target).AnimateNewChunk();
         }
     }

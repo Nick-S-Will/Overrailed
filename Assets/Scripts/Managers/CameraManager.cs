@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-using Overrailed.Terrain.Generation;
+using Overrailed.Terrain;
 
 namespace Overrailed.Managers.Cameras
 {

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 using Overrailed.Managers;
-using Overrailed.Terrain.Generation;
+using Overrailed.Terrain;
 using Overrailed.Terrain.Tools;
 using Overrailed.Player;
 using Overrailed.Train;
@@ -47,7 +47,6 @@ namespace Overrailed.UI
             {
                 foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
                 map.OnFinishAnimateChunk += CreateToolHUDs;
-                map.OnSeedChange += UpdateSeedText;
                 FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
 
                 coinsStartLength = coinsText.text.Length;
@@ -225,12 +224,8 @@ namespace Overrailed.UI
             if (Manager.instance is GameManager gm)
             {
                 foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange -= UpdateCoinsText;
-                if (map)
-                {
-                    map.OnFinishAnimateChunk -= CreateToolHUDs;
-                    map.OnSeedChange -= UpdateSeedText;
-                }
-
+                if (map) map.OnFinishAnimateChunk -= CreateToolHUDs;
+                
                 gm.OnCheckpoint -= AlignContinueWithLocomotiveZ;
                 gm.OnCheckpoint -= EnableContinueButton;
                 gm.OnEndCheckpoint -= DisableContinueButton;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Overrailed.Managers;
-using Overrailed.Terrain.Generation;
+using Overrailed.Terrain;
 using Overrailed.Terrain.Tools;
 using Overrailed.Terrain.Tiles;
 
@@ -383,23 +383,20 @@ namespace Overrailed.Mob
                 calfL.localRotation = Quaternion.Euler(Mathf.Abs(angle), 0, 0); ;
                 calfR.localRotation = calfL.localRotation;
 
-                if (!IsHoldingItem)
-                {
-                    armL.localRotation = legR.localRotation;
-                    armR.localRotation = legL.localRotation;
-                }
-
+                armL.localRotation = legR.localRotation;
+                if (!IsHoldingItem) armR.localRotation = legL.localRotation;
+                
                 time += legSwingCoefficient * moveSpeed * legRaiseAngle * Time.deltaTime;
 
                 yield return null;
-                yield return new WaitUntil(() => Manager.IsPlaying());
+                yield return Manager.Pause;
             }
 
             // Return to base position
             while (legL.localRotation != Quaternion.identity)
             {
                 float angle = Quaternion.Angle(legL.localRotation, Quaternion.identity);
-                float maxRadians = moveSpeed * ((angle + legRaiseAngle) / 2)  * Time.deltaTime;
+                float maxRadians = moveSpeed * (angle + legRaiseAngle) * Time.deltaTime;
                 legL.localRotation = Quaternion.RotateTowards(legL.localRotation, Quaternion.identity, maxRadians);
                 legR.localRotation = Quaternion.RotateTowards(legR.localRotation, Quaternion.identity, maxRadians);
 
@@ -413,7 +410,7 @@ namespace Overrailed.Mob
                 }
 
                 yield return null;
-                yield return new WaitUntil(() => Manager.IsPlaying());
+                yield return Manager.Pause;
             }
 
             legR.localRotation = Quaternion.identity;
