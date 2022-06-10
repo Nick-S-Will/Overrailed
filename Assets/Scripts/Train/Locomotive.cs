@@ -50,6 +50,7 @@ namespace Overrailed.Train
                 gm.OnEndCheckpoint += SetToBaseSpeed;
                 gm.OnCheckpoint += StopEmittingSmoke;
                 gm.OnEndCheckpoint += StartEmittingSmoke;
+                OnDeath += gm.EndGame;
             }
             
             base.Start();

@@ -4011,13 +4011,19 @@ MonoBehaviour:
   interactMask:
     serializedVersion: 2
     m_Bits: 6929
+  initialTrainDelay: 15
   highlightColor: {r: 1, g: 1, b: 1, a: 1}
   highlightEnabled: 0
   visualizeBounds: 0
-  spawnOffset: {x: 0, y: -10, z: 0}
-  rowSpawnInterval: 0.16
-  bounceHeight: 0.5
+  spawnOffset: {x: 0, y: -2.5, z: 0}
+  groundSpawnInterval: 0.1
+  obstacleSpawnInterval: 0.1
+  bounceHeight: 0.25
   slideSpeed: 50
+  numbersPrefabs: []
+  numberFadeSpeed: 0.5
+  numberFadeDuration: 1.25
+  numberSpawnSound: {fileID: 0}
   stationPos: {x: 2, y: 0, z: 7}
 --- !u!4 &815364586
 Transform:

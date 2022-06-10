@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
+using Overrailed.Terrain.Generation;
 using Overrailed.Terrain.Tiles;
 using Overrailed.Train;
 
@@ -17,14 +18,19 @@ namespace Overrailed.Terrain
         #region Inspector Variables
         [SerializeField] private MonoBehaviour defaultPlayerPrefab;
         [SerializeField] private LayerMask interactMask;
+        [SerializeField] [Min(5)] private float initialTrainDelay = 15;
         [Space]
         [SerializeField] private Color highlightColor = Color.white;
         [SerializeField] private bool highlightEnabled = true;
         [SerializeField] private bool visualizeBounds;
         [Header("Animation")]
         [SerializeField] private Vector3 spawnOffset = 10 * Vector3.down;
-        [SerializeField] [Min(0)] private float rowSpawnInterval = 0.2f, bounceHeight = 1;
+        [SerializeField] [Min(0)] private float groundSpawnInterval = 0.2f, obstacleSpawnInterval = 0.1f, bounceHeight = 1;
         [SerializeField] [Min(1)] private float slideSpeed = 100;
+        [Space]
+        [SerializeField] private GameObject[] numbersPrefabs;
+        [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
+        [SerializeField] private AudioClip numberSpawnSound;
         #endregion
 
         [SerializeField] [HideInInspector] private Vector3Int stationPos;
@@ -51,6 +57,7 @@ namespace Overrailed.Terrain
                 gm.OnEndCheckpoint += AnimateNewChunk;
                 gm.OnGameEnd += ShowAllChunks;
                 OnFinishAnimateChunk += SpawnPlayer;
+                OnFinishAnimateChunk += StartTrain;
             }
             else if (Manager.instance is MainMenuManager mm)
             {
@@ -65,7 +72,7 @@ namespace Overrailed.Terrain
                 OnFinishAnimateChunk += SpawnPlayer;
             }
 
-            AnimateNewChunk();
+            if (GetComponent<MapGenerator>() == null) AnimateFirstChunk();
 
             if (highlightEnabled) _ = StartCoroutine(TileHighlighting());
         }
@@ -81,6 +88,27 @@ namespace Overrailed.Terrain
             player.parent = null;
             player.position = stationPos;
         }
+
+        #region Train Starting
+        public void StartTrain() => StartTrain(initialTrainDelay);
+        private async void StartTrain(float delay)
+        {
+            await Manager.Delay(Mathf.RoundToInt(1000 * (delay - 5)));
+            if (!Application.isPlaying) return;
+
+            var locomotive = GetComponentInChildren<Locomotive>();
+            if (locomotive == null) Debug.LogError("Map has no Locomotive");
+
+            for (int countDown = 5; countDown > 0; countDown--)
+            {
+                Utils.FadeObject(numbersPrefabs[countDown], locomotive.transform.position + Vector3.up, numberFadeSpeed, numberFadeDuration);
+
+                await Manager.Delay(1);
+            }
+
+            locomotive.StartTrain();
+        }
+        #endregion
 
         #region Tile highlighting
         public void TryHighlightTile(Transform tile)
@@ -336,16 +364,22 @@ namespace Overrailed.Terrain
         #endregion
 
         #region Spawning animation
-        public void AnimateNewChunk() => _ = AnimateChunk(transform.childCount - 1);
+        /// <summary>
+        /// Slides in the first chunk of the map, and invokes <see cref="OnFinishAnimateChunk"/>. Only meant for the start of the game.
+        /// </summary>
+        public async void AnimateFirstChunk()
+        {
+            await Task.Yield();
+            await AnimateChunk(0);
+
+            OnFinishAnimateChunk?.Invoke();
+        }
+        public void AnimateNewChunk() => _ = AnimateChunk(transform.childCount - 2);
         public async Task AnimateChunk(int chunkIndex)
         {
-            //await Task.Delay(1000);
-            //OnFinishAnimateChunk?.Invoke();
-            //return;
-
             var chunk = transform.GetChild(chunkIndex + 1);
             Transform ground = chunk.GetChild(0), obstacles = chunk.GetChild(1);
-            print(1);
+            List<Task> slideTasks = new List<Task>();
 
             // Hiding and moving station and checkpoint
             var extras = new List<Transform>();
@@ -362,7 +396,7 @@ namespace Overrailed.Terrain
                 obj.gameObject.SetActive(false);
                 foreach (var tile in obj.GetComponentsInChildren<Tile>()) tile.SetVisible(false);
             }
-            print(ground.childCount);
+
             // Moving and hiding each row
             for (int i = 0; i < ground.childCount; i++)
             {
@@ -373,31 +407,28 @@ namespace Overrailed.Terrain
                 // Hides obstacle graphics without affecting colliders
                 foreach (var tile in obstacles.GetChild(i).GetComponentsInChildren<Tile>()) tile.SetVisible(false);
             }
-            print(3);
+
             // Turning on and sliding each ground row into place
             foreach (Transform groundRow in ground)
             {
                 groundRow.gameObject.SetActive(true);
 
-                print("bruh");
-                _ = AnimateSlideAndBounce(groundRow, Vector3.zero);
-                print("bruh2");
-                await Task.Delay(Mathf.RoundToInt(1000 * rowSpawnInterval));
-                print("bruh3");
+                slideTasks.Add(AnimateSlideAndBounce(groundRow, Vector3.zero));
+                await Manager.Delay(groundSpawnInterval);
             }
-            print(4);
+
             // Turning on and sliding each obstacle row into place
             for (int i = 0; i < ground.childCount; i++)
             {
                 var obstacleRow = obstacles.GetChild(i);
                 foreach (var tile in obstacleRow.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
 
-                _ = AnimateSlideAndBounce(obstacleRow, Vector3.zero);
+                slideTasks.Add(AnimateSlideAndBounce(obstacleRow, Vector3.zero));
 
                 if (obstacleRow.childCount == 0) continue;
-                await Task.Delay(Mathf.RoundToInt(500 * rowSpawnInterval));
+                await Manager.Delay(obstacleSpawnInterval);
             }
-            print(5);
+
             // Turning on and sliding station and checkpoint into place
             foreach (var transform in extras)
             {
@@ -409,9 +440,8 @@ namespace Overrailed.Terrain
                 await AnimateSlide(extras[0], extraStartPos[0]);
                 if (extras.Count > 1) await AnimateSlide(extras[1], extraStartPos[1]);
             }
-            print(6);
 
-            OnFinishAnimateChunk?.Invoke();
+            await Task.WhenAll(slideTasks.ToArray());
         }
 
         private async Task AnimateSlide(Transform t, Vector3 destination)
@@ -460,6 +490,7 @@ namespace Overrailed.Terrain
                 gm.OnEndCheckpoint -= AnimateNewChunk;
                 gm.OnGameEnd -= ShowAllChunks;
                 OnFinishAnimateChunk -= SpawnPlayer;
+                OnFinishAnimateChunk -= StartTrain;
             }
             else if (Manager.instance is MainMenuManager mm)
             {

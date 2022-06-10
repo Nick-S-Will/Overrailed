@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Overrailed.Managers;
 using Overrailed.Terrain;
 using Overrailed.Terrain.Tools;
+using Overrailed.Terrain.Generation;
 using Overrailed.Player;
 using Overrailed.Train;
 
@@ -41,12 +42,13 @@ namespace Overrailed.UI
         private int seedStartLength, speedStartLength, coinsStartLength;
         [HideInInspector] public bool isUpdating;
 
-        private void Awake()
+        private void Start()
         {
             if (Manager.instance is GameManager gm)
             {
                 foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
                 map.OnFinishAnimateChunk += CreateToolHUDs;
+                map.OnFinishAnimateChunk += UpdateSeedText;
                 FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
 
                 coinsStartLength = coinsText.text.Length;
@@ -64,6 +66,7 @@ namespace Overrailed.UI
         }
 
         #region Stat HUD Texts
+        public void UpdateSeedText() => UpdateText(seedText, seedStartLength, FindObjectOfType<MapGenerator>().Seed.ToString());
         public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
         public void UpdateSpeedText(string newSpeed) => UpdateText(speedText, speedStartLength, newSpeed);
         public void UpdateCoinsText(string newCoinCount) => UpdateText(coinsText, coinsStartLength, newCoinCount);

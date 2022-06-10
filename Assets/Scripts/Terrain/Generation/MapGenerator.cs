@@ -22,15 +22,10 @@ namespace Overrailed.Terrain.Generation
         [SerializeField] private GameObject stationPrefab;
         [SerializeField] private Tile stationBridge;
         [SerializeField] private Vector2Int stationSize = 5 * Vector2Int.one;
-        [SerializeField] [Min(5)] private float initialTrainDelay = 15;
         [SerializeField] private bool startBonus = false;
         [Space]
         [SerializeField] private GameObject checkpointPrefab;
         [SerializeField] private Vector2Int checkpointSize = 3 * Vector2Int.one;
-        [Space]
-        [SerializeField] private GameObject[] numbersPrefabs;
-        [SerializeField] private float numberFadeSpeed = 0.5f, numberFadeDuration = 1.25f;
-        [SerializeField] private AudioClip numberSpawnSound;
 
         [Header("Visualizer Tools")]
         [SerializeField] private Material[] visualizerMaterials;
@@ -42,46 +37,23 @@ namespace Overrailed.Terrain.Generation
         private List<Vector2> randomNoiseOffsets;
 
         public Vector3Int IntPos => Vector3Int.RoundToInt(transform.position);
-        public int Seed { get; private set; }
+        public int Seed => seed;
 
         private void Start()
         {
             if (Manager.instance is GameManager gm)
             {
-                GetComponent<MapManager>().OnFinishAnimateChunk += StartTrain;
                 gm.OnCheckpoint += AddChunk;
 
                 GenerateMap();
             }
         }
 
-
-        #region Train Starting
-        public void StartTrain() => StartTrain(initialTrainDelay);
-        private async void StartTrain(float delay)
-        {
-            await Task.Delay(Mathf.RoundToInt(1000 * (delay - 5)));
-            if (!Application.isPlaying) return;
-
-            var locomotive = GetComponentInChildren<Locomotive>();
-            if (locomotive == null) Debug.LogError("Map has no Locomotive");
-
-            for (int countDown = 5; countDown > 0; countDown--)
-            {
-                Utils.FadeObject(numbersPrefabs[countDown], locomotive.transform.position + Vector3.up, numberFadeSpeed, numberFadeDuration);
-
-                await Manager.Delay(1);
-            }
-
-            locomotive.StartTrain();
-        }
-        #endregion
-
         #region Generation
         /// <summary>
         /// Clears current map and generates the first chunk of a new one
         /// </summary>
-        public async void GenerateMap()
+        public void GenerateMap()
         {
             transform.position = IntPos;
 
@@ -103,13 +75,9 @@ namespace Overrailed.Terrain.Generation
 
             AddChunk();
 
-            await Task.Yield();
-            if (Manager.Exists && Manager.instance is GameManager gm)
-            {
-                var locomotive = GetComponentInChildren<Locomotive>();
-                locomotive.OnDeath += gm.EndGame;
-                MapManager.AddLocomotive(GetComponentInChildren<Locomotive>());
-            }
+            var locomotive = GetComponentInChildren<Locomotive>();
+            if (locomotive) MapManager.AddLocomotive(GetComponentInChildren<Locomotive>());
+            GetComponent<MapManager>().AnimateFirstChunk();
         }
 
         /// <summary>
@@ -323,7 +291,6 @@ namespace Overrailed.Terrain.Generation
         {
             if (Manager.instance is GameManager gm)
             {
-                GetComponent<MapManager>().OnFinishAnimateChunk -= StartTrain;
                 gm.OnCheckpoint -= AddChunk;
             }
         }

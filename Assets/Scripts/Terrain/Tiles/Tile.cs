@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Overrailed.Terrain.Tiles
 {
+    [SelectionBase]
     public class Tile : MonoBehaviour, IPickupable
     {
         public event System.Action OnPickUp, OnDrop;

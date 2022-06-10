@@ -13,7 +13,7 @@ namespace Overrailed.Editors
             DrawDefaultInspector();
             GUILayout.Space(15);
 
-            if (GUILayout.Button("Animate Spawn")) ((MapManager)target).AnimateNewChunk();
+            if (GUILayout.Button("Animate Chunk")) ((MapManager)target).AnimateNewChunk();
         }
     }
 }

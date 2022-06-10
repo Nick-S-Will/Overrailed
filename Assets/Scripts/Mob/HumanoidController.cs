@@ -67,12 +67,16 @@ namespace Overrailed.Mob
         {
             if (map == null)
             {
-                try { map = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Ground"))[0].transform.parent.GetComponent<MapManager>(); }
-                catch (IndexOutOfRangeException)
+                foreach (var mapManager in FindObjectsOfType<MapManager>())
                 {
-                    enabled = false;
-                    throw new Exception("Character spawned in without a map beneath it");
+                    if (mapManager.PointIsInPlayBounds(transform.position))
+                    {
+                        map = mapManager;
+                        break;
+                    }
                 }
+
+                if (map == null) Debug.LogError("Humanoid spawned outside bounds of any map");
             }
 
             controller = GetComponent<CharacterController>();
