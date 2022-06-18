@@ -49,7 +49,7 @@ namespace Overrailed.Terrain.Tools
         /// Intercepts Rod drop if bobber is out
         /// </summary>
         /// <returns></returns>
-        public override bool OnTryDrop()
+        public override bool OnTryDrop(Vector3Int position)
         {
             if (isCast) UseOn(null);
             else return true;

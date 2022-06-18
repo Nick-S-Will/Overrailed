@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -55,8 +56,9 @@ namespace Overrailed.Managers
         void Start()
         {
             map = FindObjectOfType<MapManager>();
+            map.OnFinishAnimateFirstChunk += StartTutorial;
 
-            map.OnFinishAnimateChunk += StartTutorial;
+            OnShowInfo += GamepadSouthCloseInfo;
 
             if (pointer)
             {
@@ -67,6 +69,18 @@ namespace Overrailed.Managers
         }
 
         #region Tutorial Routines
+        private async void GamepadSouthCloseInfo()
+        {
+            if (Gamepad.current == null) return;
+
+            while (infoPanel.activeSelf)
+            {
+                await Task.Yield();
+
+                if (Gamepad.current.buttonSouth.wasPressedThisFrame) CloseInfo();
+            }
+        }
+
         private void StartTutorial() => _ = StartCoroutine(TutorialRoutine());
         private IEnumerator TutorialRoutine()
         {
@@ -289,8 +303,7 @@ namespace Overrailed.Managers
             OnCloseInfo?.Invoke();
         }
 
-        // Used by Canvas Button
-        public void CloseInfo()
+        public void CloseInfo() // Used by Canvas Button
         {
             infoPanel.SetActive(false);
             Pausing.ForceResume();
@@ -316,9 +329,9 @@ namespace Overrailed.Managers
                 pointer.position = pointerTarget.position + pointerOffset + bobOffset;
                 pointer.localRotation = nthCycle ? Quaternion.Euler(0, Mathf.Lerp(0, 360, cycleProgress - cycleCount), 0) : Quaternion.identity;
 
+                await Pause;
                 await Task.Yield();
                 time += Time.deltaTime;
-                await Pause;
             }
 
             if (pointer && Application.isPlaying)
@@ -336,7 +349,7 @@ namespace Overrailed.Managers
 
             stepIndex = steps.Count - 1;
             yield return ShowInfoRoutine(steps[stepIndex]);
-            SceneManager.LoadScene(titleSceneName);
+            SceneManager.LoadScene(titleScene.name);
         }
 
         protected override void OnDestroy() => base.OnDestroy();

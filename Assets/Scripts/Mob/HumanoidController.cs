@@ -43,7 +43,7 @@ namespace Overrailed.Mob
         private CharacterController controller;
         private List<Coroutine> currentArmTurns = new List<Coroutine>();
         private Coroutine toolSwinging, legSwinging;
-        private float lastDashTime, lastInteractTime;
+        private float lastInteractTime;
         /// <summary>
         /// True if player was moving in the previous update, used to start leg swinging
         /// </summary>
@@ -59,28 +59,20 @@ namespace Overrailed.Mob
         protected Vector3 LastInputDir { get; private set; }
         public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + Vector3.up + LastInputDir);
         protected Vector2 InputDir { private get; set; }
+        protected float LastDashDownTime { private get; set; }
         public int Strength { get; private set; } = 2;
         public bool IsHoldingItem => HeldItem != null;
-        protected bool HoldingDashKey { private get; set; }
 
         protected virtual void Start()
         {
             if (map == null)
             {
-                foreach (var mapManager in FindObjectsOfType<MapManager>())
-                {
-                    if (mapManager.PointIsInPlayBounds(transform.position))
-                    {
-                        map = mapManager;
-                        break;
-                    }
-                }
-
+                map = MapManager.FindMap(transform.position);
                 if (map == null) Debug.LogError("Humanoid spawned outside bounds of any map");
             }
 
             controller = GetComponent<CharacterController>();
-            lastDashTime = -dashDuration;
+            LastDashDownTime = -dashDuration;
 
             movementHandling = StartCoroutine(HandleMovement());
         }
@@ -105,8 +97,7 @@ namespace Overrailed.Mob
                         LastInputDir = inputDir;
                     }
 
-                    if (HoldingDashKey) lastDashTime = Time.time;
-                    if (Time.time < lastDashTime + dashDuration) deltaPos *= DashMultiplier();
+                    if (Time.time < LastDashDownTime + dashDuration) deltaPos *= DashMultiplier();
 
                     if (Map.PointIsInBounds(transform.position + deltaPos))
                     {
@@ -117,7 +108,7 @@ namespace Overrailed.Mob
                 }
 
                 yield return new WaitForSeconds(Time.fixedDeltaTime);
-                yield return new WaitUntil(() => Manager.IsPlaying() || !(this && enabled));
+                if (this && enabled) yield return Manager.PauseRoutine;
             }
         }
 
@@ -129,7 +120,7 @@ namespace Overrailed.Mob
         private bool UpdateMovingStates(Vector3 input)
         {
             // Gets current moving state
-            isMoving = input != Vector3.zero || HoldingDashKey || Time.time < lastDashTime + dashDuration;
+            isMoving = input != Vector3.zero || Time.time < LastDashDownTime + dashDuration;
             if (!isMoving) return wasMoving = false;
 
             // Start swinging legs if player wasn't moving last update
@@ -146,7 +137,7 @@ namespace Overrailed.Mob
         protected float DashMultiplier()
         {
             /// Parabola that goes from <see cref="dashSpeedMultiplier"/> to 1 over <see cref="dashDuration"/> seconds
-            return (dashSpeedMultiplier - 1) * (-Mathf.Pow(Mathf.InverseLerp(lastDashTime, lastDashTime + dashDuration, Time.time), 4) + 1) + 1;
+            return (dashSpeedMultiplier - 1) * (-Mathf.Pow(Mathf.InverseLerp(LastDashDownTime, LastDashDownTime + dashDuration, Time.time), 4) + 1) + 1;
         }
 
         protected void StopMovement()
@@ -160,17 +151,17 @@ namespace Overrailed.Mob
         #region Interact
         protected void InteractAll() => TryInteract(TryToPickUpAll, TryDropAll);
         protected void InteractSingle() => TryInteract(TryToPickUpSingle, TryDropSingle);
-        private void TryInteract(Func<IPickupable, bool> pickup, Func<bool> drop)
+        private void TryInteract(Func<IPickupable, bool> Pickup, Action Drop)
         {
-            if (Time.time < lastInteractTime + interactInterval) return;
+            if (Time.time < lastInteractTime + interactInterval || Manager.IsPaused()) return;
             lastInteractTime = Time.time;
 
             if (Physics.Raycast(transform.position + Vector3.up, LastInputDir, out RaycastHit hitInfo, 1, Map.InteractMask))
             {
                 if (IsHoldingItem) TryUseHeldItemOn(hitInfo.transform.GetComponent<IInteractable>());
-                else _ = pickup(hitInfo.transform.GetComponent<IPickupable>());
+                else _ = Pickup(hitInfo.transform.GetComponent<IPickupable>());
             }
-            else _ = drop();
+            else Drop();
         }
 
         private bool TryToPickUpAll(IPickupable pickup) => TryToPickUp(pickup, Strength);
@@ -257,16 +248,16 @@ namespace Overrailed.Mob
         /// Places <see cref="HeldItem"/> on the ground if it's not null
         /// </summary>
         /// <returns>True if <see cref="HeldItem"/> was placed</returns>
-        private bool TryDropAll() => TryDrop(false);
+        private void TryDropAll() => TryDrop(false);
         /// <summary>
-        /// Places <see cref="HeldItem"/> on the ground, or a single tile if it's a stack, if <see cref="HeldItem"/> isn't null
+        /// Places <see cref="HeldItem"/> on the ground, or a single tile if it's a stack, if it isn't null
         /// </summary>
         /// <returns>True if <see cref="HeldItem"/>'s entire stack was placed</returns>
-        private bool TryDropSingle() => TryDrop(true);
-        private bool TryDrop(bool single)
+        private void TryDropSingle() => TryDrop(true);
+        private void TryDrop(bool single)
         {
             Vector3Int coords = LookPoint;
-            if (!IsHoldingItem || toolSwinging != null || !Map.PointIsInPlayBounds(coords) || !HeldItem.OnTryDrop()) return false;
+            if (!IsHoldingItem || toolSwinging != null || !Map.PointIsInPlayBounds(coords) || !HeldItem.OnTryDrop(coords)) return;
 
             if (single && HeldItem is StackTile stack && stack.GetStackCount() > 1)
             {
@@ -277,11 +268,7 @@ namespace Overrailed.Mob
                 Map.PlacePickup(HeldItem, coords);
                 LowerArms(HeldItem.IsTwoHanded);
                 HeldItem = null;
-
-                return true;
             }
-
-            return false;
         }
 
         public void ForceDrop()
@@ -314,6 +301,8 @@ namespace Overrailed.Mob
         /// <param name="both">Makes armL point downwards too</param>
         private void LowerArms(bool both)
         {
+            if (isMoving) return;
+
             _ = StopTurnArmRoutines();
             currentArmTurns.Add(StartCoroutine(TurnArm(armR, 0, armTurnSpeed)));
             if (both) currentArmTurns.Add(StartCoroutine(TurnArm(armL, 0, armTurnSpeed)));
@@ -387,13 +376,14 @@ namespace Overrailed.Mob
                 calfL.localRotation = Quaternion.Euler(Mathf.Abs(angle), 0, 0); ;
                 calfR.localRotation = calfL.localRotation;
 
-                armL.localRotation = legR.localRotation;
+
+                if (!IsHoldingItem || !HeldItem.IsTwoHanded) armL.localRotation = legR.localRotation;
                 if (!IsHoldingItem) armR.localRotation = legL.localRotation;
-                
+
                 time += legSwingCoefficient * moveSpeed * legRaiseAngle * Time.deltaTime;
 
                 yield return null;
-                yield return Manager.Pause;
+                yield return Manager.PauseRoutine;
             }
 
             // Return to base position
@@ -407,14 +397,11 @@ namespace Overrailed.Mob
                 calfL.localRotation = Quaternion.RotateTowards(calfL.localRotation, Quaternion.identity, maxRadians);
                 calfR.localRotation = Quaternion.RotateTowards(calfR.localRotation, Quaternion.identity, maxRadians);
 
-                if (!IsHoldingItem)
-                {
-                    armL.localRotation = Quaternion.RotateTowards(armL.localRotation, Quaternion.identity, maxRadians);
-                    armR.localRotation = Quaternion.RotateTowards(armR.localRotation, Quaternion.identity, maxRadians);
-                }
+                if (!IsHoldingItem || !HeldItem.IsTwoHanded) armL.localRotation = Quaternion.RotateTowards(armL.localRotation, Quaternion.identity, maxRadians);
+                if (!IsHoldingItem) armR.localRotation = Quaternion.RotateTowards(armR.localRotation, Quaternion.identity, maxRadians);
 
                 yield return null;
-                yield return Manager.Pause;
+                yield return Manager.PauseRoutine;
             }
 
             legR.localRotation = Quaternion.identity;

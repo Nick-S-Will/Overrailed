@@ -123,9 +123,9 @@ namespace Overrailed.Train
             return this;
         }
 
-        public override bool OnTryDrop() => false;
+        public override bool OnTryDrop(Vector3Int position) => false;
 
-        public override void Drop(Vector3Int position) => AudioManager.PlaySound(dropSound, transform.position);
+        public override void Drop(Vector3Int position) => AudioManager.PlaySound(DropAudio, transform.position);
 
         public virtual Interaction TryInteractUsing(IPickupable item)
         {
@@ -145,7 +145,7 @@ namespace Overrailed.Train
                 newCar.leaderLocomotive = leaderLocomotive;
                 newCar.StartDriving();
 
-                AudioManager.PlaySound(dropSound, transform.position);
+                AudioManager.PlaySound(DropAudio, transform.position);
             }
 
             Die();
@@ -237,7 +237,7 @@ namespace Overrailed.Train
             }
             else
             {
-                bool turnsRight = RailTile.BentRailToRight(newRail);
+                bool turnsRight = newRail.TurnsRight();
 
                 pathIndex = turnsRight ? newRail.Path.childCount - 1 : 0;
                 pathDir = turnsRight ? -1 : 1;

@@ -24,8 +24,7 @@ namespace Overrailed.Player
             playerInput.Movement.Walk.performed += ctx => InputDir = ctx.ReadValue<Vector2>();
             playerInput.Movement.Walk.canceled += _ => InputDir = Vector2.zero;
             playerInput.Movement.Dash.started += _ => AudioManager.PlaySound(dashSound, transform.position);
-            playerInput.Movement.Dash.started += _ => HoldingDashKey = true;
-            playerInput.Movement.Dash.canceled += _ => HoldingDashKey = false;
+            playerInput.Movement.Dash.started += _ => LastDashDownTime = Time.time;
 
             playerInput.Interaction.InteractMain.performed += _ => InteractAll();
             playerInput.Interaction.InteractAlt.performed += _ => InteractSingle();

@@ -15,7 +15,7 @@ namespace Overrailed.UI
         private TrainCar heldCar;
 
         public AudioClip PickupAudio => pickupAudio;
-        public AudioClip dropSound => dropAudio;
+        public AudioClip DropAudio => dropAudio;
         public bool IsTwoHanded => heldCar ? heldCar.IsTwoHanded : false;
         /// <summary>
         /// Can pick up car if the holder is holding one
@@ -40,7 +40,7 @@ namespace Overrailed.UI
             else return null;
         }
 
-        public bool OnTryDrop() => false;
+        public bool OnTryDrop(Vector3Int position) => false;
         public void Drop(Vector3Int position) { }
 
         public bool TryPlaceCar(TrainCar car)
@@ -65,7 +65,7 @@ namespace Overrailed.UI
             {
                 if (car == heldCar && TryPlaceCar(car))
                 {
-                    AudioManager.PlaySound(dropSound, transform.position);
+                    AudioManager.PlaySound(DropAudio, transform.position);
                     manager.Coins += car.Tier;
                     return Interaction.Used;
                 }

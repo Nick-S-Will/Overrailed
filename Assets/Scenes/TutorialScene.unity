@@ -1312,9 +1312,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b88e056739c9604cb8fb767d2be7e3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  titleSceneName: TitleScreenScene
-  gameSceneName: GameScene
-  tutorialSceneName: TutorialScene
+  titleScene: {fileID: 102900000, guid: 5bd3b91c27508e34f8f2400cd899e3ff, type: 3}
+  tutorialScene: {fileID: 102900000, guid: 2687a7ce5cee5794a8781f5b8299536c, type: 3}
+  gameScene: {fileID: 102900000, guid: 9fc0d4010bbf28b4594072e72b8655ab, type: 3}
   pauseMenuObject: {fileID: 1605715680}
   axe: {fileID: 1990161505}
   pick: {fileID: 542320097}
@@ -6829,7 +6829,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 4.5905e-41, y: 0, z: 0, w: -28.73877}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -7251,7 +7251,7 @@ BoxCollider:
   m_GameObject: {fileID: 1786097885}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 11, y: 1, z: 8}
   m_Center: {x: 0, y: 0, z: 0}

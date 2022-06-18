@@ -555,6 +555,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 712608436380757253}
+  rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 0}
@@ -566,9 +567,9 @@ MonoBehaviour:
   burnPoint: {fileID: 5518146035113473052}
   startRail: {fileID: 0}
   tier: 1
-  isPermeable: 0
-  craftResultHolder: {fileID: 0}
-  craftResultPrefab: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
+  isTangible: 1
+  craftProductHolder: {fileID: 0}
+  craftProductPrefab: {fileID: 0}
   craftPoints:
   - transform: {fileID: 712608435093044323}
     stackType: Wood

@@ -47,8 +47,9 @@ namespace Overrailed.UI
             if (Manager.instance is GameManager gm)
             {
                 foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange += UpdateCoinsText;
-                map.OnFinishAnimateChunk += CreateToolHUDs;
-                map.OnFinishAnimateChunk += UpdateSeedText;
+                map.OnFinishAnimateFirstChunk += CreateToolHUDs;
+                map.OnFinishAnimateFirstChunk += UpdateSeedText;
+                map.OnFinishAnimateFirstChunk += () => UpdateSpeedText(FindObjectOfType<Locomotive>().TrainSpeed.ToString());
                 FindObjectOfType<Locomotive>().OnSpeedChange += UpdateSpeedText;
 
                 coinsStartLength = coinsText.text.Length;
@@ -227,7 +228,7 @@ namespace Overrailed.UI
             if (Manager.instance is GameManager gm)
             {
                 foreach (var m in FindObjectsOfType<TrainStoreManager>()) m.OnCoinsChange -= UpdateCoinsText;
-                if (map) map.OnFinishAnimateChunk -= CreateToolHUDs;
+                if (map) map.OnFinishAnimateFirstChunk -= CreateToolHUDs;
                 
                 gm.OnCheckpoint -= AlignContinueWithLocomotiveZ;
                 gm.OnCheckpoint -= EnableContinueButton;

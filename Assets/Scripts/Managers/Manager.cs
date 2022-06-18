@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 using UnityEngine;
+using UnityEditor;
 
 namespace Overrailed.Managers
 {
@@ -15,7 +14,7 @@ namespace Overrailed.Managers
     {
         public static Action OnPause, OnResume;
 
-        [SerializeField] protected string titleSceneName = "TitleScreenScene", gameSceneName = "GameScene", tutorialSceneName = "TutorialScene";
+        [SerializeField] protected SceneAsset titleScene, tutorialScene, gameScene;
         [SerializeField] private GameObject pauseMenuObject;
 
         private static TaskCompletionSource<bool> pauseCompletionSource;
@@ -28,12 +27,17 @@ namespace Overrailed.Managers
         public readonly static string CurrentSkinIndexKey = "Current Skin", MasterVolumeKey = "Master Volume", SoundVolumeKey = "Sound Volume", MusicVolumeKey = "Music Volume", SeedKey = "Seed";
 
         public static MonoBehaviour GetSkin() => skinPrefab;
+        /// <summary>
+        /// Halts async functions until the game is no longer paused
+        /// </summary>
         public static Task Pause => pauseCompletionSource.Task;
+        /// <summary>
+        /// Halts coroutine until the game is no longer paused
+        /// </summary>
+        public static WaitUntil PauseRoutine => new WaitUntil(() => Pause.IsCompleted);
         /// <summary>
         /// <see cref="Task.Delay(int)"/> but awaits <see cref="Pause"/>
         /// </summary>
-        /// <param name="seconds"></param>
-        /// <returns></returns>
         public static async Task Delay(float seconds)
         {
             float time = 0f;
@@ -64,7 +68,8 @@ namespace Overrailed.Managers
             pauseCompletionSource.SetResult(true);
 
             SetCursor(false);
-            Pausing.HandlePausing(Keyboard.current.escapeKey);
+            Pausing.HandlePausing(Keyboard.current, Keyboard.current.escapeKey);
+            if (Gamepad.current != null) Pausing.HandlePausing(Gamepad.current, Gamepad.current.startButton);
         }
 
         /// <summary>
@@ -127,13 +132,13 @@ namespace Overrailed.Managers
                 SetCursor(paused);
             }
 
-            public static async void HandlePausing(KeyControl pauseKey)
+            public static async void HandlePausing(InputDevice device, ButtonControl pauseButton)
             {
                 var startScene = SceneManager.GetActiveScene();
 
-                while (Application.isPlaying && startScene == SceneManager.GetActiveScene())
+                while (Application.isPlaying && device != null && startScene == SceneManager.GetActiveScene())
                 {
-                    if (pauseKey.wasPressedThisFrame) TogglePause();
+                    if (pauseButton.wasPressedThisFrame) TogglePause();
                     await Task.Yield();
                 }
             }

@@ -44,6 +44,9 @@ namespace Overrailed.Terrain.Generation
             if (Manager.instance is GameManager gm)
             {
                 gm.OnCheckpoint += AddChunk;
+                var mapManager = GetComponent<MapManager>();
+                gm.OnCheckpoint += mapManager.DisableObstacles;
+                gm.OnEndCheckpoint += mapManager.EnableObstacles;
 
                 GenerateMap();
             }
@@ -53,7 +56,7 @@ namespace Overrailed.Terrain.Generation
         /// <summary>
         /// Clears current map and generates the first chunk of a new one
         /// </summary>
-        public void GenerateMap()
+        public async void GenerateMap()
         {
             transform.position = IntPos;
 
@@ -62,6 +65,8 @@ namespace Overrailed.Terrain.Generation
             System.Action<Object> DestroyType = DestroyImmediate;
             if (Application.isPlaying) DestroyType = Destroy;
             foreach (Transform t in transform.Cast<Transform>().ToList()) DestroyType(t.gameObject);
+
+            await Task.Yield(); // For destroy cleanup
 
             if (Application.isPlaying) seed = int.Parse(PlayerPrefs.GetString(Manager.SeedKey, "0"));
             rng = new System.Random(seed);

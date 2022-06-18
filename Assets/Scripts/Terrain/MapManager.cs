@@ -13,7 +13,7 @@ namespace Overrailed.Terrain
     [SelectionBase]
     public class MapManager : MonoBehaviour
     {
-        public event System.Action OnFinishAnimateChunk;
+        public event System.Action OnFinishAnimateFirstChunk;
 
         #region Inspector Variables
         [SerializeField] private MonoBehaviour defaultPlayerPrefab;
@@ -52,29 +52,27 @@ namespace Overrailed.Terrain
         {
             if (Manager.instance is GameManager gm)
             {
-                gm.OnCheckpoint += DisableObstacles;
-                gm.OnEndCheckpoint += EnableObstacles;
                 gm.OnEndCheckpoint += AnimateNewChunk;
                 gm.OnGameEnd += ShowAllChunks;
-                OnFinishAnimateChunk += SpawnPlayer;
-                OnFinishAnimateChunk += StartTrain;
+                OnFinishAnimateFirstChunk += SpawnPlayer;
+                OnFinishAnimateFirstChunk += StartTrain;
             }
             else if (Manager.instance is MainMenuManager mm)
             {
-                OnFinishAnimateChunk += mm.SlideInMainElements;
-                OnFinishAnimateChunk += mm.MoveSelectedSkinToGame;
+                OnFinishAnimateFirstChunk += mm.SlideInMainElements;
+                OnFinishAnimateFirstChunk += mm.MoveSelectedSkinToGame;
             }
             else if (Manager.instance is TutorialManager)
             {
                 var obstacles = transform.GetChild(1).GetChild(1);
                 var station = obstacles.GetChild(obstacles.childCount - 2);
                 stationPos = Vector3Int.RoundToInt(station.position);
-                OnFinishAnimateChunk += SpawnPlayer;
+                OnFinishAnimateFirstChunk += SpawnPlayer;
             }
 
             if (GetComponent<MapGenerator>() == null) AnimateFirstChunk();
 
-            if (highlightEnabled) _ = StartCoroutine(TileHighlighting());
+            if (highlightEnabled) _ = StartCoroutine(UpdateHighlighting());
         }
 
         public static void AddLocomotive(Locomotive newLocomotive) => locomotives.Add(newLocomotive);
@@ -93,7 +91,7 @@ namespace Overrailed.Terrain
         public void StartTrain() => StartTrain(initialTrainDelay);
         private async void StartTrain(float delay)
         {
-            await Manager.Delay(Mathf.RoundToInt(1000 * (delay - 5)));
+            await Manager.Delay(delay - 5f);
             if (!Application.isPlaying) return;
 
             var locomotive = GetComponentInChildren<Locomotive>();
@@ -171,7 +169,7 @@ namespace Overrailed.Terrain
             }
         }
 
-        private IEnumerator TileHighlighting()
+        private IEnumerator UpdateHighlighting()
         {
             while (this)
             {
@@ -186,6 +184,19 @@ namespace Overrailed.Terrain
         #endregion
 
         #region Getting Map Points/Tiles
+        public static MapManager FindMap(Vector3 point)
+        {
+            foreach (var mapManager in FindObjectsOfType<MapManager>())
+            {
+                if (mapManager.PointIsInPlayBounds(point))
+                {
+                    return mapManager;
+                }
+            }
+
+            return null;
+        }
+
         private Transform GetParentAt(Vector3Int position)
         {
             try
@@ -262,12 +273,12 @@ namespace Overrailed.Terrain
 
         #region Pickup Placing
         /// <summary>
-        /// Places <paramref name="pickup"/> at the nearest coords around <paramref name="pickup"/>'s position
+        /// Moves <paramref name="pickup"/> to the nearest coords around <paramref name="pickup"/>'s position
         /// </summary>
         /// <returns>The coords at which the pickup is move to</returns>
         public Vector3Int MovePickup(IPickupable pickup) => PlacePickup(pickup, Vector3Int.RoundToInt((pickup as Tile).transform.position), false);
         /// <summary>
-        /// Places given pickup at coords and enables its <see cref="BoxCollider"/>
+        /// Places given pickup at coords, or nearest avaible, and enables its <see cref="BoxCollider"/>
         /// </summary>
         /// <returns>The coords at which the pickup is placed</returns>
         public Vector3Int PlacePickup(IPickupable pickup, Vector3Int startCoords) => PlacePickup(pickup, startCoords, true);
@@ -290,6 +301,7 @@ namespace Overrailed.Terrain
             {
                 var coords = toCheck.Dequeue();
                 Collider[] colliders = Physics.OverlapBox(coords, 0.45f * Vector3.one, Quaternion.identity, mask);
+
                 if (colliders.Length > 0)
                 {
                     // Tries to stack pickup if possible
@@ -309,14 +321,13 @@ namespace Overrailed.Terrain
                 }
             }
 
-            throw new System.Exception("No viable coord found on map");
+            throw new System.Exception($"No viable coord found on map for {((Object)pickup).name}");
         }
         /// <summary>
         /// Places <paramref name="pickup"/> at <paramref name="coords"/> without any collision checks
         /// </summary>
         public void ForcePlacePickup(IPickupable pickup, Vector3Int coords)
         {
-            // Places pickup in empty space
             var t = (pickup as MonoBehaviour).transform;
             t.parent = GetParentAt(coords);
             t.position = coords;
@@ -326,12 +337,15 @@ namespace Overrailed.Terrain
             pickup.Drop(coords);
         }
 
+        /// <summary>
+        /// Calculates the 4 adjacent coordinates on the XZ plane
+        /// </summary>
         private Vector3Int[] GetAdjacentCoords(Vector3Int coord) => new Vector3Int[] { coord + Vector3Int.forward, coord + Vector3Int.right, coord + Vector3Int.back, coord + Vector3Int.left };
         #endregion
 
         #region Map Toggles
-        private void DisableObstacles() => SetObstacleHitboxes(false);
-        private void EnableObstacles() => SetObstacleHitboxes(true);
+        public void DisableObstacles() => SetObstacleHitboxes(false);
+        public void EnableObstacles() => SetObstacleHitboxes(true);
         private void SetObstacleHitboxes(bool enabled)
         {
             // Water
@@ -365,14 +379,14 @@ namespace Overrailed.Terrain
 
         #region Spawning animation
         /// <summary>
-        /// Slides in the first chunk of the map, and invokes <see cref="OnFinishAnimateChunk"/>. Only meant for the start of the game.
+        /// Slides in the first chunk of the map, and invokes <see cref="OnFinishAnimateFirstChunk"/>. Only meant for the start of the game.
         /// </summary>
         public async void AnimateFirstChunk()
         {
             await Task.Yield();
             await AnimateChunk(0);
 
-            OnFinishAnimateChunk?.Invoke();
+            OnFinishAnimateFirstChunk?.Invoke();
         }
         public void AnimateNewChunk() => _ = AnimateChunk(transform.childCount - 2);
         public async Task AnimateChunk(int chunkIndex)
@@ -409,12 +423,16 @@ namespace Overrailed.Terrain
             }
 
             // Turning on and sliding each ground row into place
+            System.Func<float, Task> Delay = time => Task.Delay(Mathf.RoundToInt(1000f * time));
+            if (Application.isPlaying) Delay = time => Manager.Delay(time);
             foreach (Transform groundRow in ground)
             {
                 groundRow.gameObject.SetActive(true);
 
                 slideTasks.Add(AnimateSlideAndBounce(groundRow, Vector3.zero));
-                await Manager.Delay(groundSpawnInterval);
+
+                await Manager.Pause;
+                await Delay(groundSpawnInterval);
             }
 
             // Turning on and sliding each obstacle row into place
@@ -426,7 +444,9 @@ namespace Overrailed.Terrain
                 slideTasks.Add(AnimateSlideAndBounce(obstacleRow, Vector3.zero));
 
                 if (obstacleRow.childCount == 0) continue;
-                await Manager.Delay(obstacleSpawnInterval);
+
+                await Manager.Pause;
+                await Delay(obstacleSpawnInterval);
             }
 
             // Turning on and sliding station and checkpoint into place
@@ -450,6 +470,7 @@ namespace Overrailed.Terrain
             {
                 t.localPosition = Vector3.MoveTowards(t.localPosition, destination, slideSpeed * Time.deltaTime);
 
+                await Manager.Pause;
                 await Task.Yield();
             }
         }
@@ -458,12 +479,14 @@ namespace Overrailed.Terrain
         {
             await AnimateSlide(t, destination);
 
-            var startTime = Time.time;
-            while (Time.time - startTime <= 1)
+            var time = 0f;
+            while (time <= 1f)
             {
-                t.localPosition = destination + bounceHeight * new Vector3(0, Mathf.Sin(2 * Mathf.PI * (Time.time - startTime)), 0);
+                t.localPosition = destination + bounceHeight * new Vector3(0, Mathf.Sin(2 * Mathf.PI * (time)), 0);
 
+                await Manager.Pause;
                 await Task.Yield();
+                time += Time.deltaTime;
             }
 
             t.localPosition = destination;
@@ -489,17 +512,17 @@ namespace Overrailed.Terrain
                 gm.OnEndCheckpoint -= EnableObstacles;
                 gm.OnEndCheckpoint -= AnimateNewChunk;
                 gm.OnGameEnd -= ShowAllChunks;
-                OnFinishAnimateChunk -= SpawnPlayer;
-                OnFinishAnimateChunk -= StartTrain;
+                OnFinishAnimateFirstChunk -= SpawnPlayer;
+                OnFinishAnimateFirstChunk -= StartTrain;
             }
             else if (Manager.instance is MainMenuManager mm)
             {
-                OnFinishAnimateChunk -= mm.SlideInMainElements;
-                OnFinishAnimateChunk -= mm.MoveSelectedSkinToGame;
+                OnFinishAnimateFirstChunk -= mm.SlideInMainElements;
+                OnFinishAnimateFirstChunk -= mm.MoveSelectedSkinToGame;
             }
             else if (Manager.instance is TutorialManager)
             {
-                OnFinishAnimateChunk -= SpawnPlayer;
+                OnFinishAnimateFirstChunk -= SpawnPlayer;
             }
 
             var locomotive = GetComponentInChildren<Locomotive>();

@@ -79,7 +79,6 @@ namespace Overrailed.Train
             var product = Instantiate(craftProductPrefab);
             var productMeshes = product.GetComponentsInChildren<MeshRenderer>();
             var ingredientMeshes = new List<MeshRenderer[]>();
-            float percent = 0;
 
             // Disable craft's hitboxes
             product.GetComponent<BoxCollider>().enabled = false;
@@ -94,33 +93,34 @@ namespace Overrailed.Train
             foreach (var mesh in productMeshes) mesh.enabled = false;
 
             // Instantly completes recipe
+            float elapsedTime = 0f, craftTime = 1f / (0.15f + 0.05f * tier);
             if (Manager.IsEditing() || Manager.instance is TutorialManager)
             {
                 foreach (var mesh in productMeshes) mesh.enabled = true;
-                percent = 1;
+                elapsedTime = craftTime;
             }
 
             // Animate crafting
-            while (percent < 1)
+            while (elapsedTime < craftTime)
             {
-                float oldPercent = percent;
-                percent += (0.2f + 0.05f * tier) * Time.deltaTime;
+                float oldPercent = elapsedTime / craftTime;
+                elapsedTime += Time.fixedDeltaTime;
+                float percent = elapsedTime / craftTime;
 
                 // Disables ingredient meshes
-                int onCount;
+                int visibleCount;
                 foreach (var renderers in ingredientMeshes)
                 {
-                    onCount = (int)(percent * renderers.Length);
-
-                    if (onCount - (int)(oldPercent * renderers.Length) == 1) renderers[onCount - 1].enabled = false;
+                    visibleCount = (int)(percent * renderers.Length);
+                    if (visibleCount - (int)(oldPercent * renderers.Length) == 1) renderers[visibleCount - 1].enabled = false;
                 }
 
                 // Enables product meshes
-                onCount = (int)(percent * productMeshes.Length);
-                if (onCount - (int)(oldPercent * productMeshes.Length) == 1) productMeshes[onCount - 1].enabled = true;
+                visibleCount = (int)(percent * productMeshes.Length);
+                if (visibleCount - (int)(oldPercent * productMeshes.Length) == 1) productMeshes[visibleCount - 1].enabled = true;
 
                 yield return null;
-                yield return new WaitUntil(() => Manager.IsPlaying());
+                yield return Manager.PauseRoutine;
             }
 
             // Destroy top object of craft point stacks

@@ -910,7 +910,7 @@ MonoBehaviour:
   burnPoint: {fileID: 1101871607242074150}
   startRail: {fileID: 0}
   tier: 2
-  isPermeable: 0
+  isTangible: 1
   smokeParticlePrefab: {fileID: 6533771927518338995, guid: efc91acb8022878479d4693d7a331c87, type: 3}
   smokePoint: {fileID: 1101871607242074150}
   baseSpeed: 0.05

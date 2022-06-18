@@ -45,7 +45,7 @@ namespace Overrailed.Managers
 
             if (Time.time > startTime + 2) await Task.Delay(2000);
 
-            if (instance) SceneManager.LoadScene(titleSceneName);
+            if (instance) SceneManager.LoadScene(titleScene.name);
         }
 
         protected override void OnDestroy() => base.OnDestroy();

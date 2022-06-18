@@ -541,6 +541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2777479365750552022}
+  rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 0}
@@ -552,7 +553,7 @@ MonoBehaviour:
   burnPoint: {fileID: 597451424099021626}
   startRail: {fileID: 0}
   tier: 1
-  isPermeable: 0
+  isTangible: 1
   holderSpawnPoint: {fileID: 8597756770991145594}
 --- !u!54 &1929894603775805295
 Rigidbody:

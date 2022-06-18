@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IPickupable
 {
     AudioClip PickupAudio { get; }
-    AudioClip dropSound { get; }
+    AudioClip DropAudio { get; }
 
     /// <summary>
     /// Chosen by classes that implement this, used to determine how the object will be held when picked up
@@ -25,11 +25,11 @@ public interface IPickupable
     /// <summary>
     /// Used to do a custom action and choose if the IPickupable is held or dropped
     /// </summary>
-    /// <returns>True if implementation wants IPickupable to be dropped, otherwise false</returns>
-    bool OnTryDrop();
+    /// <returns>True if implementation wants this to be dropped, otherwise false</returns>
+    bool OnTryDrop(Vector3Int position);
 
     /// <summary>
-    /// Does special action if needed by the class
+    /// Does action when dropped if needed by the class
     /// </summary>
     void Drop(Vector3Int position);
 }

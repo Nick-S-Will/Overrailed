@@ -26,7 +26,7 @@ namespace Overrailed.Terrain.Tiles
 
         private bool hasBeenRidden;
 
-        private static readonly Vector3[] mainDirections = { Vector3.forward, Vector3.right, Vector3.back, Vector3.left };
+        private static readonly Vector3[] XZDirections = { Vector3.forward, Vector3.right, Vector3.back, Vector3.left };
 
         public Transform Path => IsStraight ? straightPathParent : bentPathParent;
         public TrainCar Passenger { get; private set; }
@@ -127,64 +127,90 @@ namespace Overrailed.Terrain.Tiles
             else return base.TryStackOn(stackBase);
         }
 
+        public override bool OnTryDrop(Vector3Int coords)
+        {
+            if (GetStackCount() == 1) return true;
+
+            if (TryGetConnectableRailAt(coords))
+            {
+                MapManager.FindMap(coords).ForcePlacePickup(TryPickUp(null, 1), coords);
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
-        /// Updates rail connectivity
+        /// Places rail at <paramref name="coords"/> and updates connectivity
         /// </summary>
         public override void Drop(Vector3Int coords)
         {
             // Doesn't connect to tracks if in a stack
             if (NextInStack)
             {
-                AudioManager.PlaySound(dropSound, coords);
+                AudioManager.PlaySound(DropAudio, coords);
                 return;
             }
 
-            RailTile connectableRail = null;
-            // Looks for adjacent powered rails to connect to
-            foreach (var dir in mainDirections)
-            {
-                var rail = TryGetAdjacentRail(dir, true);
-                // rail found, has a connection available, isn't the final checkpoint, has no passenger or rail already pointing at this
-                if (rail && rail.NextRail == null && !rail.IsFinalCheckpoint && (rail.Passenger == null || rail.OutDirection == (transform.position - rail.transform.position)))
-                {
-                    connectableRail = rail;
-                    break;
-                }
-            }
-
-            // Updates affected rails' states
-            if (connectableRail)
-            {
-                Vector3Int dirToThis = coords - Vector3Int.FloorToInt(connectableRail.transform.position);
-
-                if (connectableRail.OutDirection != dirToThis) connectableRail.SetState(connectableRail.InDirection, dirToThis, this);
-                else connectableRail.NextRail = this;
-
-                PrevRail = connectableRail;
-                SetState(dirToThis, dirToThis, null);
-
-                AudioManager.PlaySound(connectSound, transform.position);
-            }
-            else AudioManager.PlaySound(dropSound, transform.position);
+            var connectableRail = TryGetConnectableRail();
+            if (connectableRail) ConnectToRail(connectableRail);
+            else AudioManager.PlaySound(DropAudio, transform.position);
         }
         #endregion
 
+        private void ConnectToRail(RailTile connectableRail)
+        {
+            Vector3Int dirToThis = Coords - Vector3Int.FloorToInt(connectableRail.transform.position);
+
+            if (connectableRail.OutDirection != dirToThis) connectableRail.SetState(connectableRail.InDirection, dirToThis, this);
+            else connectableRail.NextRail = this;
+
+            PrevRail = connectableRail;
+            SetState(dirToThis, dirToThis, null);
+
+            AudioManager.PlaySound(connectSound, transform.position);
+        }
+
         #region Find Rails
+        private RailTile TryGetConnectableRail() => TryGetConnectableRailAt(Coords);
+        private static RailTile TryGetConnectableRailAt(Vector3Int coords)
+        {
+            // Looks for adjacent powered rails to connect to
+            foreach (var dir in XZDirections)
+            {
+                var rail = TryGetRailAdjacentTo(coords, dir, true);
+                // rail found, has a connection available, isn't the final checkpoint, has no passenger or rail already pointing at this
+                if (rail && rail.NextRail == null && !rail.IsFinalCheckpoint && (rail.Passenger == null || rail.OutDirection == (coords - rail.Coords)))
+                {
+                    return rail;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
-        /// Gets adjacent rail in the given direction from this transform if it's IsPowered (property) is equal to isPowered (parameter)
+        /// Gets adjacent rail in the given direction from this transform if <see cref="IsPowered"/> is equal to <paramref name="isPowered"/>
         /// </summary>
         /// <param name="isPowered">True to search only for powered rails, false to search only for normal rails</param>
         /// <returns>Adjacent RailTile if there is one that matches criteria, otherwise null</returns>
-        private RailTile TryGetAdjacentRail(Vector3 direction, bool isPowered) => TryFindRail(direction, isPowered ? LayerMask.GetMask("Rail") : LayerMask.GetMask("Default"));
+        private RailTile TryGetAdjacentRail(Vector3 direction, bool isPowered) => TryGetRailAdjacentTo(transform.position, direction, isPowered);
+
+        /// <summary>
+        /// Gets adjacent rail in the given direction from <paramref name="position"/> if <see cref="IsPowered"/> is equal to <paramref name="isPowered"/>
+        /// </summary>
+        /// <param name="isPowered">True to search only for powered rails, false to search only for normal rails</param>
+        /// <returns>Adjacent RailTile if there is one that matches criteria, otherwise null</returns>
+        private static RailTile TryGetRailAdjacentTo(Vector3 position, Vector3 direction, bool isPowered) => TryFindRail(position, direction, isPowered ? LayerMask.GetMask("Rail") : LayerMask.GetMask("Default"));
 
         /// <summary>
         /// Used by the <see cref="TryGetAdjacentRail"/> methods, which are more straightforward
         /// </summary>
         /// <param name="layerMask">Physics layer mask used to find rail</param>
         /// <returns>Adjacent RailTile if there is one that matches criteria, otherwise null</returns>
-        private RailTile TryFindRail(Vector3 direction, int layerMask)
+        private static RailTile TryFindRail(Vector3 position, Vector3 direction, int layerMask)
         {
-            if (Physics.Raycast(transform.position, direction, out RaycastHit hitInfo, 1, layerMask)) return hitInfo.transform.GetComponent<RailTile>();
+            if (Physics.Raycast(position, direction, out RaycastHit hitInfo, 1, layerMask)) return hitInfo.transform.GetComponent<RailTile>();
             return null;
         }
         #endregion
@@ -246,7 +272,7 @@ namespace Overrailed.Terrain.Tiles
                 straightPower.SetActive(isStraight);
                 bentPower.SetActive(!isStraight);
 
-                transform.forward = isStraight ? outDir : InOutToForward(inDir, outDir);
+                transform.forward = isStraight ? outDir : ForwardFor(inDir, outDir);
 
                 if (newConnection) NextRail = newConnection;
                 // Tries to connect this to proceeding rail
@@ -307,36 +333,20 @@ namespace Overrailed.Terrain.Tiles
         #endregion
 
         /// <summary>
-        /// Jank way to determines which way the given bent rail turn
+        /// Determines if this rail turns right or not
         /// </summary>
-        /// <returns>True if rail turns right, otherwise false</returns>
-        public static bool BentRailToRight(RailTile rail)
-        {
-            if (!rail.bentMesh.activeSelf) Debug.LogError("Given Rail not bent");
-
-            if ((rail.InDirection == Vector3Int.forward && rail.OutDirection == Vector3Int.right) ||
-                (rail.InDirection == Vector3Int.right && rail.OutDirection == Vector3Int.back) ||
-                (rail.InDirection == Vector3Int.left && rail.OutDirection == Vector3Int.forward) ||
-                (rail.InDirection == Vector3Int.back && rail.OutDirection == Vector3Int.left)) return true;
-            else return false;
-        }
-
+        /// <returns>False if this rail turns left or is straight, otherwise true</returns>
+        public bool TurnsRight() => Mathf.RoundToInt(Vector3.Cross(InDirection, OutDirection).y) == 1;
+        
         /// <summary>
-        /// Jank way to convert in and out directions to local forward for bent rails
+        /// Converts in and out directions to local forward for bent rails
         /// </summary>
-        /// <returns>The forward direction for the bent rail with these in and out directions</returns>
-        private static Vector3Int InOutToForward(Vector3Int inDir, Vector3Int outDir)
+        private static Vector3Int ForwardFor(Vector3Int inDir, Vector3Int outDir)
         {
-            if ((inDir == Vector3Int.left && outDir == Vector3Int.back) ||          // (-1, -1)
-                (inDir == Vector3Int.forward && outDir == Vector3Int.right))        // (1, 1)
-                return Vector3Int.right;
-            else if ((inDir == Vector3Int.right && outDir == Vector3Int.back) ||    // (1, -1)
-                     (inDir == Vector3Int.forward && outDir == Vector3Int.left))    // (-1, 1)
-                return Vector3Int.back;
-            else if ((inDir == Vector3Int.right && outDir == Vector3Int.forward) || // (1, 1)
-                     (inDir == Vector3Int.back && outDir == Vector3Int.left))       // (-1, -1)
-                return Vector3Int.left;
-            else return Vector3Int.forward;
+            bool turnsRight = Mathf.RoundToInt(Vector3.Cross(inDir, outDir).y) == 1;
+
+            if (turnsRight) return outDir;
+            else return -inDir;
         }
 
         private void OnDrawGizmos()

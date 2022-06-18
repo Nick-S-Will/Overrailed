@@ -99,11 +99,11 @@ namespace Overrailed.Terrain.Tiles
             return toPickUp;
         }
 
-        public override bool OnTryDrop() => true;
+        public override bool OnTryDrop(Vector3Int position) => true;
 
         public override void Drop(Vector3Int position)
         {
-            AudioManager.PlaySound(dropSound, position);
+            AudioManager.PlaySound(DropAudio, position);
             InvokeOnDrop();
         }
         
@@ -129,7 +129,7 @@ namespace Overrailed.Terrain.Tiles
             transform.rotation = stackBase.transform.parent.rotation;
             transform.localRotation = Quaternion.Euler(0, Random.Range(-5, 5f), 0);
 
-            AudioManager.PlaySound(dropSound, transform.position);
+            AudioManager.PlaySound(DropAudio, transform.position);
 
             return true;
         }

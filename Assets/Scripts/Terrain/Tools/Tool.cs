@@ -44,11 +44,11 @@ namespace Overrailed.Terrain.Tools
             return this;
         }
 
-        public override bool OnTryDrop() => true;
+        public override bool OnTryDrop(Vector3Int position) => true;
 
         public override void Drop(Vector3Int position)
         {
-            AudioManager.PlaySound(dropSound, transform.position);
+            AudioManager.PlaySound(DropAudio, transform.position);
 
             OnDropTool?.Invoke(this);
         }

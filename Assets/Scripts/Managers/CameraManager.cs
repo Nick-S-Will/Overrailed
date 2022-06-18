@@ -15,8 +15,9 @@ namespace Overrailed.Managers.Cameras
         [SerializeField] private RenderTexture fadeRenderTexture;
         [SerializeField] private RawImage fadeMask;
         [SerializeField] private Vector2 endSize;
-        [SerializeField] private float fadeDuration;
+        [SerializeField] [Min(0.1f)] private float fadeSpeed = 1f;
 
+        private Coroutine followingTrains;
         private float startOffsetX;
 
         public Camera Main => camera1;
@@ -27,31 +28,32 @@ namespace Overrailed.Managers.Cameras
             {
                 gm.OnCheckpoint += TransitionEditMode;
                 gm.OnEndCheckpoint += TransitionGameMode;
+
+                FindObjectOfType<MapManager>().OnFinishAnimateFirstChunk += () => followingTrains = StartCoroutine(FollowLocomotivesRoutine());
+                gm.OnGameEnd += StopFollowingTrains;
             }
 
-            startOffsetX = camera1.transform.position.x;
-            _ = StartCoroutine(FollowLocomotivesRoutine());
+            startOffsetX = camera1.transform.position.x - 4;
         }
 
-        public IEnumerator FollowLocomotivesRoutine()
+        private IEnumerator FollowLocomotivesRoutine()
         {
             yield return new WaitWhile(() => MapManager.Locomotives == null);
 
-            while (this && Manager.instance is GameManager)
+            while (this && Manager.Exists && MapManager.Locomotives.Length != 0)
             {
                 Vector3 oldPos = camera1.transform.position;
-                try
-                {
-                    camera1.transform.position = new Vector3(startOffsetX + Utils.GetAverageX(MapManager.Locomotives), oldPos.y, oldPos.z);
-                }
-                catch (MissingReferenceException)
-                {
-                    yield break;
-                }
+                camera1.transform.position = new Vector3(startOffsetX + Utils.GetAverageX(MapManager.Locomotives), oldPos.y, oldPos.z);
 
                 yield return null;
                 yield return new WaitUntil(() => Manager.IsPlaying());
             }
+        }
+
+        private void StopFollowingTrains()
+        {
+            StopCoroutine(followingTrains);
+            followingTrains = null;
         }
 
         public static async Task SlideToStart()
@@ -69,8 +71,8 @@ namespace Overrailed.Managers.Cameras
 
         public void TransitionEditMode() => TransitionWipe(camera1, camera2);
         public void TransitionGameMode() => TransitionWipe(camera2, camera1);
-        private void TransitionWipe(Camera startCam, Camera endCam) => TransitionWipe(startCam, endCam, fadeRenderTexture, fadeMask, endSize, fadeDuration);
-        private static async void TransitionWipe(Camera startCam, Camera endCam, RenderTexture fadeTexture, RawImage fadeShape, Vector2 shapeEndSize, float duration)
+        private void TransitionWipe(Camera startCam, Camera endCam) => TransitionWipe(startCam, endCam, fadeRenderTexture, fadeMask, endSize, fadeSpeed);
+        private static async void TransitionWipe(Camera startCam, Camera endCam, RenderTexture fadeTexture, RawImage fadeShape, Vector2 shapeEndSize, float speed)
         {
             if (!startCam.enabled) throw new System.Exception("Start camera not enabled");
 
@@ -82,11 +84,11 @@ namespace Overrailed.Managers.Cameras
             fadeShape.gameObject.SetActive(true);
 
             // Grow the part of final texture that is visible
-            float completion = 0;
-            while (completion < 1)
+            float percentage = Time.deltaTime;
+            while (percentage < 1f)
             {
-                fadeShape.rectTransform.sizeDelta = Vector2.Lerp(Vector2.zero, shapeEndSize, completion);
-                completion += Time.deltaTime / duration;
+                fadeShape.rectTransform.sizeDelta = Vector2.Lerp(Vector2.zero, shapeEndSize, percentage);
+                percentage += speed * percentage * Time.deltaTime;
                 await Task.Yield();
             }
 

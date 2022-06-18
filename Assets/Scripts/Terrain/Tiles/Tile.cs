@@ -18,7 +18,8 @@ namespace Overrailed.Terrain.Tiles
         public Transform MeshParent => meshParent;
         public Gradient MeshColorGradient { get; private set; }
         public AudioClip PickupAudio => pickupAudio;
-        public AudioClip dropSound => dropAudio;
+        public AudioClip DropAudio => dropAudio;
+        public Vector3Int Coords => Vector3Int.RoundToInt(transform.position);
         public virtual bool CanPickUp => false;
         public virtual bool IsTwoHanded => true;
         public bool RotateOnSpawn => rotateOnSpawn;
@@ -53,7 +54,7 @@ namespace Overrailed.Terrain.Tiles
         public virtual IPickupable TryPickUp(Transform parent, int amount) => null;
         protected void InvokeOnPickUp() => OnPickUp?.Invoke();
         
-        public virtual bool OnTryDrop() => true;
+        public virtual bool OnTryDrop(Vector3Int position) => true;
 
         public virtual void Drop(Vector3Int position) { }
         protected void InvokeOnDrop() => OnDrop?.Invoke();
