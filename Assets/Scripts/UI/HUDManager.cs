@@ -56,7 +56,7 @@ namespace Overrailed.UI
                 speedStartLength = speedText.text.Length;
                 seedStartLength = seedText.text.Length;
 
-                continueGameButton.GetComponent<BoxCollider>().enabled = false;
+                continueGameButton.gameObject.SetActive(false);
 
                 gm.OnCheckpoint += AlignContinueWithLocomotiveZ;
                 gm.OnCheckpoint += EnableContinueButton;
@@ -208,10 +208,7 @@ namespace Overrailed.UI
             continueGameButton.transform.position = new Vector3(pos.x, pos.y, FindObjectOfType<Locomotive>().transform.position.z - 1);
         }
 
-        private void SetButtonActive(TriggerButton button, bool enabled)
-        {
-            button.gameObject.SetActive(enabled);
-        }
+        private void SetButtonActive(TriggerButton button, bool enabled) => button.gameObject.SetActive(enabled);
         private void EnableContinueButton() => SetButtonActive(continueGameButton, true);
         private void DisableContinueButton() => SetButtonActive(continueGameButton, false);
         #endregion

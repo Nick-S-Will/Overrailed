@@ -129,7 +129,7 @@ namespace Overrailed.Terrain.Tiles
 
         public override bool OnTryDrop(Vector3Int coords)
         {
-            if (GetStackCount() == 1) return true;
+            if (NextInStack == null) return true;
 
             if (TryGetConnectableRailAt(coords))
             {
@@ -285,7 +285,7 @@ namespace Overrailed.Terrain.Tiles
                     {
                         // Tries to get rail in currently iterated direction
                         nextRail = TryGetAdjacentRail(dir, false);
-                        if (nextRail && nextRail.NextInStack == null) break;
+                        if (nextRail && nextRail.NextInStack == null && (!isCheckpoint ^ nextRail.IsFinalCheckpoint)) break;
 
                         dir = Vector3Int.RoundToInt(Quaternion.AngleAxis(90, Vector3.up) * dir);
                     }
@@ -295,7 +295,6 @@ namespace Overrailed.Terrain.Tiles
                         SetState(inDir, dir, nextRail);
                         nextRail.PrevRail = this;
 
-                        // Checkpoint rails
                         if (nextRail.isCheckpoint)
                         {
                             nextRail.DelaySetState(dir, nextRail.OutDirection, null);
@@ -317,7 +316,6 @@ namespace Overrailed.Terrain.Tiles
                                 } while (prev);
                             }
                         }
-                        // Other rails
                         else nextRail.DelaySetState(dir, dir, null);
 
                         return;

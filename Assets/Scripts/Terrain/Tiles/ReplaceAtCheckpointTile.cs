@@ -19,7 +19,7 @@ namespace Overrailed.Terrain.Tiles
             {
                 if (map.PointIsInPlayBounds(transform.position))
                 {
-                    map.PlacePickup(Instantiate(replacementTile), Vector3Int.RoundToInt(transform.position + Vector3.up));
+                    map.PlacePickup(Instantiate(replacementTile), Coords);
                     Destroy(gameObject);
                 }
             }

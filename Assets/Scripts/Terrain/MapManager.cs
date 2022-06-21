@@ -284,7 +284,7 @@ namespace Overrailed.Terrain
         public Vector3Int PlacePickup(IPickupable pickup, Vector3Int startCoords) => PlacePickup(pickup, startCoords, true);
         private Vector3Int PlacePickup(IPickupable pickup, Vector3Int startCoords, bool includeStart)
         {
-            if (!PointIsInPlayBounds(startCoords)) throw new System.Exception("Starting coord isn't in the bounds of the map");
+            if (!PointIsInPlayBounds(startCoords)) throw new System.Exception($"startCoords aren't in the bounds of the map. Value: {startCoords}");
 
             LayerMask mask = LayerMask.GetMask("Default", "Water", "Rail", "Entity");
             var flags = new HashSet<Vector3Int>();

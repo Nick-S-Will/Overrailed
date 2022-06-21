@@ -41978,7 +41978,7 @@ MonoBehaviour:
   fadeRenderTexture: {fileID: 8400000, guid: 15b69a98c25ec134bbec2000d87d1a12, type: 2}
   fadeMask: {fileID: 792759880}
   endSize: {x: 15000, y: 15000}
-  fadeSpeed: 2.5
+  fadeSpeed: 7
 --- !u!1 &1157912793
 GameObject:
   m_ObjectHideFlags: 0

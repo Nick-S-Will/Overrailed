@@ -10,6 +10,7 @@ using Overrailed.Terrain.Tiles;
 
 namespace Overrailed.Mob
 {
+    // TODO: break when walking into breakables
     [RequireComponent(typeof(CharacterController))]
     public abstract class HumanoidController : MonoBehaviour
     {
@@ -60,7 +61,7 @@ namespace Overrailed.Mob
         public Vector3Int LookPoint => Vector3Int.RoundToInt(transform.position + Vector3.up + LastInputDir);
         protected Vector2 InputDir { private get; set; }
         protected float LastDashDownTime { private get; set; }
-        public int Strength { get; private set; } = 2;
+        public int Strength { get; private set; } = 3;
         public bool IsHoldingItem => HeldItem != null;
 
         protected virtual void Start()
@@ -259,7 +260,7 @@ namespace Overrailed.Mob
             Vector3Int coords = LookPoint;
             if (!IsHoldingItem || toolSwinging != null || !Map.PointIsInPlayBounds(coords) || !HeldItem.OnTryDrop(coords)) return;
 
-            if (single && HeldItem is StackTile stack && stack.GetStackCount() > 1)
+            if (single && HeldItem is StackTile stack && stack.NextInStack)
             {
                 Map.PlacePickup(stack.TryPickUp(null, 1), coords);
             }
@@ -338,9 +339,9 @@ namespace Overrailed.Mob
             while (percent < 1)
             {
                 yield return null;
-                yield return new WaitUntil(() => Manager.IsPlaying());
+                yield return Manager.PauseRoutine;
 
-                percent += animSpeed * Time.deltaTime;
+                percent += animSpeed * Time.fixedDeltaTime;
                 arm.localRotation = Quaternion.Lerp(from, to, percent);
             }
 
@@ -416,5 +417,16 @@ namespace Overrailed.Mob
             }
         }
         #endregion
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (HeldItem == null) return;
+            var heldStack = HeldItem as StackTile;
+            if (heldStack == null || heldStack.GetStackCount() == Strength) return;
+            var otherStack = other.GetComponent<StackTile>();
+            if (otherStack == null) return;
+
+            _ = otherStack.TryStackOn(heldStack);
+        }
     }
 }

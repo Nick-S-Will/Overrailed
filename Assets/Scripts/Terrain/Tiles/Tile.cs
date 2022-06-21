@@ -19,6 +19,9 @@ namespace Overrailed.Terrain.Tiles
         public Gradient MeshColorGradient { get; private set; }
         public AudioClip PickupAudio => pickupAudio;
         public AudioClip DropAudio => dropAudio;
+        /// <summary>
+        /// Rounded <see cref="Transform.position"/>
+        /// </summary>
         public Vector3Int Coords => Vector3Int.RoundToInt(transform.position);
         public virtual bool CanPickUp => false;
         public virtual bool IsTwoHanded => true;

@@ -49,7 +49,7 @@ namespace Overrailed.Terrain.Tiles
             {
                 stack.BuildBridge(this);
                 OnBridge?.Invoke();
-                return stack.GetStackCount() == 1 ? Interaction.Used : Interaction.Interacted;
+                return stack.NextInStack == null ? Interaction.Used : Interaction.Interacted;
             }
             else if (item is Bucket bucket)
             {

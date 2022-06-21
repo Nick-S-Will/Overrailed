@@ -6,6 +6,7 @@ using Overrailed.Managers.Audio;
 
 namespace Overrailed.Terrain.Tiles
 {
+    [RequireComponent(typeof(BoxCollider))]
     public class StackTile : Tile, IPickupable, IInteractable
     {
         [SerializeField] private Tile bridge;
@@ -16,6 +17,7 @@ namespace Overrailed.Terrain.Tiles
         [Min(1)] [SerializeField] private int startStackHeight = 1;
 
         private StackTile nextInStack, prevInStack;
+        private BoxCollider boxCollider;
 
         public StackTile NextInStack => nextInStack;
         public StackTile PrevInStack => prevInStack;
@@ -26,6 +28,7 @@ namespace Overrailed.Terrain.Tiles
 
         override protected void Start()
         {
+            boxCollider = GetComponent<BoxCollider>();
             if (startStackHeight > 1) SelfStack();
         }
 
@@ -77,7 +80,7 @@ namespace Overrailed.Terrain.Tiles
             if (amount < stackSize)
             {
                 // If stack is left at 1, base becomes trigger
-                if (stackSize - amount == 1) GetComponent<BoxCollider>().isTrigger = true;
+                if (stackSize - amount == 1) boxCollider.isTrigger = true;
 
                 // Get bottom tile to pick up
                 for (int i = 0; i < stackSize - amount; i++) toPickUp = toPickUp.nextInStack;
@@ -88,7 +91,7 @@ namespace Overrailed.Terrain.Tiles
             }
 
             // Moving bottom of pickup stack to hands
-            toPickUp.GetComponent<BoxCollider>().enabled = false;
+            toPickUp.boxCollider.enabled = false;
             toPickUp.transform.parent = parent;
             toPickUp.transform.localPosition = Vector3.up;
             toPickUp.transform.localRotation = Quaternion.identity;
@@ -105,6 +108,9 @@ namespace Overrailed.Terrain.Tiles
         {
             AudioManager.PlaySound(DropAudio, position);
             InvokeOnDrop();
+
+            boxCollider.enabled = true;
+            boxCollider.isTrigger = nextInStack == null;
         }
         
         /// <summary>
@@ -116,7 +122,8 @@ namespace Overrailed.Terrain.Tiles
         {
             if (stackType != stackBase.stackType) return false;
 
-            if (!stackBase.prevInStack) stackBase.GetComponent<BoxCollider>().isTrigger = false;
+            GetComponent<BoxCollider>().enabled = false;
+            if (!stackBase.prevInStack) stackBase.boxCollider.isTrigger = false;
 
             // Get top of stack
             StackTile top = stackBase.GetStackTop();
@@ -141,7 +148,6 @@ namespace Overrailed.Terrain.Tiles
         {
             var newTile = Instantiate(this);
             newTile.name = newTile.name.Substring(0, newTile.name.Length - 7);
-            newTile.GetComponent<BoxCollider>().enabled = false;
 
             newTile.startStackHeight = startStackHeight - 1;
             newTile.TryStackOn(this);
