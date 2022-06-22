@@ -10,11 +10,10 @@ using Overrailed.Terrain.Tiles;
 
 namespace Overrailed.Mob
 {
-    // TODO: break when walking into breakables
     [RequireComponent(typeof(CharacterController))]
     public abstract class HumanoidController : MonoBehaviour
     {
-        public event System.Action OnMove;
+        public event Action OnMove;
 
         #region Inspector Variables
         [SerializeField] private MapManager map;
@@ -35,7 +34,11 @@ namespace Overrailed.Mob
         [SerializeField] private float armSwingSpeed = 360;
 
         [Header("Interact")]
-        [SerializeField] private float interactInterval = 0.5f;
+        [SerializeField] private float interactInterval = 0.4f;
+        [SerializeField] private bool autoMine;
+        [SerializeField] private float autoMineInterval = 0.5f;
+        [Tooltip("Max distance at which auto mine will work while moving")]
+        [SerializeField] private float autoMineDistanceThreshold = 0.2f;
 
         [Header("Transforms")] [SerializeField] private Transform armL;
         [SerializeField] private Transform armR, legL, legR, calfL, calfR, toolHolder, pickupHolder;
@@ -54,7 +57,8 @@ namespace Overrailed.Mob
         /// </summary>
         private bool isMoving;
 
-        protected Coroutine movementHandling;
+        protected Coroutine movementHandling { get; private set; }
+        protected Coroutine miningHandling { get; private set; }
         protected MapManager Map => map;
         protected IPickupable HeldItem { get; private set; }
         protected Vector3 LastInputDir { get; private set; }
@@ -63,6 +67,7 @@ namespace Overrailed.Mob
         protected float LastDashDownTime { private get; set; }
         public int Strength { get; private set; } = 3;
         public bool IsHoldingItem => HeldItem != null;
+        protected bool AutoMine => autoMine;
 
         protected virtual void Start()
         {
@@ -75,11 +80,22 @@ namespace Overrailed.Mob
             controller = GetComponent<CharacterController>();
             LastDashDownTime = -dashDuration;
 
-            movementHandling = StartCoroutine(HandleMovement());
+            HandleCharacter();
+        }
+
+        protected void HandleCharacter()
+        {
+            HandleMovement();
+            if (autoMine) HandleMining();
         }
 
         #region Movement
-        protected IEnumerator HandleMovement()
+        protected void HandleMovement()
+        {
+            if (movementHandling != null) return;
+            movementHandling = StartCoroutine(HandleMovementRoutine());
+        }
+        private IEnumerator HandleMovementRoutine()
         {
             if (Map == null || controller == null) yield break;
 
@@ -111,6 +127,8 @@ namespace Overrailed.Mob
                 yield return new WaitForSeconds(Time.fixedDeltaTime);
                 if (this && enabled) yield return Manager.PauseRoutine;
             }
+
+            movementHandling = null;
         }
 
         /// <summary>
@@ -143,13 +161,46 @@ namespace Overrailed.Mob
 
         protected void StopMovement()
         {
-            movementHandling = null;
             wasMoving = false;
             isMoving = false;
         }
         #endregion
 
         #region Interact
+        protected void HandleMining()
+        {
+            if (miningHandling != null) return;
+            miningHandling = StartCoroutine(HandleMiningRoutine());
+        }
+        private IEnumerator HandleMiningRoutine()
+        {
+            if (Map == null || controller == null) yield break;
+
+            while (this && enabled)
+            {
+                if (HeldItem != null && InteractRaycast(out RaycastHit info, 0.5f))
+                {
+                    var breakTile = info.transform.GetComponent<BreakableTile>();
+                    if (breakTile != null && (!isMoving || info.distance <= autoMineDistanceThreshold))
+                    {
+                        TryUseHeldItemOn(breakTile);
+                        yield return Manager.Delay(autoMineInterval);
+                    }
+                }
+
+                yield return new WaitForSeconds(Time.fixedDeltaTime);
+                if (this && enabled) yield return Manager.PauseRoutine;
+            }
+
+            miningHandling = null;
+        }
+
+        /// <summary>
+        /// Performs a raycast at <see cref="Transform.position"/> + <see cref="Vector3.up"/>, towards <see cref="LastInputDir"/> for <paramref name="distance"/> units, using <see cref="MapManager.InteractMask"/>
+        /// </summary>
+        /// <returns>True if the raycast hit something</returns>
+        protected bool InteractRaycast(out RaycastHit hitInfo, float distance = 1f) => Physics.Raycast(transform.position + Vector3.up, LastInputDir, out hitInfo, distance, Map.InteractMask);
+
         protected void InteractAll() => TryInteract(TryToPickUpAll, TryDropAll);
         protected void InteractSingle() => TryInteract(TryToPickUpSingle, TryDropSingle);
         private void TryInteract(Func<IPickupable, bool> Pickup, Action Drop)
@@ -157,7 +208,7 @@ namespace Overrailed.Mob
             if (Time.time < lastInteractTime + interactInterval || Manager.IsPaused()) return;
             lastInteractTime = Time.time;
 
-            if (Physics.Raycast(transform.position + Vector3.up, LastInputDir, out RaycastHit hitInfo, 1, Map.InteractMask))
+            if (InteractRaycast(out RaycastHit hitInfo))
             {
                 if (IsHoldingItem) TryUseHeldItemOn(hitInfo.transform.GetComponent<IInteractable>());
                 else _ = Pickup(hitInfo.transform.GetComponent<IPickupable>());
@@ -187,7 +238,7 @@ namespace Overrailed.Mob
         /// </summary>
         private void TryUseHeldItemOn(IInteractable interactable)
         {
-            if (!IsHoldingItem || toolSwinging != null || interactable == null) return;
+            if (!IsHoldingItem || toolSwinging != null || interactable == null || (autoMine && interactable is BreakableTile)) return;
 
             var interaction = interactable.TryInteractUsing(HeldItem);
             if (interaction == Interaction.None)
@@ -385,9 +436,27 @@ namespace Overrailed.Mob
 
                 yield return null;
                 yield return Manager.PauseRoutine;
+                if (InteractRaycast(out _, autoMineDistanceThreshold))
+                {
+                    yield return StartCoroutine(ResetLimbRotations());
+                    yield return new WaitWhile(() => InteractRaycast(out _, autoMineDistanceThreshold));
+                }
             }
 
-            // Return to base position
+            _ = StartCoroutine(ResetLimbRotations());
+
+            if (!IsHoldingItem)
+            {
+                armL.localRotation = Quaternion.identity;
+                armR.localRotation = Quaternion.identity;
+            }
+        }
+
+        /// <summary>
+        /// Works with the <see cref="SwingLimbs"/> method, under the assumption that all limbs have the same angle from <see cref="Quaternion.identity"/>
+        /// </summary>
+        private IEnumerator ResetLimbRotations()
+        {
             while (legL.localRotation != Quaternion.identity)
             {
                 float angle = Quaternion.Angle(legL.localRotation, Quaternion.identity);
@@ -410,11 +479,8 @@ namespace Overrailed.Mob
             calfL.localRotation = Quaternion.identity;
             calfR.localRotation = Quaternion.identity;
 
-            if (!IsHoldingItem)
-            {
-                armL.localRotation = Quaternion.identity;
-                armR.localRotation = Quaternion.identity;
-            }
+            armL.localRotation = Quaternion.identity;
+            armR.localRotation = Quaternion.identity;
         }
         #endregion
 

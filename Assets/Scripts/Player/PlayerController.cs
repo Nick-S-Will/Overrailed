@@ -56,7 +56,7 @@ namespace Overrailed.Player
         {
             while (this && Map)
             {
-                _ = Physics.Raycast(transform.position + Vector3.up, LastInputDir, out RaycastHit hitInfo, 1, Map.InteractMask);
+                _ = InteractRaycast(out RaycastHit hitInfo);
                 var tile = hitInfo.transform;
                 if (tile == null) tile = Map.GetTileAt(LookPoint + Vector3Int.down);
                 Map.TryHighlightTile(tile);
@@ -97,7 +97,7 @@ namespace Overrailed.Player
         {
             if (enabled)
             {
-                if (movementHandling == null) SetControls(() => playerInput.Enable(), () => movementHandling = StartCoroutine(HandleMovement()));
+                if (movementHandling == null) SetControls(() => playerInput.Enable(), () => HandleCharacter());
             }
             else enabled = true;
         }

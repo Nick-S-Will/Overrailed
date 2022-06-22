@@ -9,6 +9,7 @@ namespace Overrailed.Managers.Audio
     {
         public event System.Action OnVolumeChange;
 
+        [SerializeField] private bool on = true;
         [SerializeField] [Range(0, 1)] private float masterVolume = 0.5f, soundVolume = 0.5f, musicVolume = 0.5f;
         [Space]
         [SerializeField] private AudioClip startingMusic;
@@ -51,6 +52,8 @@ namespace Overrailed.Managers.Audio
 
         private void Awake()
         {
+            if (!on) return;
+
             if (instance)
             {
                 Destroy(gameObject);
@@ -122,38 +125,42 @@ namespace Overrailed.Managers.Audio
             else Debug.LogWarning("Null clip given");
         }
 
-        public void PlaySound(string title, Vector3 position)
+        public static void PlaySound(string title, Vector3 position)
         {
-            if (audioDictionary.TryGetValue(title, out AudioClip[] clips)) PlaySound(clips[Random.Range(0, clips.Length)], position);
+            if (instance == null) return;
+
+            if (instance.audioDictionary.TryGetValue(title, out AudioClip[] clips)) PlaySound(clips[Random.Range(0, clips.Length)], position);
             else Debug.LogError("No audio group titled \"" + title + "\".");
         }
 
-        public async void PlayMusic(AudioClip clip, bool loop, float fadeDuration = 0)
+        public static async void PlayMusic(AudioClip clip, bool loop, float fadeDuration = 0f)
         {
-            activeMusicSourceIndex = 1 - activeMusicSourceIndex;
+            if (instance == null) return;
 
-            musicSources[activeMusicSourceIndex].clip = clip;
-            musicSources[activeMusicSourceIndex].loop = loop;
-            musicSources[activeMusicSourceIndex].Play();
+            instance.activeMusicSourceIndex = 1 - instance.activeMusicSourceIndex;
+
+            instance.musicSources[instance.activeMusicSourceIndex].clip = clip;
+            instance.musicSources[instance.activeMusicSourceIndex].loop = loop;
+            instance.musicSources[instance.activeMusicSourceIndex].Play();
 
             if (fadeDuration == 0)
             {
-                musicSources[activeMusicSourceIndex].volume = masterVolume * musicVolume;
-                musicSources[1 - activeMusicSourceIndex].Stop();
+                instance.musicSources[instance.activeMusicSourceIndex].volume = instance.masterVolume * instance.musicVolume;
+                instance.musicSources[1 - instance.activeMusicSourceIndex].Stop();
                 return;
             }
 
             float percent = 0;
             while (percent < 1)
             {
-                musicSources[activeMusicSourceIndex].volume = Mathf.Lerp(0, masterVolume * musicVolume, percent);
-                musicSources[1 - activeMusicSourceIndex].volume = Mathf.Lerp(masterVolume * musicVolume, 0, percent);
+                instance.musicSources[instance.activeMusicSourceIndex].volume = Mathf.Lerp(0, instance.masterVolume * instance.musicVolume, percent);
+                instance.musicSources[1 - instance.activeMusicSourceIndex].volume = Mathf.Lerp(instance.masterVolume * instance.musicVolume, 0, percent);
 
                 percent += Time.deltaTime / fadeDuration;
                 await Task.Yield();
             }
 
-            musicSources[1 - activeMusicSourceIndex].Stop();
+            instance.musicSources[1 - instance.activeMusicSourceIndex].Stop();
         }
 
         private void OnValidate()

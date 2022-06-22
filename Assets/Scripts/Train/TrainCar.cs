@@ -196,7 +196,6 @@ namespace Overrailed.Train
             else return false;
         }
 
-        // TODO: Clean up how these work
         /// <summary>
         /// Places this train car on given rail tile
         /// </summary>

@@ -7660,6 +7660,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c036d97f95b4bf34398fbf95cf0995c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  on: 0
   masterVolume: 0.5
   soundVolume: 0.5
   musicVolume: 0.5
