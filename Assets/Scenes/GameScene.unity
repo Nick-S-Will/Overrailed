@@ -79829,10 +79829,10 @@ MonoBehaviour:
   highlightEnabled: 1
   visualizeBounds: 0
   spawnOffset: {x: 0, y: -10, z: 0}
-  groundSpawnInterval: 0.1
+  groundSpawnInterval: 0.15
   obstacleSpawnInterval: 0.06
   bounceHeight: 0.5
-  slideSpeed: 100
+  slideSpeed: 80
   numbersPrefabs:
   - {fileID: 7693936741897243366, guid: 1e79d1022ab56b7439f7e1fb226d0ca7, type: 3}
   - {fileID: 7285955767927605312, guid: bd11511afb9eb7a4cbad0ef9e50ba7fa, type: 3}

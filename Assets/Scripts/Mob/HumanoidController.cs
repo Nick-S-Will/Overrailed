@@ -23,6 +23,8 @@ namespace Overrailed.Mob
         [Tooltip("Radians per second of the player's turn")]
         [SerializeField] private float turnSpeed = 15;
         [SerializeField] private float legSwingCoefficient = 0.1f, legRaiseAngle = 45;
+        [Tooltip("Min distance from obstacle at which the humanoid will be animated walking")]
+        [SerializeField] private float walkCycleMinDistance = 0.3f;
 
         [Header("Dash")]
         [SerializeField] [Range(1, 10)] private float dashSpeedMultiplier = 2;
@@ -36,9 +38,8 @@ namespace Overrailed.Mob
         [Header("Interact")]
         [SerializeField] private float interactInterval = 0.4f;
         [SerializeField] private bool autoMine;
-        [SerializeField] private float autoMineInterval = 0.5f;
         [Tooltip("Max distance at which auto mine will work while moving")]
-        [SerializeField] private float autoMineDistanceThreshold = 0.2f;
+        [SerializeField] private float autoMineDistanceThreshold = 0.25f;
 
         [Header("Transforms")] [SerializeField] private Transform armL;
         [SerializeField] private Transform armR, legL, legR, calfL, calfR, toolHolder, pickupHolder;
@@ -175,16 +176,21 @@ namespace Overrailed.Mob
         private IEnumerator HandleMiningRoutine()
         {
             if (Map == null || controller == null) yield break;
-
+            
             while (this && enabled)
             {
-                if (HeldItem != null && InteractRaycast(out RaycastHit info, 0.5f))
+                if (HeldItem is BreakTool && InteractRaycast(out RaycastHit info, 0.6f))
                 {
-                    var breakTile = info.transform.GetComponent<BreakableTile>();
-                    if (breakTile != null && (!isMoving || info.distance <= autoMineDistanceThreshold))
+                    var pos = transform.position;
+                    yield return Manager.DelayRoutine(interactInterval);
+                    if ((transform.position - pos).magnitude < autoMineDistanceThreshold)
                     {
-                        TryUseHeldItemOn(breakTile);
-                        yield return Manager.Delay(autoMineInterval);
+                        var breakTile = info.transform.GetComponent<BreakableTile>();
+                        if (breakTile != null && (!isMoving || info.distance <= autoMineDistanceThreshold))
+                        {
+                            TryUseHeldItemOn(breakTile);
+                            yield return Manager.DelayRoutine(interactInterval);
+                        }
                     }
                 }
 
@@ -238,7 +244,7 @@ namespace Overrailed.Mob
         /// </summary>
         private void TryUseHeldItemOn(IInteractable interactable)
         {
-            if (!IsHoldingItem || toolSwinging != null || interactable == null || (autoMine && interactable is BreakableTile)) return;
+            if (!IsHoldingItem || toolSwinging != null || interactable == null) return;
 
             var interaction = interactable.TryInteractUsing(HeldItem);
             if (interaction == Interaction.None)
@@ -428,7 +434,6 @@ namespace Overrailed.Mob
                 calfL.localRotation = Quaternion.Euler(Mathf.Abs(angle), 0, 0); ;
                 calfR.localRotation = calfL.localRotation;
 
-
                 if (!IsHoldingItem || !HeldItem.IsTwoHanded) armL.localRotation = legR.localRotation;
                 if (!IsHoldingItem) armR.localRotation = legL.localRotation;
 
@@ -436,20 +441,14 @@ namespace Overrailed.Mob
 
                 yield return null;
                 yield return Manager.PauseRoutine;
-                if (InteractRaycast(out _, autoMineDistanceThreshold))
+                if (InteractRaycast(out _, walkCycleMinDistance))
                 {
                     yield return StartCoroutine(ResetLimbRotations());
-                    yield return new WaitWhile(() => InteractRaycast(out _, autoMineDistanceThreshold));
+                    yield return new WaitWhile(() => InteractRaycast(out _, walkCycleMinDistance));
                 }
             }
 
             _ = StartCoroutine(ResetLimbRotations());
-
-            if (!IsHoldingItem)
-            {
-                armL.localRotation = Quaternion.identity;
-                armR.localRotation = Quaternion.identity;
-            }
         }
 
         /// <summary>
@@ -474,23 +473,18 @@ namespace Overrailed.Mob
                 yield return Manager.PauseRoutine;
             }
 
-            legR.localRotation = Quaternion.identity;
-
-            calfL.localRotation = Quaternion.identity;
-            calfR.localRotation = Quaternion.identity;
-
-            armL.localRotation = Quaternion.identity;
-            armR.localRotation = Quaternion.identity;
+            legR.localRotation = calfL.localRotation = calfR.localRotation = Quaternion.identity;
+            if (!IsHoldingItem) armL.localRotation = armR.localRotation = Quaternion.identity;
         }
         #endregion
 
         private void OnTriggerEnter(Collider other)
         {
-            if (HeldItem == null) return;
+            if (!IsHoldingItem) return;
             var heldStack = HeldItem as StackTile;
             if (heldStack == null || heldStack.GetStackCount() == Strength) return;
             var otherStack = other.GetComponent<StackTile>();
-            if (otherStack == null) return;
+            if (otherStack == null || (otherStack is RailTile rail && rail.IsPowered)) return;
 
             _ = otherStack.TryStackOn(heldStack);
         }

@@ -109,6 +109,13 @@ namespace Overrailed.UI
                         tool,
                         toolType.Tint,
                         toolType.ToolImage));
+
+                // Background
+                var color = toolHUDs[toolHUDs.Count - 1].background.color;
+                toolHUDs[toolHUDs.Count - 1].background.color = new Color(color.r, color.g, color.b, 0);
+                // Foreground
+                color = toolHUDs[toolHUDs.Count - 1].icon.color;
+                toolHUDs[toolHUDs.Count - 1].icon.color = new Color(color.r, color.g, color.b, 0);
             }
 
             _ = StartCoroutine(UpdateToolHUDs());

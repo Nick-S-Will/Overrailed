@@ -5,6 +5,7 @@ using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEditor;
+using System.Collections;
 
 namespace Overrailed.Managers
 {
@@ -40,12 +41,24 @@ namespace Overrailed.Managers
         /// </summary>
         public static async Task Delay(float seconds)
         {
-            float time = 0f;
-            while (time < seconds)
+            float elapsedTime = 0f;
+            while (elapsedTime < seconds)
             {
+                float startTime = Time.time;
                 await Pause;
                 await Task.Yield();
-                time += Time.deltaTime;
+                elapsedTime += Time.fixedDeltaTime + Time.time - startTime;
+            }
+        }
+        public static IEnumerator DelayRoutine(float seconds)
+        {
+            float elapsedTime = 0f;
+            while (elapsedTime < seconds)
+            {
+                float startTime = Time.time;
+                yield return PauseRoutine;
+                elapsedTime += Time.fixedDeltaTime + Time.time - startTime;
+                yield return new WaitForSeconds(Time.fixedDeltaTime);
             }
         }
         public static GameState CurrentState { get; protected set; }
@@ -115,7 +128,7 @@ namespace Overrailed.Managers
                 {
                     pauseCompletionSource = new TaskCompletionSource<bool>();
                     CurrentState = GameState.Paused;
-                    
+
                     Utils.PauseTasks();
                     OnPause?.Invoke();
                 }
@@ -123,7 +136,7 @@ namespace Overrailed.Managers
                 {
                     pauseCompletionSource.SetResult(true);
                     CurrentState = GameState.Play;
-                    
+
                     Utils.ResumeTasks();
                     OnResume?.Invoke();
                 }
