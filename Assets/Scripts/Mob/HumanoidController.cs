@@ -176,7 +176,7 @@ namespace Overrailed.Mob
         private IEnumerator HandleMiningRoutine()
         {
             if (Map == null || controller == null) yield break;
-            
+
             while (this && enabled)
             {
                 if (HeldItem is BreakTool && InteractRaycast(out RaycastHit info, 0.6f))
@@ -188,6 +188,7 @@ namespace Overrailed.Mob
                         var breakTile = info.transform.GetComponent<BreakableTile>();
                         if (breakTile != null && (!isMoving || info.distance <= autoMineDistanceThreshold))
                         {
+                            lastInteractTime = Time.time;
                             TryUseHeldItemOn(breakTile);
                             yield return Manager.DelayRoutine(interactInterval);
                         }
@@ -213,22 +214,26 @@ namespace Overrailed.Mob
         {
             if (Time.time < lastInteractTime + interactInterval || Manager.IsPaused()) return;
             lastInteractTime = Time.time;
-
+            
             if (InteractRaycast(out RaycastHit hitInfo))
             {
-                if (IsHoldingItem) TryUseHeldItemOn(hitInfo.transform.GetComponent<IInteractable>());
+                if (IsHoldingItem)
+                {
+                    if (autoMine && HeldItem is BreakTool && hitInfo.transform.GetComponent<BreakableTile>()) return;
+                    else TryUseHeldItemOn(hitInfo.transform.GetComponent<IInteractable>());
+                }
                 else _ = Pickup(hitInfo.transform.GetComponent<IPickupable>());
             }
             else Drop();
         }
 
         private bool TryToPickUpAll(IPickupable pickup) => TryToPickUp(pickup, Strength);
-        private bool TryToPickUpSingle(IPickupable pickup) => TryToPickUp(pickup, 1);
+        private bool TryToPickUpSingle(IPickupable pickup) => TryToPickUp(pickup);
         /// <summary>
         /// Tries to pick up given IPickupable
         /// </summary>
         /// <returns>True if given pickup isn't null and is picked up</returns>
-        private bool TryToPickUp(IPickupable pickup, int amount)
+        private bool TryToPickUp(IPickupable pickup, int amount = 1)
         {
             if (pickup == null) return false;
 
@@ -319,7 +324,7 @@ namespace Overrailed.Mob
 
             if (single && HeldItem is StackTile stack && stack.NextInStack)
             {
-                Map.PlacePickup(stack.TryPickUp(null, 1), coords);
+                Map.PlacePickup(stack.TryPickUp(null), coords);
             }
             else
             {

@@ -108,7 +108,7 @@ namespace Overrailed.Terrain.Tiles
         /// Checks if can be picked up, then unpowers it, then returns the base method
         /// </summary>
         /// <returns>The tile to be picked up, if it can be</returns>
-        public override IPickupable TryPickUp(Transform parent, int amount)
+        public override IPickupable TryPickUp(Transform parent, int amount = 1)
         {
             if (Passenger) return Passenger.TryPickUp(parent, amount);
             else if (!CanPickUp) return null;
@@ -133,7 +133,7 @@ namespace Overrailed.Terrain.Tiles
 
             if (TryGetConnectableRailAt(coords))
             {
-                MapManager.FindMap(coords).ForcePlacePickup(TryPickUp(null, 1), coords);
+                MapManager.FindMap(coords).ForcePlacePickup(TryPickUp(null), coords);
                 return false;
             }
 

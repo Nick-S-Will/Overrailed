@@ -20,7 +20,7 @@ public interface IPickupable
     /// <param name="parent">Transform the returned IPickupable will be parented to</param>
     /// <param name="amount">Max amount to pick up</param>
     /// <returns>The selected IPickupable from this</returns>
-    IPickupable TryPickUp(Transform parent, int amount);
+    IPickupable TryPickUp(Transform parent, int amount = 1);
 
     /// <summary>
     /// Used to do a custom action and choose if the IPickupable is held or dropped

@@ -70,7 +70,7 @@ namespace Overrailed.Terrain.Tiles
         /// <param name="parent">Transform this will be parented to</param>
         /// <param name="amount">Max amount of tiles to be picked up from the stack</param>
         /// <returns>Bottom StackTile of the stack to be picked up</returns>
-        public override IPickupable TryPickUp(Transform parent, int amount)
+        public override IPickupable TryPickUp(Transform parent, int amount = 1)
         {
             if (!CanPickUp) return null;
 

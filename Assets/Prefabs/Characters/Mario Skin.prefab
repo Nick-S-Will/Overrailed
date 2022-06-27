@@ -1147,6 +1147,7 @@ MonoBehaviour:
   turnSpeed: 15
   legSwingCoefficient: 0.09
   legRaiseAngle: 45
+  walkCycleMinDistance: 0.3
   dashSpeedMultiplier: 2.25
   dashDuration: 0.2
   dashSound: {fileID: 8300000, guid: 212c048a3d3a11a459367b859bafea33, type: 3}
@@ -1154,7 +1155,7 @@ MonoBehaviour:
   armSwingSpeed: 720
   interactInterval: 0.3
   autoMine: 1
-  autoMineDistanceThreshold: 0.3
+  autoMineDistanceThreshold: 0.35
   armL: {fileID: 5118414907984844143}
   armR: {fileID: 5118414909038260398}
   legL: {fileID: 5118414908764633356}

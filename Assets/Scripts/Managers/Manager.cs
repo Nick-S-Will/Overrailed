@@ -29,11 +29,11 @@ namespace Overrailed.Managers
 
         public static MonoBehaviour GetSkin() => skinPrefab;
         /// <summary>
-        /// Halts async functions until the game is no longer paused
+        /// Halts async functions while the game is paused
         /// </summary>
         public static Task Pause => pauseCompletionSource.Task;
         /// <summary>
-        /// Halts coroutine until the game is no longer paused
+        /// Halts coroutines while the game is paused
         /// </summary>
         public static WaitUntil PauseRoutine => new WaitUntil(() => Pause.IsCompleted);
         /// <summary>

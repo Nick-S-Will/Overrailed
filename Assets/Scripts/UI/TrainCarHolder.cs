@@ -26,7 +26,7 @@ namespace Overrailed.UI
         {
             if (!CanPickUp) return null;
 
-            var car = heldCar.TryPickUp(parent, 1) as TrainCar;
+            var car = heldCar.TryPickUp(parent) as TrainCar;
             if (car && manager.Coins >= car.Tier)
             {
                 Utils.MoveToLayer(car.transform, LayerMask.NameToLayer("Train"));

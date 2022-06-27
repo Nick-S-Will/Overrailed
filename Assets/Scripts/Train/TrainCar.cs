@@ -9,6 +9,7 @@ using Overrailed.Terrain.Tiles;
 namespace Overrailed.Train
 {
     [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(BoxCollider))]
     public abstract class TrainCar : Tile, IPickupable, IInteractable
     {
         public event System.Action OnDeath;
@@ -109,11 +110,15 @@ namespace Overrailed.Train
         /// Picks up this car if in edit mode
         /// </summary>
         /// <returns>This train car if in edit mode, otherwise null</returns>
-        public override IPickupable TryPickUp(Transform parent, int amount)
+        public override IPickupable TryPickUp(Transform parent, int amount = 1)
         {
-            if (GameManager.CurrentState != GameState.Edit || this is Locomotive || currentRail) return null;
+            if (Manager.CurrentState != GameState.Edit || this is Locomotive || currentRail) return null;
 
             GetComponent<BoxCollider>().enabled = false;
+            var body = GetComponent<Rigidbody>();
+            body.velocity = Vector3.zero;
+            body.freezeRotation = true;
+
             transform.parent = parent;
             transform.localPosition = Vector3.up;
             transform.localRotation = Quaternion.identity;
