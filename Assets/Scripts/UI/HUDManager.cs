@@ -135,12 +135,12 @@ namespace Overrailed.UI
                 }
 
                 yield return null;
-                if (!Manager.IsPlaying())
+                if (Manager.IsPaused() || Manager.IsEditing())
                 {
                     foreach (var toolHUD in toolHUDs) SetToolHUD(toolHUD.tool, false);
 
-                    yield return new WaitUntil(() => Manager.IsPlaying());
-
+                    yield return new WaitWhile(() => Manager.IsPaused() || Manager.IsEditing());
+                    
                     foreach (var toolHUD in toolHUDs) SetToolHUD(toolHUD.tool, true);
                 }
             }

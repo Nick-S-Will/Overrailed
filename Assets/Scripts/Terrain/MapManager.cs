@@ -34,7 +34,7 @@ namespace Overrailed.Terrain
         #endregion
 
         [SerializeField] [HideInInspector] private Vector3Int stationPos;
-        private List<Transform> newHighlights = new List<Transform>(), highlights = new List<Transform>();
+        private List<MeshRenderer> newHighlights = new List<MeshRenderer>(), highlights = new List<MeshRenderer>();
         private static List<Locomotive> locomotives = new List<Locomotive>();
 
         public static Locomotive[] Locomotives => locomotives.ToArray();
@@ -113,8 +113,10 @@ namespace Overrailed.Terrain
         {
             if (tile == null) return;
 
-            if (newHighlights.Contains(tile)) return;
-            else newHighlights.Add(tile);
+            foreach (var renderer in tile.GetComponentsInChildren<MeshRenderer>())
+            {
+                if (!newHighlights.Contains(renderer)) newHighlights.Add(renderer);
+            }
         }
 
         /// <summary>
@@ -122,9 +124,10 @@ namespace Overrailed.Terrain
         /// </summary>
         private void RemoveOldHighlights()
         {
-            foreach (var tile in highlights.ToArray())
-                if (!newHighlights.Contains(tile))
-                    highlights.Remove(tile);
+            foreach (var renderer in highlights.ToArray())
+            {
+                if (!newHighlights.Contains(renderer)) highlights.Remove(renderer);
+            }
         }
 
         /// <summary>
@@ -132,12 +135,12 @@ namespace Overrailed.Terrain
         /// </summary>
         private void AddHighlights()
         {
-            foreach (var tile in newHighlights)
+            foreach (var renderer in newHighlights)
             {
-                if (!highlights.Contains(tile))
+                if (!highlights.Contains(renderer))
                 {
-                    highlights.Add(tile);
-                    _ = StartCoroutine(HightlightTile(tile));
+                    highlights.Add(renderer);
+                    _ = StartCoroutine(HightlightMesh(renderer));
                 }
             }
         }
@@ -145,28 +148,18 @@ namespace Overrailed.Terrain
         /// <summary>
         /// Tints selected tile's children's meshes by highlightColor until tile is no longer selected
         /// </summary>
-        private IEnumerator HightlightTile(Transform tile)
+        private IEnumerator HightlightMesh(MeshRenderer renderer)
         {
-            if (tile == null) yield break;
+            if (renderer == null) yield break;
 
-            var renderers = tile.GetComponentsInChildren<MeshRenderer>();
-            var originalColors = new Color[renderers.Length];
+            // Tint mesh
+            var originalColor = renderer.material.color;
+            renderer.material.color = 0.5f * (originalColor + highlightColor);
 
-            // Tint mesh colors
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                originalColors[i] = renderers[i].material.color;
-                renderers[i].material.color = 0.5f * (originalColors[i] + highlightColor);
-            }
-
-            yield return new WaitWhile(() => highlights.Contains(tile));
+            yield return new WaitWhile(() => highlights.Contains(renderer));
 
             // Reset colors
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                if (renderers[i] == null) break;
-                else renderers[i].material.color = originalColors[i];
-            }
+            if (renderer) renderer.material.color = originalColor;
         }
 
         private IEnumerator UpdateHighlighting()

@@ -101,6 +101,7 @@ namespace Overrailed.Managers
 
         protected static class Pausing
         {
+            private static GameState prevState = GameState.Play;
             private static bool isPaused = false, isForced = false;
 
             public static void ForcePause()
@@ -127,6 +128,7 @@ namespace Overrailed.Managers
                 if (paused)
                 {
                     pauseCompletionSource = new TaskCompletionSource<bool>();
+                    if (CurrentState != GameState.Paused) prevState = CurrentState;
                     CurrentState = GameState.Paused;
 
                     Utils.PauseTasks();
@@ -135,7 +137,7 @@ namespace Overrailed.Managers
                 else
                 {
                     pauseCompletionSource.SetResult(true);
-                    CurrentState = GameState.Play;
+                    CurrentState = prevState;
 
                     Utils.ResumeTasks();
                     OnResume?.Invoke();
