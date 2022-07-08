@@ -10,7 +10,7 @@ namespace Overrailed.Train
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(BoxCollider))]
-    public abstract class TrainCar : Tile, IPickupable, IInteractable
+    public abstract class TrainCar : PickupTile, IInteractable
     {
         public event System.Action OnDeath;
         public virtual event System.Action OnInteract;
@@ -20,7 +20,7 @@ namespace Overrailed.Train
         [SerializeField] private Locomotive leaderLocomotive;
         [Space]
         [SerializeField] private ParticleSystem burningParticlePrefab;
-        [SerializeField] private ParticleSystem breakParticlePrefab, splashParticlePrefab;
+        [SerializeField] private ParticleSystem splashParticlePrefab;
         [Space]
         [SerializeField] private AudioClip explosionSound;
         [SerializeField] private AudioClip igniteSound;
@@ -269,7 +269,7 @@ namespace Overrailed.Train
         
         protected virtual void Die()
         {
-            BreakIntoParticles(breakParticlePrefab, MeshColorGradient, transform.position);
+            BreakIntoParticles(transform.position);
             AudioManager.PlaySound(explosionSound, transform.position);
 
             var waterColliders = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Water"));

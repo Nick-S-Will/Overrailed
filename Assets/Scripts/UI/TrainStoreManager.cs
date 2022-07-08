@@ -5,7 +5,7 @@ using UnityEngine;
 using Overrailed.Managers;
 using Overrailed.Train;
 
-namespace Overrailed.UI
+namespace Overrailed.UI.Shop
 {
     [RequireComponent(typeof(SpriteRenderer))]
     public class TrainStoreManager : MonoBehaviour
@@ -31,7 +31,7 @@ namespace Overrailed.UI
         {
             float panelWidth = GetComponent<SpriteRenderer>().size.x;
             float panelInterval = panelWidth / (carTypes.Length + 1);
-            Coins = 10;
+            Coins = 10; // TODO: Remove when shop testing complete
 
             // Spawns in holders
             for (int i = 0; i < carTypes.Length; i++)

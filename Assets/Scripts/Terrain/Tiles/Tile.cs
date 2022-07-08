@@ -5,32 +5,27 @@ using UnityEngine;
 namespace Overrailed.Terrain.Tiles
 {
     [SelectionBase]
-    public class Tile : MonoBehaviour, IPickupable
+    public class Tile : MonoBehaviour
     {
-        public event System.Action OnPickUp, OnDrop;
-
         [SerializeField] private Transform meshParent;
+        [SerializeField] private ParticleSystem breakParticlePrefab;
         [SerializeField] private bool rotateOnSpawn;
-        [Space]
-        [SerializeField] private AudioClip pickupAudio;
-        [SerializeField] private AudioClip dropAudio;
+
+        private Gradient meshColorGradient;
 
         public Transform MeshParent => meshParent;
-        public Gradient MeshColorGradient { get; private set; }
-        public AudioClip PickupAudio => pickupAudio;
-        public AudioClip DropAudio => dropAudio;
         /// <summary>
         /// Rounded <see cref="Transform.position"/>
         /// </summary>
         public Vector3Int Coords => Vector3Int.RoundToInt(transform.position);
-        public virtual bool CanPickUp => false;
-        public virtual bool IsTwoHanded => true;
         public bool RotateOnSpawn => rotateOnSpawn;
 
         protected virtual void Start()
         {
-            MeshColorGradient = GetMeshGradient();
+            meshColorGradient = GetMeshGradient();
         }
+
+        public void SetVisible(bool isVisible) => meshParent.gameObject.SetActive(isVisible);
 
         private Gradient GetMeshGradient()
         {
@@ -53,24 +48,14 @@ namespace Overrailed.Terrain.Tiles
 
             return meshColors;
         }
-
-        public virtual IPickupable TryPickUp(Transform parent, int amount) => null;
-        protected void InvokeOnPickUp() => OnPickUp?.Invoke();
         
-        public virtual bool OnTryDrop(Vector3Int position) => true;
-
-        public virtual void Drop(Vector3Int position) { }
-        protected void InvokeOnDrop() => OnDrop?.Invoke();
-
-        public void SetVisible(bool isVisible) => meshParent.gameObject.SetActive(isVisible);
-        
-        protected void BreakIntoParticles(ParticleSystem prefab, Gradient meshColors, Vector3 position)
+        protected void BreakIntoParticles(Vector3 position)
         {
-            var particles = Instantiate(prefab, position, prefab.transform.rotation);
-            Destroy(particles.gameObject, prefab.main.startLifetime.constant);
+            var particles = Instantiate(breakParticlePrefab, position, breakParticlePrefab.transform.rotation);
+            Destroy(particles.gameObject, particles.main.startLifetime.constant);
 
             var settings = particles.main;
-            var colors = new ParticleSystem.MinMaxGradient(meshColors);
+            var colors = new ParticleSystem.MinMaxGradient(meshColorGradient);
             colors.mode = ParticleSystemGradientMode.RandomColor;
             settings.startColor = colors;
         }

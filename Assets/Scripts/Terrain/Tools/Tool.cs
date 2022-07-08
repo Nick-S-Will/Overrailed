@@ -7,7 +7,7 @@ using Overrailed.Terrain.Tiles;
 
 namespace Overrailed.Terrain.Tools
 {
-    public abstract class Tool : Tile, IPickupable, IInteractable
+    public abstract class Tool : PickupTile, IInteractable
     {
         public event System.Action<Tool> OnPickup, OnDropTool;
 

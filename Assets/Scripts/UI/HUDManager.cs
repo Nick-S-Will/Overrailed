@@ -10,6 +10,7 @@ using Overrailed.Terrain.Tools;
 using Overrailed.Terrain.Generation;
 using Overrailed.Player;
 using Overrailed.Train;
+using Overrailed.UI.Shop;
 
 namespace Overrailed.UI
 {

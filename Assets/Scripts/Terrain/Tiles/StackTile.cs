@@ -7,7 +7,7 @@ using Overrailed.Managers.Audio;
 namespace Overrailed.Terrain.Tiles
 {
     [RequireComponent(typeof(BoxCollider))]
-    public class StackTile : Tile, IPickupable, IInteractable
+    public class StackTile : PickupTile, IInteractable
     {
         [SerializeField] private Tile bridge;
         [SerializeField] private AudioClip bridgeBuildAudio;

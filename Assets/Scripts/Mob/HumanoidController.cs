@@ -254,7 +254,7 @@ namespace Overrailed.Mob
             var interaction = interactable.TryInteractUsing(HeldItem);
             if (interaction == Interaction.None)
             {
-                if (!TrySwapHeldWith(interactable)) _ = TryReplaceWithHeld(interactable as Tile);
+                if (!TrySwapHeldWith(interactable)) _ = TryReplaceWithHeld(interactable as PickupTile);
             }
             else if (interaction == Interaction.Used)
             {
@@ -273,7 +273,7 @@ namespace Overrailed.Mob
         /// <returns>True if they swapped successfully</returns>
         private bool TrySwapHeldWith(IInteractable interactable)
         {
-            Tile interactTile = interactable as Tile;
+            var interactTile = interactable as PickupTile;
             if (!IsHoldingItem || !interactTile.CanPickUp) return false;
 
             var stackPos = Vector3Int.RoundToInt(interactTile.transform.position);

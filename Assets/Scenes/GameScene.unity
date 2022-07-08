@@ -592,11 +592,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1294096869}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &7950690
 GameObject:
@@ -1172,9 +1170,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1482950730}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &20192477
 GameObject:
   m_ObjectHideFlags: 0
@@ -1348,11 +1345,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 327688154}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &26086151
 GameObject:
@@ -1399,9 +1394,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1357631673}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &26319306
 GameObject:
   m_ObjectHideFlags: 0
@@ -1543,11 +1537,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1055731072}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &28924503
 GameObject:
@@ -1854,11 +1846,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1541005714}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &56133446
 GameObject:
@@ -1949,9 +1939,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1034571350}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1813926191}
   surfacePoint: {fileID: 1143773223}
   waveHeight: 0.2
@@ -2489,11 +2478,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 432527046}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &79177052
 GameObject:
@@ -3227,9 +3214,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1578082860}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &99901404
 GameObject:
   m_ObjectHideFlags: 0
@@ -3429,9 +3415,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2086938817}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &108205814
 GameObject:
   m_ObjectHideFlags: 0
@@ -3784,9 +3769,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 669756618}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &113156552
 GameObject:
   m_ObjectHideFlags: 0
@@ -4635,11 +4619,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2033255310}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &126488112
 GameObject:
@@ -4686,9 +4668,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1160280215}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &126797515
 GameObject:
   m_ObjectHideFlags: 0
@@ -4929,9 +4910,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1276820343}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &131904678
 GameObject:
   m_ObjectHideFlags: 0
@@ -4991,9 +4971,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1101484862}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 260652855}
   surfacePoint: {fileID: 1746032411}
   waveHeight: 0.2
@@ -5156,9 +5135,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1738478302}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &139515877
 GameObject:
   m_ObjectHideFlags: 0
@@ -5204,9 +5182,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 784750586}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &141765242
 GameObject:
   m_ObjectHideFlags: 0
@@ -5252,9 +5229,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 361715178}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &142870080
 GameObject:
   m_ObjectHideFlags: 0
@@ -5732,11 +5708,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 638733344}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &159397206
 GameObject:
@@ -5961,11 +5935,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 20192478}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &169326565
 GameObject:
@@ -6371,9 +6343,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1263797821}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &188324448
 GameObject:
   m_ObjectHideFlags: 0
@@ -6791,11 +6762,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1034316127}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &197484139
 GameObject:
@@ -6924,9 +6893,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 807116348}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &200810238
 GameObject:
   m_ObjectHideFlags: 0
@@ -7593,11 +7561,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 130171880}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &222411522
 GameObject:
@@ -7740,11 +7706,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1659721961}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &224154743
 GameObject:
@@ -7872,9 +7836,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1671260902}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &225910264
 GameObject:
   m_ObjectHideFlags: 0
@@ -8016,11 +7979,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 255724192}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &226842606
 GameObject:
@@ -8180,9 +8141,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2063442345}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &231711820
 GameObject:
   m_ObjectHideFlags: 0
@@ -8504,9 +8464,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 300584247}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &237576806
 GameObject:
   m_ObjectHideFlags: 0
@@ -8566,9 +8525,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1736499217}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1370580899}
   surfacePoint: {fileID: 890464420}
   waveHeight: 0.2
@@ -8631,11 +8589,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1000695395}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &239795156
 GameObject:
@@ -8877,9 +8833,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1951730066}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &249236361
 GameObject:
   m_ObjectHideFlags: 0
@@ -8971,11 +8926,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 366360748}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &255372101
 GameObject:
@@ -9135,9 +9088,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 483763686}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &258775252
 GameObject:
   m_ObjectHideFlags: 0
@@ -9245,9 +9197,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1845261121}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &260652854
 GameObject:
   m_ObjectHideFlags: 0
@@ -9489,9 +9440,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1104403541}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &269490350
 GameObject:
   m_ObjectHideFlags: 0
@@ -9633,9 +9583,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 925959292}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 258775253}
   surfacePoint: {fileID: 427989866}
   waveHeight: 0.2
@@ -9862,11 +9811,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 629857437}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &282057349
 GameObject:
@@ -10026,9 +9973,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 743746667}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &287221056
 GameObject:
   m_ObjectHideFlags: 0
@@ -10156,9 +10102,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1950252231}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &292522623
 GameObject:
   m_ObjectHideFlags: 0
@@ -10412,6 +10357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 755992735}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -11409,9 +11355,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2031102278}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &318710368
 GameObject:
   m_ObjectHideFlags: 0
@@ -11898,11 +11843,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1717836254}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &328094598
 GameObject:
@@ -11979,9 +11922,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 704135084}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &330071988
 GameObject:
   m_ObjectHideFlags: 0
@@ -12058,9 +12000,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 663597286}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &331632076
 GameObject:
   m_ObjectHideFlags: 0
@@ -12202,11 +12143,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1242381285}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &334784542
 GameObject:
@@ -12267,11 +12206,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1563311969}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &334995004
 GameObject:
@@ -12332,11 +12269,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 433349532}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &335655990
 GameObject:
@@ -12451,6 +12386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1420347041}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -12556,11 +12492,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1581750001}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &338796639
 GameObject:
@@ -12621,11 +12555,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1201654975}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &342450829
 GameObject:
@@ -12768,11 +12700,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 658577148}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &344705415
 GameObject:
@@ -12934,6 +12864,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 133370657}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: 3e1982dc99884ea4a9afda7dc75bbba8, type: 3}
@@ -13074,9 +13005,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1176834861}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &349648684
 GameObject:
   m_ObjectHideFlags: 0
@@ -13154,9 +13084,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 221563109}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &351915624
 GameObject:
   m_ObjectHideFlags: 0
@@ -13216,11 +13145,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1007128856}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &353841850
 GameObject:
@@ -13680,11 +13607,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 803588982}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &361235864
 GameObject:
@@ -13909,11 +13834,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 224484252}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &363513062
 GameObject:
@@ -14090,11 +14013,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1802085803}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &370370716
 GameObject:
@@ -14141,9 +14062,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1007383614}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &373409094
 GameObject:
   m_ObjectHideFlags: 0
@@ -14548,9 +14468,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 293499315}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &396924119
 GameObject:
   m_ObjectHideFlags: 0
@@ -14722,11 +14641,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 805106003}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &406679447
 GameObject:
@@ -14929,11 +14846,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 756622980}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &412127937
 GameObject:
@@ -15473,9 +15388,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1975510193}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &422139061
 GameObject:
   m_ObjectHideFlags: 0
@@ -15603,9 +15517,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1159363855}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &423647509
 GameObject:
   m_ObjectHideFlags: 0
@@ -17270,11 +17183,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 420782618}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &465164357
 GameObject:
@@ -17321,9 +17232,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1970831505}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &466405391
 GameObject:
   m_ObjectHideFlags: 0
@@ -17758,9 +17668,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1585812700}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &485395114
 GameObject:
   m_ObjectHideFlags: 0
@@ -17888,9 +17797,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 318710369}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &486880098
 GameObject:
   m_ObjectHideFlags: 0
@@ -18018,9 +17926,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 976274041}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &490523960
 GameObject:
   m_ObjectHideFlags: 0
@@ -18230,9 +18137,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1057788459}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &492364830
 GameObject:
   m_ObjectHideFlags: 0
@@ -18404,11 +18310,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 983825020}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &505173743
 GameObject:
@@ -18619,9 +18523,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1427217906}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &510673763
 GameObject:
   m_ObjectHideFlags: 0
@@ -18667,9 +18570,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1192759575}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &513462890
 GameObject:
   m_ObjectHideFlags: 0
@@ -18875,11 +18777,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1592540851}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &544637173
 GameObject:
@@ -19022,11 +18922,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 226842607}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &545706217
 GameObject:
@@ -19087,11 +18985,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1093832930}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &547751885
 GameObject:
@@ -19682,9 +19578,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 309634804}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &554657972
 GameObject:
   m_ObjectHideFlags: 0
@@ -19894,9 +19789,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1152632186}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &562206244
 GameObject:
   m_ObjectHideFlags: 0
@@ -20072,11 +19966,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1735199380}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &566781263
 GameObject:
@@ -20137,11 +20029,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2080632838}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &567259065
 GameObject:
@@ -20284,11 +20174,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 99901405}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &574637600
 GameObject:
@@ -20349,11 +20237,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 330071989}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &575915224
 GameObject:
@@ -20608,11 +20494,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 14329137}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &579016779
 GameObject:
@@ -20645,6 +20529,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 32305186}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -20736,9 +20621,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1890118095}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &582298367
 GameObject:
   m_ObjectHideFlags: 0
@@ -20817,9 +20701,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1546425283}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &586636568
 GameObject:
   m_ObjectHideFlags: 0
@@ -20879,9 +20762,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 704397349}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1688861053}
   surfacePoint: {fileID: 1863201220}
   waveHeight: 0.2
@@ -21414,9 +21296,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 737369602}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &598656569
 GameObject:
   m_ObjectHideFlags: 0
@@ -21708,9 +21589,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1923903232}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &609283632
 GameObject:
   m_ObjectHideFlags: 0
@@ -21979,6 +21859,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1034630743}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -22127,11 +22008,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1055965541}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &626291624
 GameObject:
@@ -22293,12 +22172,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 28924504}
+  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 1954688010}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
-  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   splashParticlePrefab: {fileID: 5256204201205229158, guid: 2564afb13d47b0d44801e6317b90800e, type: 3}
   explosionSound: {fileID: 8300000, guid: e53a8f6e5aef95b49bc739e43f65f2a5, type: 3}
   igniteSound: {fileID: 8300000, guid: 3809ed2d5e0e97a4faae678c67ce661a, type: 3}
@@ -22386,9 +22265,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 894854498}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &634411152
 GameObject:
   m_ObjectHideFlags: 0
@@ -22434,9 +22312,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1961567352}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &638575846
 GameObject:
   m_ObjectHideFlags: 0
@@ -22762,11 +22639,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 416578911}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &651084865
 GameObject:
@@ -22813,9 +22688,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 778834434}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &652335417
 GameObject:
   m_ObjectHideFlags: 0
@@ -23151,11 +23025,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1006465132}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &658577147
 GameObject:
@@ -23345,9 +23217,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 952704329}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &669756617
 GameObject:
   m_ObjectHideFlags: 0
@@ -23717,11 +23588,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 960659748}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &682186599
 GameObject:
@@ -24014,9 +23883,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1224189639}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &688793815
 GameObject:
   m_ObjectHideFlags: 0
@@ -24240,9 +24108,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1429418538}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 588358970}
   surfacePoint: {fileID: 845799978}
   waveHeight: 0.2
@@ -24455,9 +24322,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 941952700}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &698763710
 GameObject:
   m_ObjectHideFlags: 0
@@ -24599,9 +24465,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1836401206}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1262557927}
   surfacePoint: {fileID: 1981784830}
   waveHeight: 0.2
@@ -24732,9 +24597,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1473123746}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &704397348
 GameObject:
   m_ObjectHideFlags: 0
@@ -24949,9 +24813,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1508778628}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -25104,11 +24967,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1840229682}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &709953665
 GameObject:
@@ -25237,9 +25098,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 698763711}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &713263740
 GameObject:
   m_ObjectHideFlags: 0
@@ -25315,9 +25175,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1566350571}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &717306661
 GameObject:
   m_ObjectHideFlags: 0
@@ -25541,11 +25400,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1812594446}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &722984188
 GameObject:
@@ -25756,9 +25613,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1433024042}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &729571187
 GameObject:
   m_ObjectHideFlags: 0
@@ -26257,6 +26113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 562206245}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: 3e1982dc99884ea4a9afda7dc75bbba8, type: 3}
@@ -26638,9 +26495,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1334728116}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &746567596
 GameObject:
   m_ObjectHideFlags: 0
@@ -27192,9 +27048,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1546192135}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &768649085
 GameObject:
   m_ObjectHideFlags: 0
@@ -27814,9 +27669,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1955183226}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &790772510
 GameObject:
   m_ObjectHideFlags: 0
@@ -27862,9 +27716,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1457594422}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &792717625
 GameObject:
   m_ObjectHideFlags: 0
@@ -29019,11 +28872,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 953097063}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &820490588
 GameObject:
@@ -29264,9 +29115,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 775639962}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &828611665
 GameObject:
   m_ObjectHideFlags: 0
@@ -29490,9 +29340,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 197484140}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1508947140}
   surfacePoint: {fileID: 1845434379}
   waveHeight: 0.2
@@ -30162,11 +30011,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 893684615}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &852548361
 GameObject:
@@ -30246,12 +30093,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 847768713}
+  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 1954688010}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
-  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   splashParticlePrefab: {fileID: 5256204201205229158, guid: 2564afb13d47b0d44801e6317b90800e, type: 3}
   explosionSound: {fileID: 8300000, guid: e53a8f6e5aef95b49bc739e43f65f2a5, type: 3}
   igniteSound: {fileID: 8300000, guid: 3809ed2d5e0e97a4faae678c67ce661a, type: 3}
@@ -30389,9 +30236,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1887063760}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &867292838
 GameObject:
   m_ObjectHideFlags: 0
@@ -30646,11 +30492,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1164651522}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &871395569
 GameObject:
@@ -30893,9 +30737,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1699949999}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &880891336
 GameObject:
   m_ObjectHideFlags: 0
@@ -31187,9 +31030,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1009804462}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &885727951
 GameObject:
   m_ObjectHideFlags: 0
@@ -32291,9 +32133,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 785316377}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &904223477
 GameObject:
   m_ObjectHideFlags: 0
@@ -32517,6 +32358,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2012152150}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -33444,11 +33286,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1013742274}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &928485094
 GameObject:
@@ -33755,11 +33595,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2017370803}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &934712106
 GameObject:
@@ -33888,9 +33726,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 335655991}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &939036574
 GameObject:
   m_ObjectHideFlags: 0
@@ -34333,9 +34170,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1351712765}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &946587665
 GameObject:
   m_ObjectHideFlags: 0
@@ -34801,9 +34637,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 70594519}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &958905385
 GameObject:
   m_ObjectHideFlags: 0
@@ -34963,9 +34798,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1455574297}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &960659747
 GameObject:
   m_ObjectHideFlags: 0
@@ -35113,6 +34947,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 958905386}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -35579,11 +35414,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1424345645}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &972051168
 GameObject:
@@ -35644,9 +35477,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2137914558}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 249236362}
   surfacePoint: {fileID: 1535347014}
   waveHeight: 0.2
@@ -36081,11 +35913,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1880770779}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &983825019
 GameObject:
@@ -36535,11 +36365,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 110213545}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1004017267
 GameObject:
@@ -36897,9 +36725,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 142870081}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1010640998
 GameObject:
   m_ObjectHideFlags: 0
@@ -36945,9 +36772,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1324557472}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1011594964
 GameObject:
   m_ObjectHideFlags: 0
@@ -36993,9 +36819,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1340021349}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1011617685
 GameObject:
   m_ObjectHideFlags: 0
@@ -37055,11 +36880,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 458074821}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1013742273
 GameObject:
@@ -37172,9 +36995,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2275699}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1019256422
 GameObject:
   m_ObjectHideFlags: 0
@@ -37452,9 +37274,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 951910545}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1028647762
 GameObject:
   m_ObjectHideFlags: 0
@@ -37612,9 +37433,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 828611666}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1034316126
 GameObject:
   m_ObjectHideFlags: 0
@@ -37691,9 +37511,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1222921533}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1034571349
 GameObject:
   m_ObjectHideFlags: 0
@@ -37857,9 +37676,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 590632327}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1039187790
 GameObject:
   m_ObjectHideFlags: 0
@@ -38270,9 +38088,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1870175794}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1055731071
 GameObject:
   m_ObjectHideFlags: 0
@@ -38479,9 +38296,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 95664915}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 736566704}
   surfacePoint: {fileID: 1357202491}
   waveHeight: 0.2
@@ -38858,9 +38674,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1817651406}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1074056159
 GameObject:
   m_ObjectHideFlags: 0
@@ -39152,9 +38967,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 893482828}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1079165862
 GameObject:
   m_ObjectHideFlags: 0
@@ -39636,11 +39450,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1614495817}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1087582706
 GameObject:
@@ -39870,9 +39682,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1891249098}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1097287383
 GameObject:
   m_ObjectHideFlags: 0
@@ -39952,9 +39763,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1340470070}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1100358542
 GameObject:
   m_ObjectHideFlags: 0
@@ -40000,9 +39810,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1577547204}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1101484861
 GameObject:
   m_ObjectHideFlags: 0
@@ -40212,9 +40021,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 859429821}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1108618057
 GameObject:
   m_ObjectHideFlags: 0
@@ -40376,9 +40184,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 731852894}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1115642139
 GameObject:
   m_ObjectHideFlags: 0
@@ -41312,9 +41119,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 693076194}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 313452464}
   surfacePoint: {fileID: 2109970757}
   waveHeight: 0.2
@@ -41862,11 +41668,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2027542855}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1157193389
 GameObject:
@@ -42024,9 +41828,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 558705032}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1158801174
 GameObject:
   m_ObjectHideFlags: 0
@@ -42072,9 +41875,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 317758877}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1159363854
 GameObject:
   m_ObjectHideFlags: 0
@@ -42593,9 +42395,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 973266422}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1165246299
 GameObject:
   m_ObjectHideFlags: 0
@@ -43000,9 +42801,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1987266675}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1179701488
 GameObject:
   m_ObjectHideFlags: 0
@@ -43256,11 +43056,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 944322468}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1186755208
 GameObject:
@@ -43779,9 +43577,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 11682208}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1201654974
 GameObject:
   m_ObjectHideFlags: 0
@@ -44022,9 +43819,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 273762748}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1207827593
 GameObject:
   m_ObjectHideFlags: 0
@@ -44494,11 +44290,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1140246525}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1212225295
 GameObject:
@@ -44545,9 +44339,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1658317825}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1213588660
 GameObject:
   m_ObjectHideFlags: 0
@@ -44627,9 +44420,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1110532847}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1215984978
 GameObject:
   m_ObjectHideFlags: 0
@@ -44675,9 +44467,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 682744909}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1216655301
 GameObject:
   m_ObjectHideFlags: 0
@@ -44887,9 +44678,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1151835390}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1220393588
 GameObject:
   m_ObjectHideFlags: 0
@@ -45300,9 +45090,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1718391367}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1229638466
 GameObject:
   m_ObjectHideFlags: 0
@@ -45348,9 +45137,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 316386189}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1231122941
 GameObject:
   m_ObjectHideFlags: 0
@@ -45396,9 +45184,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 120585504}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1236262435
 GameObject:
   m_ObjectHideFlags: 0
@@ -45608,9 +45395,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1642490956}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1240484510
 GameObject:
   m_ObjectHideFlags: 0
@@ -45885,9 +45671,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1296866006}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1250393571
 GameObject:
   m_ObjectHideFlags: 0
@@ -46078,12 +45863,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 442288521}
+  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 0}
   dropAudio: {fileID: 0}
   leaderLocomotive: {fileID: 1954688010}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
-  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   splashParticlePrefab: {fileID: 0}
   explosionSound: {fileID: 0}
   igniteSound: {fileID: 0}
@@ -46153,11 +45938,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1914050850}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1262557926
 GameObject:
@@ -46236,9 +46019,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 904536391}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1263623952
 GameObject:
   m_ObjectHideFlags: 0
@@ -46284,9 +46066,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 301201719}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1263797820
 GameObject:
   m_ObjectHideFlags: 0
@@ -46674,11 +46455,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 16582628}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1269508996
 GameObject:
@@ -46725,9 +46504,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 108205815}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1272031440
 GameObject:
   m_ObjectHideFlags: 0
@@ -46773,9 +46551,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 7950691}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1272626243
 GameObject:
   m_ObjectHideFlags: 0
@@ -47147,11 +46924,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1240484511}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1279592456
 GameObject:
@@ -47444,9 +47219,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 527755345}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1290157010
 GameObject:
   m_ObjectHideFlags: 0
@@ -47492,9 +47266,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1168266744}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1291195687
 GameObject:
   m_ObjectHideFlags: 0
@@ -47952,9 +47725,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 885727952}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1305959878
 GameObject:
   m_ObjectHideFlags: 0
@@ -48208,11 +47980,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 35753733}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1313249163
 GameObject:
@@ -48259,9 +48029,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2044018347}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1315257051
 GameObject:
   m_ObjectHideFlags: 0
@@ -48501,9 +48270,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 159397207}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1318200755
 GameObject:
   m_ObjectHideFlags: 0
@@ -48612,11 +48380,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 639624960}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1323059891
 GameObject:
@@ -50028,11 +49794,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1728509496}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1351000693
 GameObject:
@@ -50093,6 +49857,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1729828370}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -50586,9 +50351,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 485395115}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1370580898
 GameObject:
   m_ObjectHideFlags: 0
@@ -50912,9 +50676,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1932774450}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1375391351
 GameObject:
   m_ObjectHideFlags: 0
@@ -51548,9 +51311,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1506030781}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 441654187}
   surfacePoint: {fileID: 1490541292}
   waveHeight: 0.2
@@ -51774,11 +51536,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1612013639}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5595235350578854948, guid: 7cd57254a1d987446ae012b3567db32d, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 5595235350578854948, guid: 7cd57254a1d987446ae012b3567db32d, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1394672371
 GameObject:
@@ -51921,11 +51681,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 412127938}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1397696366
 GameObject:
@@ -52218,9 +51976,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 248334119}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1407319860
 GameObject:
   m_ObjectHideFlags: 0
@@ -52541,11 +52298,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 466405392}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1424345644
 GameObject:
@@ -52749,11 +52504,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1276640751}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1427217905
 GameObject:
@@ -53098,11 +52851,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 185194477}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1433024041
 GameObject:
@@ -53861,11 +53612,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1165246300}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1448609452
 GameObject:
@@ -53926,11 +53675,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 35076746}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1449553745
 GameObject:
@@ -53977,9 +53724,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1361386820}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1450217114
 GameObject:
   m_ObjectHideFlags: 0
@@ -54549,9 +54295,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 653523073}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1462406723
 GameObject:
   m_ObjectHideFlags: 0
@@ -54646,9 +54391,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 788752740}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1464244961
 GameObject:
   m_ObjectHideFlags: 0
@@ -54977,9 +54721,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 122796436}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1471011704
 GameObject:
   m_ObjectHideFlags: 0
@@ -55643,9 +55386,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1689029991}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1504319421
 GameObject:
   m_ObjectHideFlags: 0
@@ -55869,11 +55611,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 83506863}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1506030780
 GameObject:
@@ -56002,9 +55742,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1833412171}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1506848312
 GameObject:
   m_ObjectHideFlags: 0
@@ -56147,6 +55886,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1419839848}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -56723,9 +56463,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 225910265}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1518375460
 GameObject:
   m_ObjectHideFlags: 0
@@ -56899,11 +56638,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 894700766}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1521080994
 GameObject:
@@ -56964,11 +56701,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1085204369}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1527508036
 GameObject:
@@ -57029,11 +56764,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 243075914}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1528230497
 GameObject:
@@ -57080,9 +56813,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 544637174}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1528965923
 GameObject:
   m_ObjectHideFlags: 0
@@ -57142,11 +56874,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1745599041}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1529329303
 GameObject:
@@ -57275,9 +57005,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1217324823}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1533160041
 GameObject:
   m_ObjectHideFlags: 0
@@ -57383,9 +57112,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 22044953}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1538275120
 GameObject:
   m_ObjectHideFlags: 0
@@ -57691,11 +57419,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 513462891}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1541005713
 GameObject:
@@ -57774,9 +57500,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1575670106}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1543002074
 GameObject:
   m_ObjectHideFlags: 0
@@ -57822,9 +57547,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2095344785}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1544290289
 GameObject:
   m_ObjectHideFlags: 0
@@ -58001,9 +57725,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 323251344}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1548744188}
   surfacePoint: {fileID: 1079165863}
   waveHeight: 0.2
@@ -58315,12 +58038,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1277290179}
+  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 1954688010}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
-  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   splashParticlePrefab: {fileID: 5256204201205229158, guid: 2564afb13d47b0d44801e6317b90800e, type: 3}
   explosionSound: {fileID: 8300000, guid: e53a8f6e5aef95b49bc739e43f65f2a5, type: 3}
   igniteSound: {fileID: 8300000, guid: 3809ed2d5e0e97a4faae678c67ce661a, type: 3}
@@ -58628,9 +58351,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1562757795}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1557982970
 GameObject:
   m_ObjectHideFlags: 0
@@ -58758,9 +58480,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 79177053}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1562450657
 GameObject:
   m_ObjectHideFlags: 0
@@ -59213,6 +58934,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2020895233}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -60148,9 +59870,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 617604127}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1580623239
 GameObject:
   m_ObjectHideFlags: 0
@@ -60849,11 +60570,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 641578131}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1602473065
 GameObject:
@@ -60982,9 +60701,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 177938508}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1606807200
 GameObject:
   m_ObjectHideFlags: 0
@@ -61428,9 +61146,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1782724560}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1619936289
 GameObject:
   m_ObjectHideFlags: 0
@@ -61781,11 +61498,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 590563902}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1633737775
 GameObject:
@@ -62109,9 +61824,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1887910454}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1641140708
 GameObject:
   m_ObjectHideFlags: 0
@@ -62288,11 +62002,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 873757559}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1644490773
 GameObject:
@@ -62339,9 +62051,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1050601780}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1648238233
 GameObject:
   m_ObjectHideFlags: 0
@@ -62387,9 +62098,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 894437018}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1649989158
 GameObject:
   m_ObjectHideFlags: 0
@@ -63043,9 +62753,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1769978448}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1667595630
 GameObject:
   m_ObjectHideFlags: 0
@@ -63091,9 +62800,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1180059116}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1670099095
 GameObject:
   m_ObjectHideFlags: 0
@@ -63303,9 +63011,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1466297872}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1674115111
 GameObject:
   m_ObjectHideFlags: 0
@@ -63470,9 +63177,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 300953298}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1679014954
 GameObject:
   m_ObjectHideFlags: 0
@@ -63712,9 +63418,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 239795157}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1688861052
 GameObject:
   m_ObjectHideFlags: 0
@@ -63956,9 +63661,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 939659097}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1696840414
 GameObject:
   m_ObjectHideFlags: 0
@@ -63990,6 +63694,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1186755209}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -64570,11 +64275,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 358582976}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 8817695416137823023, guid: 287f29926338025458a6ef04d977c8ab, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1704943297
 GameObject:
@@ -64621,9 +64324,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1544290290}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1705690049
 GameObject:
   m_ObjectHideFlags: 0
@@ -64669,9 +64371,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1470518049}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1707109260
 GameObject:
   m_ObjectHideFlags: 0
@@ -64717,9 +64418,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 505906340}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1711600607
 GameObject:
   m_ObjectHideFlags: 0
@@ -64861,9 +64561,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1651661556}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 2020466578}
   surfacePoint: {fileID: 1838398557}
   waveHeight: 0.2
@@ -65164,11 +64863,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1293900443}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1717836253
 GameObject:
@@ -65345,11 +65042,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1164714320}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1726903827
 GameObject:
@@ -65478,9 +65173,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1338717756}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1728509495
 GameObject:
   m_ObjectHideFlags: 0
@@ -65705,9 +65399,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 917838052}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1732816853
 GameObject:
   m_ObjectHideFlags: 0
@@ -65769,6 +65462,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 349648685}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
@@ -65990,9 +65684,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1352063206}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1518375461}
   surfacePoint: {fileID: 732747824}
   waveHeight: 0.2
@@ -66055,11 +65748,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1747587460}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1738478301
 GameObject:
@@ -66188,9 +65879,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1700922931}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1744704020
 GameObject:
   m_ObjectHideFlags: 0
@@ -66966,9 +66656,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 742117556}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1768486156
 GameObject:
   m_ObjectHideFlags: 0
@@ -67014,9 +66703,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1174546849}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1769524769
 GameObject:
   m_ObjectHideFlags: 0
@@ -67062,9 +66750,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1092436748}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1769978447
 GameObject:
   m_ObjectHideFlags: 0
@@ -67206,11 +66893,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1606807201}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1770769470
 GameObject:
@@ -68161,11 +67846,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1966727918}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1800104546
 GameObject:
@@ -68212,9 +67895,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 102580379}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1800241925
 GameObject:
   m_ObjectHideFlags: 0
@@ -68387,11 +68069,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1636376690}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1810951812
 GameObject:
@@ -69078,11 +68758,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 282057350}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1828145977
 GameObject:
@@ -69211,9 +68889,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 428945460}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1833326749
 GameObject:
   m_ObjectHideFlags: 0
@@ -69727,11 +69404,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1024602717}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1838398556
 GameObject:
@@ -69808,9 +69483,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1784372346}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1840229681
 GameObject:
   m_ObjectHideFlags: 0
@@ -70317,9 +69991,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2087493965}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1860499593
 GameObject:
   m_ObjectHideFlags: 0
@@ -70365,9 +70038,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 2007976432}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1862450739
 GameObject:
   m_ObjectHideFlags: 0
@@ -70413,9 +70085,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 813854983}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1863201219
 GameObject:
   m_ObjectHideFlags: 0
@@ -70781,11 +70452,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1446880915}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5595235350578854948, guid: 7cd57254a1d987446ae012b3567db32d, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 5595235350578854948, guid: 7cd57254a1d987446ae012b3567db32d, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1876955572
 GameObject:
@@ -70928,9 +70597,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1021202176}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1415649470}
   surfacePoint: {fileID: 2004073305}
   waveHeight: 0.2
@@ -71587,9 +71255,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 793384769}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1888199871
 GameObject:
   m_ObjectHideFlags: 0
@@ -71635,9 +71302,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1209176047}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1890118094
 GameObject:
   m_ObjectHideFlags: 0
@@ -71847,9 +71513,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 196115556}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1892541323
 GameObject:
   m_ObjectHideFlags: 0
@@ -71925,9 +71590,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1998181550}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1896742506
 GameObject:
   m_ObjectHideFlags: 0
@@ -72407,9 +72071,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1576735768}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 1450800228}
   surfacePoint: {fileID: 922575255}
   waveHeight: 0.2
@@ -72797,11 +72460,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1213588661}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &1927968110
 GameObject:
@@ -72848,9 +72509,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 655145180}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1928500863
 GameObject:
   m_ObjectHideFlags: 0
@@ -73074,9 +72734,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 759594444}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
   liquid: {fileID: 201047528}
   surfacePoint: {fileID: 204876697}
   waveHeight: 0.2
@@ -73371,9 +73030,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1438181366}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1939930593
 GameObject:
   m_ObjectHideFlags: 0
@@ -73911,9 +73569,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1837108083}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1954374018
 GameObject:
   m_ObjectHideFlags: 0
@@ -74028,12 +73685,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1778660545}
+  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 1954688010}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
-  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   splashParticlePrefab: {fileID: 5256204201205229158, guid: 2564afb13d47b0d44801e6317b90800e, type: 3}
   explosionSound: {fileID: 8300000, guid: e53a8f6e5aef95b49bc739e43f65f2a5, type: 3}
   igniteSound: {fileID: 8300000, guid: 3809ed2d5e0e97a4faae678c67ce661a, type: 3}
@@ -74300,9 +73957,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1155706150}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1960547074
 GameObject:
   m_ObjectHideFlags: 0
@@ -74362,11 +74018,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 870802357}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1961306697
 GameObject:
@@ -74776,11 +74430,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1337816737}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &1970831504
 GameObject:
@@ -75822,9 +75474,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 379853966}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &1998181549
 GameObject:
   m_ObjectHideFlags: 0
@@ -76392,9 +76043,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1926951255}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2012152149
 GameObject:
   m_ObjectHideFlags: 0
@@ -76568,11 +76218,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1108618058}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 650179087660195252, guid: 65dce7fee55fc114cb037ea0102d5c2b, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &2016569200
 GameObject:
@@ -76897,11 +76545,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 210769760}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 7170167450463823396, guid: b76bee35622ba6b4b9d26f060df2cbfe, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &2021817612
 GameObject:
@@ -77096,9 +76742,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1484934536}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2027479494
 GameObject:
   m_ObjectHideFlags: 0
@@ -77144,9 +76789,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 460236151}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2027505860
 GameObject:
   m_ObjectHideFlags: 0
@@ -77206,11 +76850,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 965585046}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &2027542854
 GameObject:
@@ -77761,9 +77403,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1588149569}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2032778677
 GameObject:
   m_ObjectHideFlags: 0
@@ -78164,11 +77805,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 320649810}
-  rotateOnSpawn: 1
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 1
+  lowerTier: {fileID: 5522539728120098085, guid: 3edbc46ae52c5d34c970d94b337d11ec, type: 3}
   breakAudio: {fileID: 8300000, guid: 0c1bedc5c712f5d49adfa23ed7de8925, type: 3}
 --- !u!1 &2057136590
 GameObject:
@@ -78215,9 +77854,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 454910509}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2058499541
 GameObject:
   m_ObjectHideFlags: 0
@@ -78263,9 +77901,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 709953666}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2060943620
 GameObject:
   m_ObjectHideFlags: 0
@@ -78680,9 +78317,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 673226048}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2074915760
 GameObject:
   m_ObjectHideFlags: 0
@@ -78728,9 +78364,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1427320081}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2075800477
 GameObject:
   m_ObjectHideFlags: 0
@@ -78776,9 +78411,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1928500864}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2076132467
 GameObject:
   m_ObjectHideFlags: 0
@@ -79002,11 +78636,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 889471716}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &2079682969
 GameObject:
@@ -79620,11 +79252,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 35485984}
-  rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
-  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakParticlePrefab: {fileID: 5111784658692134587, guid: ab684822e09228e4eb555630d277d405, type: 3}
+  rotateOnSpawn: 0
+  lowerTier: {fileID: 3540607043370630385, guid: 02e17c11d9b0c1049aedf6fbb43ea975, type: 3}
   breakAudio: {fileID: 8300000, guid: 0cf794424871cba44b0ffae559634e4c, type: 3}
 --- !u!1 &2094956987
 GameObject:
@@ -80455,9 +80085,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1342734209}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2135602748
 GameObject:
   m_ObjectHideFlags: 0
@@ -80779,9 +80408,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 831716234}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &2141206870
 GameObject:
   m_ObjectHideFlags: 0
@@ -80909,9 +80537,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 1726903828}
+  breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
-  pickupAudio: {fileID: 0}
-  dropAudio: {fileID: 0}
 --- !u!1 &7164010559301638584
 GameObject:
   m_ObjectHideFlags: 0

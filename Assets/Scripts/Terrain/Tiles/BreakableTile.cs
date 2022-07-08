@@ -13,7 +13,6 @@ namespace Overrailed.Terrain.Tiles
 
         [Space]
         [SerializeField] private Tile lowerTier;
-        [SerializeField] private ParticleSystem breakParticlePrefab;
         [SerializeField] private AudioClip breakAudio;
 
         protected override void Start() => base.Start();
@@ -39,7 +38,7 @@ namespace Overrailed.Terrain.Tiles
             {
                 if (toSpawn is BreakableTile t)
                 {
-                    BreakIntoParticles(breakParticlePrefab, toSpawn.MeshColorGradient, transform.position);
+                    BreakIntoParticles(transform.position);
                     AudioManager.PlaySound(tool.InteractSound, transform.position);
                     AudioManager.PlaySound(breakAudio, transform.position);
                     
@@ -50,17 +49,15 @@ namespace Overrailed.Terrain.Tiles
 
             if (toSpawn == this)
             {
-                Debug.LogError("Tool is tier 0");
-                return;
-            }
-            else if (toSpawn == null)
-            {
-                Debug.LogError("BreakTile has lower tier assigned");
+                Debug.LogError("Tool is tier < 1");
                 return;
             }
 
-            var tile = Instantiate(toSpawn, transform.position, transform.rotation, transform.parent);
-            OnBreak?.Invoke(tile);
+            if (toSpawn)
+            {
+                var tile = Instantiate(toSpawn, transform.position, transform.rotation, transform.parent);
+                OnBreak?.Invoke(tile);
+            }
             Destroy(gameObject);
         }
     }

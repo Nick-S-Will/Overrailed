@@ -17,7 +17,7 @@ namespace Overrailed.Terrain.Tools
             set => liquid.gameObject.SetActive(value);
         }
 
-        override protected void Start()
+        new protected virtual void Start()
         {
             liquid.gameObject.SetActive(IsFull);
         }

@@ -5,7 +5,7 @@ using UnityEngine;
 using Overrailed.Managers.Audio;
 using Overrailed.Train;
 
-namespace Overrailed.UI
+namespace Overrailed.UI.Shop
 {
     public class TrainCarHolder : MonoBehaviour, IInteractable, IPickupable
     {
