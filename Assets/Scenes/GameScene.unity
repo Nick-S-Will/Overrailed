@@ -79824,7 +79824,7 @@ MonoBehaviour:
   interactMask:
     serializedVersion: 2
     m_Bits: 6929
-  initialTrainDelay: 25
+  initialTrainDelay: 10
   highlightColor: {r: 1, g: 1, b: 1, a: 1}
   highlightEnabled: 1
   visualizeBounds: 0

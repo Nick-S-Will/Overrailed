@@ -95,7 +95,7 @@ namespace Overrailed.Train
                 InvokeOnInteract();
                 return Interaction.Interacted;
             }
-            else return Interaction.None;
+            else return base.TryInteractUsing(item);
         }
     }
 }

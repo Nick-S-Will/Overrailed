@@ -112,7 +112,8 @@ namespace Overrailed.Train
         /// <returns>This train car if in edit mode, otherwise null</returns>
         public override IPickupable TryPickUp(Transform parent, int amount = 1)
         {
-            if (Manager.CurrentState != GameState.Edit || this is Locomotive || currentRail) return null;
+            // TODO: Update to enable car rearranging
+            if (!Manager.IsEditing() || this is Locomotive || currentRail) return null;
 
             GetComponent<BoxCollider>().enabled = false;
             var body = GetComponent<Rigidbody>();

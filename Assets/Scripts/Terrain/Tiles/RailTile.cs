@@ -95,7 +95,8 @@ namespace Overrailed.Terrain.Tiles
         public override Interaction TryInteractUsing(IPickupable item)
         {
             if (Passenger) return Passenger.TryInteractUsing(item);
-            else if (item is TrainCar car) return car.TrySetRail(this, true) ? Interaction.Used : Interaction.None;
+            // TODO: Implement car rearranging
+            else if (false && item is TrainCar car) return car.TrySetRail(this, true) ? Interaction.Used : Interaction.None;
             else if (item is RailTile rail)
             {
                 if (IsPowered) return Interaction.Interacted; // To prevent swapping of rails

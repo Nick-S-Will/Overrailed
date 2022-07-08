@@ -47,7 +47,7 @@ namespace Overrailed.Managers
                 float startTime = Time.time;
                 await Pause;
                 await Task.Yield();
-                elapsedTime += Time.fixedDeltaTime + Time.time - startTime;
+                elapsedTime += Time.time - startTime;
             }
         }
         public static IEnumerator DelayRoutine(float seconds)
@@ -57,8 +57,8 @@ namespace Overrailed.Managers
             {
                 float startTime = Time.time;
                 yield return PauseRoutine;
-                elapsedTime += Time.fixedDeltaTime + Time.time - startTime;
                 yield return new WaitForSeconds(Time.fixedDeltaTime);
+                elapsedTime += Time.time - startTime;
             }
         }
         public static GameState CurrentState { get; protected set; }
