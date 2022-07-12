@@ -71,6 +71,8 @@ namespace Overrailed.Train
         protected void StopEmittingSmoke() => SetEmitSmoke(false);
         private void SetEmitSmoke(bool emit)
         {
+            if (smokeParticles == null) return;
+
             var emissionSettings = smokeParticles.emission;
             emissionSettings.enabled = emit;
         }

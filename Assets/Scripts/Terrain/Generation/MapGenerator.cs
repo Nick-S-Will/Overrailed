@@ -14,6 +14,7 @@ namespace Overrailed.Terrain.Generation
     public class MapGenerator : MonoBehaviour
     {
         [SerializeField] private Biome currentBiome;
+        [SerializeField] private Coin coinPrefab;
         [SerializeField] private int seed = 0;
         [SerializeField] [Min(1)] private float noiseScale = 10;
         [SerializeField] private Vector2 noiseOffset;
@@ -138,7 +139,7 @@ namespace Overrailed.Terrain.Generation
         /// <summary>
         /// Generates the ground or obstacles of a chunk
         /// </summary>
-        /// <param name="tiles"></param>
+        /// <param name="tiles"><see cref="Tile"/> objects to be instantiated</param>
         /// <param name="parent">Object the rows of the chunk are parented to</param>
         /// <param name="station">Bounds where the station resides if there is one in the chunk</param>
         /// <param name="checkpoint">Bounds where the checkpoint of the chunk resides</param>
@@ -146,6 +147,17 @@ namespace Overrailed.Terrain.Generation
         private void GenerateSection(Tile[,] tiles, Transform parent, BoundsInt[] obstructions, bool isGround)
         {
             int mapLength = chunks.Count * chunkLength;
+
+            if (!isGround)
+            {
+                var coinPos = Vector3Int.left;
+                while (coinPos == Vector3Int.left)
+                {
+                    coinPos = new Vector3Int(rng.Next(mapLength - chunkLength, mapLength), 0, rng.Next(0, mapWidth));
+                    if (obstructions.Any(bounds => bounds.Contains(coinPos))) coinPos = Vector3Int.left;
+                }
+                tiles[coinPos.x, coinPos.z] = coinPrefab;
+            }
 
             System.Action<Object> destroyType = DestroyImmediate;
             if (Application.isPlaying) destroyType = Destroy;
@@ -217,7 +229,7 @@ namespace Overrailed.Terrain.Generation
         /// <summary>
         /// Generates ground and obstacle tiles from biome data
         /// </summary>
-        /// <returns>The ground and obstacle tiles of the map</returns>
+        /// <returns>The ground and obstacle tiles of the maps as a tuple</returns>
         private (Tile[,], Tile[,]) GenerateMapTiles()
         {
             float[,] liquidTerrainMap = GenerateHeightMap(randomNoiseOffsets[randomNoiseOffsets.Count - 1]);

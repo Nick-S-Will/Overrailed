@@ -99,6 +99,7 @@ namespace Overrailed.Terrain
 
             for (int countDown = 5; countDown > 0; countDown--)
             {
+                if (locomotive == null) return;
                 Utils.FadeObject(numbersPrefabs[countDown], locomotive.transform.position + Vector3.up, numberFadeSpeed, numberFadeDuration);
 
                 await Manager.Delay(1);

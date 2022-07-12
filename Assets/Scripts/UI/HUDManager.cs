@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 using Overrailed.Managers;
 using Overrailed.Terrain;
@@ -22,8 +23,8 @@ namespace Overrailed.UI
         [SerializeField] private Transform toolHUDParent;
         [SerializeField] private Transform warningHUDParent;
         [Header("Texts")]
-        [SerializeField] private Text seedText;
-        [SerializeField] private Text speedText, coinsText;
+        [SerializeField] private TextMeshProUGUI seedText;
+        [SerializeField] private TextMeshProUGUI speedText, coinsText;
         [Header("Tool HUDs")]
         [SerializeField] private GameObject toolHUDPrefab;
         [SerializeField] private ToolType[] toolTypes;
@@ -72,7 +73,7 @@ namespace Overrailed.UI
         public void UpdateSeedText(string newSeed) => UpdateText(seedText, seedStartLength, newSeed);
         public void UpdateSpeedText(string newSpeed) => UpdateText(speedText, speedStartLength, newSpeed);
         public void UpdateCoinsText(string newCoinCount) => UpdateText(coinsText, coinsStartLength, newCoinCount);
-        private void UpdateText(Text textElement, int baseLength, string newString) => textElement.text = textElement.text.Substring(0, baseLength) + newString;
+        private void UpdateText(TextMeshProUGUI textElement, int baseLength, string newString) => textElement.text = textElement.text.Substring(0, baseLength) + newString;
         #endregion
 
         #region Tool HUDs
