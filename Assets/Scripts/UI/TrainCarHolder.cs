@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 using Overrailed.Managers.Audio;
 using Overrailed.Train;
@@ -10,6 +11,7 @@ namespace Overrailed.UI.Shop
     public class TrainCarHolder : MonoBehaviour, IInteractable, IPickupable
     {
         [SerializeField] private AudioClip pickupAudio, dropAudio;
+        [SerializeField] private TextMeshPro priceText;
 
         public TrainStoreManager manager { private get; set; }
         private TrainCar heldCar;
@@ -26,16 +28,17 @@ namespace Overrailed.UI.Shop
         {
             if (!CanPickUp) return null;
 
-            var car = heldCar.TryPickUp(parent) as TrainCar;
-            if (car && manager.Coins >= car.Tier)
+            if (heldCar && manager.Coins >= heldCar.Tier)
             {
-                Utils.MoveToLayer(car.transform, LayerMask.NameToLayer("Train"));
+                _ = heldCar.TryPickUp(parent);
+                Utils.MoveToLayer(heldCar.transform, LayerMask.NameToLayer("Train"));
                 heldCar.GetComponent<BoxCollider>().enabled = true;
-                manager.Coins -= car.Tier;
+                manager.Coins -= heldCar.Tier;
+                priceText.text = string.Empty;
 
                 AudioManager.PlaySound(PickupAudio, transform.position);
 
-                return car;
+                return heldCar;
             }
             else return null;
         }
@@ -54,6 +57,7 @@ namespace Overrailed.UI.Shop
 
                 Utils.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));
                 heldCar = car;
+                priceText.text = $"{heldCar.Tier}¢";
 
                 return true;
             }

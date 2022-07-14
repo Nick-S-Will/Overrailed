@@ -116,7 +116,8 @@ namespace Overrailed.Terrain
 
             foreach (var renderer in tile.GetComponentsInChildren<MeshRenderer>())
             {
-                if (!newHighlights.Contains(renderer)) newHighlights.Add(renderer);
+                // Standard shader to avoid text mesh pro meshes
+                if (!newHighlights.Contains(renderer) && renderer.material.shader == Shader.Find("Standard")) newHighlights.Add(renderer);
             }
         }
 
