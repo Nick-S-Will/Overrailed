@@ -31,7 +31,8 @@ namespace Overrailed.Train
         [SerializeField] protected bool isTangible = true;
 
         protected ParticleSystem burningParticles;
-        private Rigidbody rb;
+        private Rigidbody body;
+        private BoxCollider hitbox;
         protected RailTile currentRail;
         private int pathIndex, pathDir;
 
@@ -43,9 +44,11 @@ namespace Overrailed.Train
 
         override protected void Start()
         {
+            body = GetComponent<Rigidbody>();
+            hitbox = GetComponent<BoxCollider>();
+
             if (startRail) _ = TrySetRail(startRail, false);
             if (leaderLocomotive) leaderLocomotive.OnStartTrain += StartDriving;
-            rb = GetComponent<Rigidbody>();
 
             base.Start();
         }
@@ -92,7 +95,7 @@ namespace Overrailed.Train
                 }
 
                 transform.position = Vector3.MoveTowards(transform.position, target.position, leaderLocomotive.TrainSpeed * Time.deltaTime);
-                rb.MovePosition(transform.position);
+                body.MovePosition(transform.position);
                 float currentDst = (target.position - transform.position).magnitude;
                 transform.forward = Vector3.Lerp(startForward, pathDir * target.forward, 1 - (currentDst / startDst));
 
@@ -115,10 +118,8 @@ namespace Overrailed.Train
             // TODO: Update to enable car rearranging
             if (!Manager.IsEditing() || this is Locomotive || currentRail) return null;
 
-            GetComponent<BoxCollider>().enabled = false;
-            var body = GetComponent<Rigidbody>();
-            body.velocity = Vector3.zero;
-            body.freezeRotation = true;
+            hitbox.enabled = false;
+            body.constraints = RigidbodyConstraints.FreezeAll;
 
             transform.parent = parent;
             transform.localPosition = Vector3.up;
@@ -148,6 +149,8 @@ namespace Overrailed.Train
 
             if (newCar.TrySetRail(currentRail, false))
             {
+                newCar.body.constraints = RigidbodyConstraints.None;
+
                 newCar.leaderLocomotive = leaderLocomotive;
                 newCar.StartDriving();
 
@@ -220,7 +223,7 @@ namespace Overrailed.Train
             transform.position = pos;
             transform.forward = dir;
 
-            GetComponent<BoxCollider>().enabled = isTangible;
+            hitbox.enabled = isTangible;
 
             return true;
         }

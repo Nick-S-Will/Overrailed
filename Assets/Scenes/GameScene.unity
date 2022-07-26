@@ -24923,7 +24923,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0.0000000049126037}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -79597,7 +79597,7 @@ MonoBehaviour:
   defaultPlayerPrefab: {fileID: 2264036827029980985, guid: 37c883f1cd71af545b1a14781b5c8f5e, type: 3}
   interactMask:
     serializedVersion: 2
-    m_Bits: 6929
+    m_Bits: 6417
   initialTrainDelay: 10
   highlightColor: {r: 1, g: 1, b: 1, a: 1}
   highlightEnabled: 1

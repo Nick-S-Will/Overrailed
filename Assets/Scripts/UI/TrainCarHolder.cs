@@ -13,7 +13,7 @@ namespace Overrailed.UI.Shop
         [SerializeField] private AudioClip pickupAudio, dropAudio;
         [SerializeField] private TextMeshPro priceText;
 
-        public TrainStoreManager manager { private get; set; }
+        public TrainStoreManager shopManager { private get; set; }
         private TrainCar heldCar;
 
         public AudioClip PickupAudio => pickupAudio;
@@ -28,12 +28,12 @@ namespace Overrailed.UI.Shop
         {
             if (!CanPickUp) return null;
 
-            if (heldCar && manager.Coins >= heldCar.Tier)
+            if (heldCar && shopManager.Coins >= heldCar.Tier)
             {
                 _ = heldCar.TryPickUp(parent);
                 Utils.MoveToLayer(heldCar.transform, LayerMask.NameToLayer("Train"));
                 heldCar.GetComponent<BoxCollider>().enabled = true;
-                manager.Coins -= heldCar.Tier;
+                shopManager.Coins -= heldCar.Tier;
                 priceText.text = string.Empty;
 
                 AudioManager.PlaySound(PickupAudio, transform.position);
@@ -54,6 +54,7 @@ namespace Overrailed.UI.Shop
                 car.transform.parent = transform;
                 car.transform.localPosition = 1.1f * Vector3.up;
                 car.transform.localRotation = Quaternion.identity;
+                car.GetComponent<BoxCollider>().enabled = false;
 
                 Utils.MoveToLayer(car.transform, LayerMask.NameToLayer("Edit Mode"));
                 heldCar = car;
@@ -70,7 +71,7 @@ namespace Overrailed.UI.Shop
                 if (car == heldCar && TryPlaceCar(car))
                 {
                     AudioManager.PlaySound(DropAudio, transform.position);
-                    manager.Coins += car.Tier;
+                    shopManager.Coins += car.Tier;
                     return Interaction.Used;
                 }
             }

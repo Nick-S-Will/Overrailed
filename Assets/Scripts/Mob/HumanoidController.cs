@@ -274,7 +274,7 @@ namespace Overrailed.Mob
         private bool TrySwapHeldWith(IInteractable interactable)
         {
             var interactTile = interactable as PickupTile;
-            if (!IsHoldingItem || !interactTile.CanPickUp) return false;
+            if (!IsHoldingItem || interactTile == null || !interactTile.CanPickUp) return false;
 
             var stackPos = Vector3Int.RoundToInt(interactTile.transform.position);
 
@@ -295,7 +295,7 @@ namespace Overrailed.Mob
         /// <returns>True if the objects were moved successfully</returns>
         private bool TryReplaceWithHeld(IPickupable toReplace)
         {
-            if (!IsHoldingItem || !toReplace.CanPickUp) return false;
+            if (!IsHoldingItem || toReplace == null || !toReplace.CanPickUp) return false;
 
             var replacePos = Vector3Int.RoundToInt((toReplace as MonoBehaviour).transform.position);
             _ = Map.MovePickup(toReplace);

@@ -31,12 +31,13 @@ namespace Overrailed.UI.Shop
         {
             float panelWidth = GetComponent<SpriteRenderer>().size.x;
             float panelInterval = panelWidth / (carTypes.Length + 1);
+            Coins = 3;
 
             // Spawns in holders
             for (int i = 0; i < carTypes.Length; i++)
             {
                 carTypes[i].holder = Instantiate(holderPrefab, transform);
-                carTypes[i].holder.manager = this;
+                carTypes[i].holder.shopManager = this;
 
                 float xOffset = (i + 1) * panelInterval - panelWidth / 2f;
                 carTypes[i].holder.transform.position = transform.position + xOffset * Vector3.right;

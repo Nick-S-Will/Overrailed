@@ -712,7 +712,7 @@ MonoBehaviour:
   armSwingSpeed: 720
   interactInterval: 0.3
   autoMine: 1
-  autoMineDistanceThreshold: 0.35
+  autoMineDistanceThreshold: 0.5
   armL: {fileID: 2264036826433275187}
   armR: {fileID: 2264036827478139122}
   legL: {fileID: 2264036827265493328}
