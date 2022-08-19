@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,10 +11,13 @@ namespace Overrailed.Train
     public class HolderCar : TrainCar
     {
         /// <summary>
-        /// Invoked when a player takes a tile from the stack
+        /// Invoked when a player picks up a tile from the holder
         /// </summary>
-        public event System.Action OnTaken;
-        public event System.Action<HolderCar> OnUpgrade;
+        public event Action OnTaken;
+        public event Action<TrainCar> OnUpgrade;
+        public override event Action OnPickUp;
+        public override event Action OnDrop;
+
         [Space]
         [SerializeField] private Transform holderSpawnPoint;
 
@@ -55,7 +59,7 @@ namespace Overrailed.Train
             holdCount = Mathf.Max(holdCount - amount, holdCount % 1);
 
             OnTaken?.Invoke();
-            InvokeOnPickUp();
+            OnPickUp?.Invoke();
             return holdersContent;
         }
 
@@ -63,7 +67,7 @@ namespace Overrailed.Train
         {
             if (base.TryUpgradeCar(newCar))
             {
-                OnUpgrade?.Invoke(newCar as HolderCar);
+                OnUpgrade?.Invoke(newCar);
                 return true;
             }
             else return false;

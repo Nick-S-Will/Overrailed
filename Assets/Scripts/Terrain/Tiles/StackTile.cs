@@ -9,6 +9,9 @@ namespace Overrailed.Terrain.Tiles
     [RequireComponent(typeof(BoxCollider))]
     public class StackTile : PickupTile, IInteractable
     {
+        public override event System.Action OnPickUp;
+        public override event System.Action OnDrop;
+
         [SerializeField] private Tile bridge;
         [SerializeField] private AudioClip bridgeBuildAudio;
         [Tooltip("Must have same exact same string to stack with")]
@@ -97,7 +100,7 @@ namespace Overrailed.Terrain.Tiles
             toPickUp.transform.localRotation = Quaternion.identity;
 
             AudioManager.PlaySound(PickupAudio, transform.position);
-            InvokeOnPickUp();
+            OnPickUp?.Invoke();
 
             return toPickUp;
         }
@@ -107,7 +110,7 @@ namespace Overrailed.Terrain.Tiles
         public override void Drop(Vector3Int position)
         {
             AudioManager.PlaySound(DropAudio, position);
-            InvokeOnDrop();
+            OnDrop?.Invoke();
 
             boxCollider.enabled = true;
             boxCollider.isTrigger = nextInStack == null;
@@ -133,7 +136,6 @@ namespace Overrailed.Terrain.Tiles
             top.nextInStack = this;
             transform.parent = top.transform;
             transform.localPosition = top.tileHeight * Vector3.up;
-            transform.rotation = stackBase.transform.parent.rotation;
             transform.localRotation = Quaternion.Euler(0, Random.Range(-5, 5f), 0);
 
             AudioManager.PlaySound(DropAudio, transform.position);

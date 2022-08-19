@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Overrailed.Managers;
+using System;
 
 namespace Overrailed.Train
 {
@@ -10,6 +11,8 @@ namespace Overrailed.Train
     {
         public event System.Action<string> OnSpeedChange;
         public event System.Action OnStartTrain;
+        public override event Action OnPickUp;
+        public override event Action OnDrop;
 
         [Space]
         [SerializeField] private ParticleSystem smokeParticlePrefab;

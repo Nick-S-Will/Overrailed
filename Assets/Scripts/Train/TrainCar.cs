@@ -13,8 +13,9 @@ namespace Overrailed.Train
     public abstract class TrainCar : PickupTile, IInteractable
     {
         public event System.Action OnDeath;
-        public virtual event System.Action OnInteract;
+        public event System.Action<TrainCar> OnUpgrade;
         public static event System.Action<TrainCar> OnWarning;
+        public virtual event System.Action OnInteract;
         protected event System.Action OnStartDriving;
 
         [SerializeField] private Locomotive leaderLocomotive;
@@ -48,7 +49,7 @@ namespace Overrailed.Train
             hitbox = GetComponent<BoxCollider>();
 
             if (startRail) _ = TrySetRail(startRail, false);
-            if (leaderLocomotive) leaderLocomotive.OnStartTrain += StartDriving;
+            if (leaderLocomotive != null) leaderLocomotive.OnStartTrain += StartDriving;
 
             base.Start();
         }

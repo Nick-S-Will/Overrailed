@@ -171,6 +171,7 @@ namespace Overrailed.Mob
         protected void HandleMining()
         {
             if (miningHandling != null) return;
+
             miningHandling = StartCoroutine(HandleMiningRoutine());
         }
         private IEnumerator HandleMiningRoutine()
@@ -182,8 +183,9 @@ namespace Overrailed.Mob
                 if (HeldItem is BreakTool && InteractRaycast(out RaycastHit info, 0.6f))
                 {
                     var pos = transform.position;
+                    var rot = transform.rotation;
                     yield return Manager.DelayRoutine(interactInterval);
-                    if ((transform.position - pos).magnitude < autoMineDistanceThreshold)
+                    if ((transform.position - pos).magnitude < autoMineDistanceThreshold && Quaternion.Angle(rot, transform.rotation) < 45f)
                     {
                         var breakTile = info.transform.GetComponent<BreakableTile>();
                         if (breakTile != null && (!isMoving || info.distance <= autoMineDistanceThreshold))

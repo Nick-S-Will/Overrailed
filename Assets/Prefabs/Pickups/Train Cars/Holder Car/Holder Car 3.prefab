@@ -161,12 +161,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshParent: {fileID: 9046295326501293821}
+  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   rotateOnSpawn: 0
   pickupAudio: {fileID: 8300000, guid: 5afd1d6747cf3604393bad591551a266, type: 3}
   dropAudio: {fileID: 8300000, guid: c497e222452d3c84eb8bdca0dc275a3a, type: 3}
   leaderLocomotive: {fileID: 0}
   burningParticlePrefab: {fileID: 8944320411309521189, guid: 93bc31d8aac8d9c4fbfa1bdd2e0f97d0, type: 3}
-  breakParticlePrefab: {fileID: 4952216837369594339, guid: d79d791a407dc4841a42dde9aef72a02, type: 3}
   splashParticlePrefab: {fileID: 5256204201205229158, guid: 2564afb13d47b0d44801e6317b90800e, type: 3}
   explosionSound: {fileID: 8300000, guid: e53a8f6e5aef95b49bc739e43f65f2a5, type: 3}
   igniteSound: {fileID: 8300000, guid: 3809ed2d5e0e97a4faae678c67ce661a, type: 3}
@@ -187,7 +187,7 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0

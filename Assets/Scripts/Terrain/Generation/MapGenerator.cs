@@ -45,9 +45,8 @@ namespace Overrailed.Terrain.Generation
             if (Manager.instance is GameManager gm)
             {
                 gm.OnCheckpoint += AddChunk;
-                var mapManager = GetComponent<MapManager>();
-                gm.OnCheckpoint += mapManager.DisableObstacles;
-                gm.OnEndCheckpoint += mapManager.EnableObstacles;
+                // Done in this class to lift new chunk *after* it's added
+                gm.OnCheckpoint += GetComponent<MapManager>().LiftNewChunk;
 
                 GenerateMap();
             }

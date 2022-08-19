@@ -8,6 +8,9 @@ namespace Overrailed.Terrain.Tools
 {
     public class Bucket : Tool
     {
+        public override event System.Action OnPickUp;
+        public override event System.Action OnDrop;
+
         [Space]
         [SerializeField] private Transform liquid;
 

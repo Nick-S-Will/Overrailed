@@ -197,7 +197,7 @@ namespace Overrailed.UI
             warningHUD.SetAsFirstSibling();
             var image = warningHUD.GetComponentInChildren<Image>();
 
-            while (car.IsWarning)
+            while (car.IsWarning && car)
             {
                 MoveRectToWorldPosition(warningHUD, car.transform.position);
                 image.color = Color.Lerp(Color.white, Color.red, Mathf.PingPong(warningBlinkSpeed * Time.time, 1));

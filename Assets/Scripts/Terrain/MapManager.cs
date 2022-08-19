@@ -33,7 +33,6 @@ namespace Overrailed.Terrain
         [SerializeField] private AudioClip numberSpawnSound;
         #endregion
 
-        [SerializeField] [HideInInspector] private Vector3Int stationPos;
         private List<MeshRenderer> newHighlights = new List<MeshRenderer>(), highlights = new List<MeshRenderer>();
         private static List<Locomotive> locomotives = new List<Locomotive>();
 
@@ -64,9 +63,6 @@ namespace Overrailed.Terrain
             }
             else if (Manager.instance is TutorialManager)
             {
-                var obstacles = transform.GetChild(1).GetChild(1);
-                var station = obstacles.GetChild(obstacles.childCount - 2);
-                stationPos = Vector3Int.RoundToInt(station.position);
                 OnFinishAnimateFirstChunk += SpawnPlayer;
             }
 
@@ -82,9 +78,10 @@ namespace Overrailed.Terrain
             MonoBehaviour playerPrefab = Manager.GetSkin();
             if (playerPrefab == null) playerPrefab = defaultPlayerPrefab;
 
-            var player = Instantiate(playerPrefab).transform;
-            player.parent = null;
-            player.position = stationPos;
+            var obstacles = transform.GetChild(1).GetChild(1);
+            var station = obstacles.GetChild(obstacles.childCount - 2);
+            var stationPos = Vector3Int.RoundToInt(station.position);
+            Instantiate(playerPrefab, stationPos, Quaternion.identity, null);
         }
 
         #region Train Starting
@@ -339,9 +336,9 @@ namespace Overrailed.Terrain
         #endregion
 
         #region Map Toggles
-        public void DisableObstacles() => SetObstacleHitboxes(false);
-        public void EnableObstacles() => SetObstacleHitboxes(true);
-        private void SetObstacleHitboxes(bool enabled)
+        public void DisableObstacles() => SetHitboxes(false);
+        public void EnableObstacles() => SetHitboxes(true);
+        private void SetHitboxes(bool enabled)
         {
             // Water
             for (int i = 1; i < transform.childCount; i++)
@@ -358,12 +355,22 @@ namespace Overrailed.Terrain
                 foreach (var collider in transform.GetChild(i).GetChild(1).GetComponentsInChildren<BoxCollider>())
                 {
                     // Prevents tiles in a stack to all enable their hitboxes
-                    var stack = collider.GetComponent<StackTile>();
-                    if (stack && stack.PrevInStack) continue;
+                    if (!enabled)
+                    {
+                        var stack = collider.GetComponent<StackTile>();
+                        if (stack && stack.PrevInStack) continue;
+                    }
 
                     if (collider.gameObject.layer == LayerMask.NameToLayer("Default")) collider.enabled = enabled;
                 }
             }
+        }
+
+        public void LiftNewChunk() => SetChunkDisplaced(transform.childCount - 2, true);
+        public void LowerNewChunk() => SetChunkDisplaced(transform.childCount - 2, false);
+        private void SetChunkDisplaced(int index, bool displaced)
+        {
+            transform.GetChild(index + 1).localPosition = displaced ? 20 * Vector3.up : Vector3.zero;
         }
 
         public void ShowAllChunks()
@@ -383,9 +390,16 @@ namespace Overrailed.Terrain
 
             OnFinishAnimateFirstChunk?.Invoke();
         }
-        public void AnimateNewChunk() => _ = AnimateChunk(transform.childCount - 2);
+        public void AnimateNewChunk()
+        {
+            LowerNewChunk();
+            _ = AnimateChunk(transform.childCount - 2);
+        }
+
         public async Task AnimateChunk(int chunkIndex)
         {
+            if (spawnOffset == Vector3.zero || !Application.isPlaying) return;
+
             var chunk = transform.GetChild(chunkIndex + 1);
             Transform ground = chunk.GetChild(0), obstacles = chunk.GetChild(1);
             List<Task> slideTasks = new List<Task>();
@@ -503,8 +517,6 @@ namespace Overrailed.Terrain
 
             if (Manager.instance is GameManager gm)
             {
-                gm.OnCheckpoint -= DisableObstacles;
-                gm.OnEndCheckpoint -= EnableObstacles;
                 gm.OnEndCheckpoint -= AnimateNewChunk;
                 gm.OnGameEnd -= ShowAllChunks;
                 OnFinishAnimateFirstChunk -= SpawnPlayer;

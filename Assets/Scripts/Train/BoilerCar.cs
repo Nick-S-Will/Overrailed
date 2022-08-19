@@ -4,11 +4,15 @@ using UnityEngine;
 using Overrailed.Managers;
 using Overrailed.Managers.Audio;
 using Overrailed.Terrain.Tools;
+using System;
 
 namespace Overrailed.Train
 {
     public class BoilerCar : TrainCar
     {
+        public override event Action OnPickUp;
+        public override event Action OnDrop;
+
         [Space]
         [SerializeField] private AudioClip refillSound;
         [SerializeField] private Transform liquid;

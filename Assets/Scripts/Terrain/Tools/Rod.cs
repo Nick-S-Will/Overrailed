@@ -10,6 +10,9 @@ namespace Overrailed.Terrain.Tools
     [RequireComponent(typeof(LineRenderer))]
     public class Rod : Tool
     {
+        public override event System.Action OnPickUp;
+        public override event System.Action OnDrop;
+
         [Space]
         [SerializeField] private float bobHeight = 0.05f;
         [SerializeField] private float fishReactionTime = 1;

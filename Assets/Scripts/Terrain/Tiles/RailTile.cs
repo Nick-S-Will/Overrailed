@@ -54,7 +54,7 @@ namespace Overrailed.Terrain.Tiles
                 UpdateConnections();
 
                 if (startsPowered) straightPower.SetActive(true);
-                else if (Manager.instance is GameManager gm) gm.OnEndCheckpoint += ConvertToNonCheckpoint;
+                else if (Manager.instance is GameManager gm) gm.OnCheckpoint += ConvertToNonCheckpoint;
             }
 
             base.Start();
@@ -79,15 +79,21 @@ namespace Overrailed.Terrain.Tiles
             {
                 isCheckpoint = false;
                 UpdateConnections();
-                if (Manager.instance is GameManager gm) gm.OnEndCheckpoint -= ConvertToNonCheckpoint;
+                if (Manager.instance is GameManager gm) gm.OnCheckpoint -= ConvertToNonCheckpoint;
             }
         }
 
-        private void UpdateConnections()
+        private async void UpdateConnections()
         {
+            if (isCheckpoint && FindObjectOfType<MapManager>().transform.childCount > 2) await Task.Delay(200);
+
             RaycastHit info;
             if (Physics.Raycast(transform.position, OutDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) NextRail = info.collider.GetComponent<RailTile>();
+            // Debug.DrawLine(transform.position, transform.position + OutDirection, info.collider ? Color.green : Color.red, 5);
+            // print($"NextRail: {(info.collider ? info.collider.name : "None")}");      
             if (Physics.Raycast(transform.position, -InDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) PrevRail = info.collider.GetComponent<RailTile>();
+            // Debug.DrawLine(transform.position, transform.position - InDirection, info.collider ? Color.green : Color.red, 5);
+            // print($"PrevRail: {(info.collider ? info.collider.name : "None")}");
         }
         #endregion
 
@@ -180,6 +186,7 @@ namespace Overrailed.Terrain.Tiles
             foreach (var dir in XZDirections)
             {
                 var rail = TryGetRailAdjacentTo(coords, dir, true);
+                // if (rail) print($"{rail != null} and {rail.NextRail == null} and {!rail.IsFinalCheckpoint} and ({rail.Passenger == null} or {rail.OutDirection == (coords - rail.Coords)})");
                 // rail found, has a connection available, isn't the final checkpoint, has no passenger or rail already pointing at this
                 if (rail && rail.NextRail == null && !rail.IsFinalCheckpoint && (rail.Passenger == null || rail.OutDirection == (coords - rail.Coords)))
                 {
@@ -211,7 +218,12 @@ namespace Overrailed.Terrain.Tiles
         /// <returns>Adjacent RailTile if there is one that matches criteria, otherwise null</returns>
         private static RailTile TryFindRail(Vector3 position, Vector3 direction, int layerMask)
         {
-            if (Physics.Raycast(position, direction, out RaycastHit hitInfo, 1, layerMask)) return hitInfo.transform.GetComponent<RailTile>();
+            if (Physics.Raycast(position, direction, out RaycastHit hitInfo, 1, layerMask))
+            {
+                var rail = hitInfo.transform.GetComponent<RailTile>();
+                // Debug.DrawLine(position, position + direction, rail ? Color.green : Color.red, 1f);
+                return rail;
+            }
             return null;
         }
         #endregion
@@ -266,15 +278,6 @@ namespace Overrailed.Terrain.Tiles
             // Power On
             else
             {
-                bool isStraight = inDir - outDir == Vector3Int.zero;
-
-                straightMesh.gameObject.SetActive(isStraight);
-                bentMesh.gameObject.SetActive(!isStraight);
-                straightPower.SetActive(isStraight);
-                bentPower.SetActive(!isStraight);
-
-                transform.forward = isStraight ? outDir : ForwardFor(inDir, outDir);
-
                 if (newConnection) NextRail = newConnection;
                 // Tries to connect this to proceeding rail
                 else
@@ -286,7 +289,9 @@ namespace Overrailed.Terrain.Tiles
                     {
                         // Tries to get rail in currently iterated direction
                         nextRail = TryGetAdjacentRail(dir, false);
+                        // print(nextRail ? $"{nextRail != null} && {nextRail.NextInStack == null} && ({!isCheckpoint} ^ {nextRail.IsFinalCheckpoint})" : "None");
                         if (nextRail && nextRail.NextInStack == null && (!isCheckpoint ^ nextRail.IsFinalCheckpoint)) break;
+                        else nextRail = null;
 
                         dir = Vector3Int.RoundToInt(Quaternion.AngleAxis(90, Vector3.up) * dir);
                     }
@@ -322,6 +327,15 @@ namespace Overrailed.Terrain.Tiles
                         return;
                     }
                 }
+
+                bool isStraight = inDir - outDir == Vector3Int.zero;
+
+                straightMesh.gameObject.SetActive(isStraight);
+                bentMesh.gameObject.SetActive(!isStraight);
+                straightPower.SetActive(isStraight);
+                bentPower.SetActive(!isStraight);
+
+                transform.forward = isStraight ? outDir : ForwardFor(inDir, outDir);
             }
 
             InDirection = inDir;

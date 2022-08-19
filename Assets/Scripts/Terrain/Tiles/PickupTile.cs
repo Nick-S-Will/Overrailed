@@ -6,7 +6,7 @@ namespace Overrailed.Terrain.Tiles
 {
     public abstract class PickupTile : Tile, IPickupable
     {
-        public event System.Action OnPickUp, OnDrop;
+        public abstract event System.Action OnPickUp, OnDrop;
 
         [Space]
         [SerializeField] private AudioClip pickupAudio;
@@ -20,11 +20,9 @@ namespace Overrailed.Terrain.Tiles
         protected override void Start() => base.Start();
 
         public virtual IPickupable TryPickUp(Transform parent, int amount) => null;
-        protected void InvokeOnPickUp() => OnPickUp?.Invoke();
 
         public virtual bool OnTryDrop(Vector3Int position) => true;
 
         public virtual void Drop(Vector3Int position) { }
-        protected void InvokeOnDrop() => OnDrop?.Invoke();
     }
 }

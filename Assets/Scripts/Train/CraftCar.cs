@@ -5,11 +5,15 @@ using UnityEngine;
 
 using Overrailed.Managers;
 using Overrailed.Terrain.Tiles;
+using System;
 
 namespace Overrailed.Train
 {
     public class CraftCar : TrainCar
     {
+        public override event Action OnPickUp;
+        public override event Action OnDrop;
+
         [Space]
         [SerializeField] private HolderCar craftProductHolder;
         [SerializeField] private StackTile craftProductPrefab;
@@ -30,7 +34,11 @@ namespace Overrailed.Train
 
         override protected void Start()
         {
-            if (craftProductHolder) AddToHolderEvents();
+            if (craftProductHolder)
+            {
+                craftProductHolder.OnTaken += ProductTaken;
+                craftProductHolder.OnUpgrade += UpdateHolder;
+            }
 
             base.Start();
         }
@@ -40,27 +48,21 @@ namespace Overrailed.Train
         {
             if (base.TryUpgradeCar(newCar))
             {
-                ((CraftCar)newCar).craftProductHolder = craftProductHolder;
-                craftProductHolder.OnTaken += ((CraftCar)newCar).ProductTaken;
-                craftProductHolder.OnUpgrade += ((CraftCar)newCar).UpdateHolder;
+                (newCar as CraftCar).UpdateHolder(craftProductHolder);
                 return true;
             }
             else return false;
         }
-        private void UpdateHolder(HolderCar newHolder) 
-        { 
-            craftProductHolder = newHolder;
-            AddToHolderEvents();
-        }
-        private void AddToHolderEvents()
+        private void UpdateHolder(TrainCar newHolder)
         {
+            craftProductHolder = newHolder as HolderCar;
             craftProductHolder.OnTaken += ProductTaken;
             craftProductHolder.OnUpgrade += UpdateHolder;
         }
         #endregion
 
         private void ProductTaken() => _ = StartCoroutine(TryCraft());
-        
+
         protected IEnumerator TryCraft()
         {
             while (CanCraft)

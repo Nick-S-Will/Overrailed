@@ -36,14 +36,12 @@ namespace Overrailed.Managers
         public async void EndGame()
         {
             OnGameEnd?.Invoke();
-            await Task.Delay(2000);
+            await Task.Delay(1000);
 
             if (!Application.isPlaying) return;
 
-            var startTime = Time.time;
             await CameraManager.SlideToStart();
-
-            if (Time.time > startTime + 2) await Task.Delay(2000);
+            await Task.Delay(1500);
 
             if (instance) SceneManager.LoadScene(titleScene.name);
         }
