@@ -820,10 +820,10 @@ RectTransform:
   m_Father: {fileID: 1976377077}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 590, y: -50}
-  m_SizeDelta: {x: 1130, y: 80}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &168957951
 MonoBehaviour:
@@ -848,7 +848,7 @@ MonoBehaviour:
   m_text: Title Info
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1344,22 +1344,24 @@ MonoBehaviour:
   pointerBobSpeed: 0.8
   spinCycleInterval: 4
   steps:
-  - title: Pickupables
-    info: Click on pickupables to pick them up.
-  - title: Break Tiles
-    info: Interact with break tiles using the correct tool until they become a pickup.
+  - title: Pickupable Tiles
+    info: Click on pickupable tiles to pick them up.
+  - title: Breakable Tiles
+    info: Walk into breakable tiles with the corresponding tool to break them.
   - title: Wood
-    info: 
+    info: Once fully broken, breakable tiles drop their material which you can then
+      pick up. Up to 3 of a kind can be held at base strength
   - title: Bridges
-    info: Interact with water using wood to build a bridge.
+    info: Click on water using wood to build a bridge.
   - title: Bucket
     info: 
   - title: Collecting Water
-    info: Interact with water using a bucket to fill it.
+    info: Click on water using the bucket to fill it.
   - title: The Boiler
-    info: The boiler keeps the train cool. Interact with it using a full bucket to
-      refill it. If it runs out of water, the train will overheat and ignite, but
-      can be put out with a full bucket.
+    info: The boiler keeps the train cool. Click on it using a bucket of water to
+      refill it. If it runs out of water, the train will overheat and ignite. If
+      the locomotive ignites, it's game over. Train cars can be put out with a full
+      bucket. Higher tiers will use water less quickly.
   - title: Pickaxe
     info: 
   - title: Break Stone
@@ -1367,7 +1369,7 @@ MonoBehaviour:
   - title: Pick Up Stone
     info: 
   - title: Crafting Part 1
-    info: Interact with the crafter using the right pickups to add to the ingredients.
+    info: Click on the crafter using either wood or stone to add them to its materials.
   - title: Axe
     info: 
   - title: Break Tree
@@ -1375,10 +1377,11 @@ MonoBehaviour:
   - title: Pick Up Wood
     info: 
   - title: Crafting Part 2
-    info: This crafter creates rails out of wood and stone. Place one of each on
-      it to start the craft.
+    info: The crafter creates 1 rail for each wood and stone. Place one of each on
+      it to start the craft. Higher tiers will speed up the crafting.
   - title: The Holder
-    info: The crafter's products are placed on the holder waiting to be picked up.
+    info: The crafter places its rails on the holder which wait to be picked up.
+      It can hold up to 4 rails at tier 1.
   - title: Placing Rails
     info: Place rails next to powered ones to connect them to the track.
   - title: Complete
@@ -3944,10 +3947,10 @@ RectTransform:
   m_Father: {fileID: 1869166633}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 600, y: -320}
-  m_SizeDelta: {x: 1180, y: 400}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &894571315
 MonoBehaviour:
@@ -4075,10 +4078,10 @@ RectTransform:
   m_Father: {fileID: 894571314}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 590, y: -200}
-  m_SizeDelta: {x: 1130, y: 360}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &900289888
 MonoBehaviour:
@@ -6829,7 +6832,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 4.5905e-41, y: 0, z: 0, w: -28.73877}
+  m_BoundingSphereOverride: {x: 4.5904e-41, y: 0, z: 0, w: -0.0000000054342912}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -7559,7 +7562,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1869166633
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7866,10 +7869,10 @@ RectTransform:
   m_Father: {fileID: 1869166633}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 600, y: -60}
-  m_SizeDelta: {x: 1180, y: 100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1976377078
 MonoBehaviour:
@@ -8025,7 +8028,6 @@ MonoBehaviour:
   numberFadeSpeed: 0.5
   numberFadeDuration: 1.25
   numberSpawnSound: {fileID: 0}
-  stationPos: {x: 2, y: 0, z: 7}
 --- !u!4 &2026388582
 Transform:
   m_ObjectHideFlags: 0
@@ -8389,10 +8391,10 @@ RectTransform:
   m_Father: {fileID: 1869166633}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 600, y: -560}
-  m_SizeDelta: {x: 1180, y: 60}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2101578285
 MonoBehaviour:
