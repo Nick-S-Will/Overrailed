@@ -338,8 +338,33 @@ namespace Overrailed.Terrain
         #region Map Toggles
         public void DisableObstacles() => SetHitboxes(false);
         public void EnableObstacles() => SetHitboxes(true);
-        private void SetHitboxes(bool enabled)
+        /// <summary>
+        /// Sets all tile colliders in the <paramref name="chunkIndex"/> to <paramref name="enabled"/>
+        /// </summary>
+        /// <param name="chunkIndex">-1 by default which means all chunks</param>
+        private void SetHitboxes(bool enabled, int chunkIndex = -1)
         {
+            if (chunkIndex >= 0)
+            {
+                // Water
+                foreach (var collider in transform.GetChild(chunkIndex + 1).GetChild(0).GetComponentsInChildren<BoxCollider>())
+                {
+                    collider.enabled = enabled;
+                }
+
+                // Obstacles
+                foreach (var collider in transform.GetChild(chunkIndex + 1).GetChild(1).GetComponentsInChildren<BoxCollider>())
+                {
+                    // Prevents tiles in a stack to all enable their hitboxes
+                    var stack = collider.GetComponent<StackTile>();
+                    if (stack && stack.PrevInStack) continue;
+
+                    if (collider.gameObject.layer == LayerMask.NameToLayer("Default")) collider.enabled = enabled;
+                }
+
+                return;
+            }
+
             // Water
             for (int i = 1; i < transform.childCount; i++)
             {
@@ -355,22 +380,22 @@ namespace Overrailed.Terrain
                 foreach (var collider in transform.GetChild(i).GetChild(1).GetComponentsInChildren<BoxCollider>())
                 {
                     // Prevents tiles in a stack to all enable their hitboxes
-                    if (!enabled)
-                    {
-                        var stack = collider.GetComponent<StackTile>();
-                        if (stack && stack.PrevInStack) continue;
-                    }
+                    var stack = collider.GetComponent<StackTile>();
+                    if (stack && stack.PrevInStack) continue;
 
                     if (collider.gameObject.layer == LayerMask.NameToLayer("Default")) collider.enabled = enabled;
                 }
             }
         }
 
-        public void LiftNewChunk() => SetChunkDisplaced(transform.childCount - 2, true);
-        public void LowerNewChunk() => SetChunkDisplaced(transform.childCount - 2, false);
-        private void SetChunkDisplaced(int index, bool displaced)
+        public void PreventCollisions() => SetChunkDisplaced(true);
+        public void RestoreCollisions() => SetChunkDisplaced(false);
+        private void SetChunkDisplaced(bool displaced)
         {
-            transform.GetChild(index + 1).localPosition = displaced ? 20 * Vector3.up : Vector3.zero;
+            var currentChunk = transform.childCount - 3;
+            SetHitboxes(!displaced, currentChunk);
+
+            transform.GetChild(currentChunk + 2).localPosition = displaced ? 20 * Vector3.up : Vector3.zero;
         }
 
         public void ShowAllChunks()
@@ -392,7 +417,7 @@ namespace Overrailed.Terrain
         }
         public void AnimateNewChunk()
         {
-            LowerNewChunk();
+            RestoreCollisions();
             _ = AnimateChunk(transform.childCount - 2);
         }
 

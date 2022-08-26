@@ -20747,7 +20747,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.5509434, b: 0.899555, a: 0.58431375}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.58431375}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -24923,7 +24923,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0.000000005011916}
+  m_BoundingSphereOverride: {x: 4.5905e-41, y: 0, z: 0, w: -22.776672}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -30143,67 +30143,6 @@ MonoBehaviour:
   refillSound: {fileID: 8300000, guid: fd9e3ff979e1da548be069e4b73b72e5, type: 3}
   liquid: {fileID: 2022066368}
   warningPercent: 0.15
---- !u!1001 &856830700
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_RootOrder
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2387588890368719892, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: startStackHeight
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 6142629535676016274, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
-      propertyPath: m_Name
-      value: Rail
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 89342437821057141b5c9095fe3d9a05, type: 3}
 --- !u!1 &859429820
 GameObject:
   m_ObjectHideFlags: 0
@@ -61487,7 +61426,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1627498996}
   m_LocalRotation: {x: 0.7071068, y: -0, z: 0.0000000041909516, w: 0.7071068}
-  m_LocalPosition: {x: -15, y: 0, z: -0.5}
+  m_LocalPosition: {x: -18, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1079686204}
@@ -61539,7 +61478,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 45, y: 19}
+  m_Size: {x: 50, y: 19}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -80862,6 +80801,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1079686204}
     m_Modifications:
+    - target: {fileID: 1001212080541711563, guid: 1a6bfe7841cbbec409b821d0bc979363, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 6361066735888777639, guid: 1a6bfe7841cbbec409b821d0bc979363, type: 3}
       propertyPath: m_text
       value: Continue
@@ -80889,6 +80832,10 @@ PrefabInstance:
     - target: {fileID: 7164010559780666864, guid: 1a6bfe7841cbbec409b821d0bc979363, type: 3}
       propertyPath: m_Color.g
       value: 0.46666667
+      objectReference: {fileID: 0}
+    - target: {fileID: 7164010559780666864, guid: 1a6bfe7841cbbec409b821d0bc979363, type: 3}
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7164010559780666865, guid: 1a6bfe7841cbbec409b821d0bc979363, type: 3}
       propertyPath: m_RootOrder

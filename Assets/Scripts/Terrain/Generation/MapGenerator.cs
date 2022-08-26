@@ -46,7 +46,7 @@ namespace Overrailed.Terrain.Generation
             {
                 gm.OnCheckpoint += AddChunk;
                 // Done in this class to lift new chunk *after* it's added
-                gm.OnCheckpoint += GetComponent<MapManager>().LiftNewChunk;
+                gm.OnCheckpoint += GetComponent<MapManager>().PreventCollisions;
 
                 GenerateMap();
             }

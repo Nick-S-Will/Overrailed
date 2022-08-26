@@ -26,7 +26,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1921839336156920067}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.01}
+  m_LocalPosition: {x: 0, y: 0, z: -0.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7164010559780666865}
@@ -302,6 +302,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 861133460825d714a9443a697c136168, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+  collisionTag: Player
   buttonFill: {fileID: 7164010559054610870}
   loadingBar: {fileID: 7164010560570438347}
   text: {fileID: 1021879577615299789}
@@ -319,7 +323,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3, y: 1, z: 0.5}
+  m_Size: {x: 3, y: 1, z: 0.25}
   m_Center: {x: 0, y: 0, z: -0.25}
 --- !u!212 &7164010559780666864
 SpriteRenderer:
