@@ -349,7 +349,7 @@ namespace Overrailed.Managers
 
             stepIndex = steps.Count - 1;
             yield return ShowInfoRoutine(steps[stepIndex]);
-            SceneManager.LoadScene(titleScene.name);
+            SceneManager.LoadScene(titleSceneName);
         }
 
         protected override void OnDestroy() => base.OnDestroy();

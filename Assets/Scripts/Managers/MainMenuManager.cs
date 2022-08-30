@@ -281,12 +281,12 @@ namespace Overrailed.Managers
 
         public void PlayGame() // Used by trigger button
         {
-            SceneManager.LoadScene(gameScene.name);
+            SceneManager.LoadScene(gameSceneName);
         }
 
         public void PlayTutorial() // Used by trigger button
         {
-            SceneManager.LoadScene(tutorialScene.name);
+            SceneManager.LoadScene(tutorialSceneName);
         }
 
         protected override void OnDestroy() => base.OnDestroy();

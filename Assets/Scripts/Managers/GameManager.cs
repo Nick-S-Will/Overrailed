@@ -43,7 +43,7 @@ namespace Overrailed.Managers
             await CameraManager.SlideToStart();
             await Task.Delay(1500);
 
-            if (instance) SceneManager.LoadScene(titleScene.name);
+            if (instance) SceneManager.LoadScene(titleSceneName);
         }
 
         protected override void OnDestroy() => base.OnDestroy();

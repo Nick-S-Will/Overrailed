@@ -4,7 +4,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 using UnityEngine;
-using UnityEditor;
 using System.Collections;
 
 namespace Overrailed.Managers
@@ -15,7 +14,7 @@ namespace Overrailed.Managers
     {
         public static Action OnPause, OnResume;
 
-        [SerializeField] protected SceneAsset titleScene, tutorialScene, gameScene;
+        [SerializeField] protected string titleSceneName = "TitleScreenScene", tutorialSceneName = "TutorialScene", gameSceneName = "GameScene";
         [SerializeField] private GameObject pauseMenuObject;
 
         private static TaskCompletionSource<bool> pauseCompletionSource;
