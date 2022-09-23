@@ -38,6 +38,25 @@ namespace Overrailed.Managers
         /// <summary>
         /// <see cref="Task.Delay(int)"/> but awaits <see cref="Pause"/>
         /// </summary>
+        
+        protected virtual void Awake()
+        {
+            if (instance)
+            {
+                Debug.LogError("Mutliple Managers Exist");
+                return;
+            }
+
+            instance = this;
+            CurrentState = GameState.Play;
+            pauseCompletionSource = new TaskCompletionSource<bool>();
+            pauseCompletionSource.SetResult(true);
+
+            SetCursor(false);
+            Pausing.HandlePausing(Keyboard.current, Keyboard.current.escapeKey);
+            if (Gamepad.current != null) Pausing.HandlePausing(Gamepad.current, Gamepad.current.startButton);
+        }
+
         public static async Task Delay(float seconds)
         {
             float elapsedTime = 0f;
@@ -66,24 +85,6 @@ namespace Overrailed.Managers
         public static bool IsEditing() => CurrentState == GameState.Edit;
         public static bool Exists => instance;
 
-        protected virtual void Awake()
-        {
-            if (instance)
-            {
-                Debug.LogError("Mutliple Managers Exist");
-                return;
-            }
-
-            instance = this;
-            CurrentState = GameState.Play;
-            pauseCompletionSource = new TaskCompletionSource<bool>();
-            pauseCompletionSource.SetResult(true);
-
-            SetCursor(false);
-            Pausing.HandlePausing(Keyboard.current, Keyboard.current.escapeKey);
-            if (Gamepad.current != null) Pausing.HandlePausing(Gamepad.current, Gamepad.current.startButton);
-        }
-
         /// <summary>
         /// Sets <see cref="Cursor.visible"/> to <paramref name="visible"/> and <see cref="Cursor.lockState"/> to <paramref name="visible"/> ? <see cref="CursorLockMode.None"/> : <see cref="CursorLockMode.Locked"/>
         /// </summary>
@@ -91,6 +92,12 @@ namespace Overrailed.Managers
         {
             Cursor.visible = visible;
             Cursor.lockState = visible ? CursorLockMode.None : CursorLockMode.Locked;
+        }
+
+        public void QuitGame() // Used by trigger button
+        {
+            Application.Quit();
+            Debug.Log("Quit");
         }
 
         protected virtual void OnDestroy()

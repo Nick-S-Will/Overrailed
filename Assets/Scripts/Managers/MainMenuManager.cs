@@ -24,9 +24,10 @@ namespace Overrailed.Managers
         [Space]
         [SerializeField] private TriggerButton playButton;
         [SerializeField] private TriggerButton tutorialButton, optionsButton;
-        [SerializeField] private Vector3 mainSlideOffset = 10 * Vector3.forward;
         [Space]
+        [SerializeField] private TriggerButton quitButton;
         [SerializeField] private Transform mainCamTransform;
+        [SerializeField] private Vector3 mainSlideOffset = 10 * Vector3.forward;
         [Header("Options Menu Settings")]
         [SerializeField] private Transform optionsTitle;
         [SerializeField] private TriggerButton skinsButton;
@@ -67,7 +68,10 @@ namespace Overrailed.Managers
 
         void Start()
         {
-            mainElements = new Transform[] { mainTitle, optionsButton.transform, tutorialButton.transform, playButton.transform, controls };
+            currentSkinIndex = PlayerPrefs.GetInt(CurrentSkinIndexKey, 0);
+            skinPrefab = skinPrefabs[currentSkinIndex];
+
+            mainElements = new Transform[] { mainTitle, quitButton.transform, optionsButton.transform, tutorialButton.transform, playButton.transform, controls };
             optionsElements = new Transform[] { optionsTitle, returnButton.transform, seedButton.transform, volumeButton.transform, skinsButton.transform };
             volumeElements = new Transform[] { volumeSliders[0].transform.parent, volumeSliders[1].transform.parent, volumeSliders[2].transform.parent, volumeSaveButton.transform };
             seedElements = new Transform[] { seedText.transform, seedSaveButton.transform };
@@ -76,9 +80,6 @@ namespace Overrailed.Managers
             foreach (var element in optionsElements) element.position += optionsSlideOffset;
             foreach (var element in volumeElements) element.position += optionsSlideOffset;
             foreach (var element in seedElements) element.position += optionsSlideOffset;
-
-            currentSkinIndex = PlayerPrefs.GetInt(CurrentSkinIndexKey, 0);
-            skinPrefab = skinPrefabs[currentSkinIndex];
         }
 
         #region Slide UI

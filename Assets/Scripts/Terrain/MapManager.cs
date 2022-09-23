@@ -559,6 +559,13 @@ namespace Overrailed.Terrain
 
             var locomotive = GetComponentInChildren<Locomotive>();
             if (locomotive) locomotives.Remove(locomotive);
+            else
+            {
+                foreach (var l in locomotives.ToArray())
+                {
+                    if (l == null) locomotives.Remove(l);
+                }
+            }
         }
     }
 }
