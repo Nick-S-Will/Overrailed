@@ -34,9 +34,14 @@ namespace Overrailed.Player
 
         protected override void Start()
         {
+            base.Start();
+
             if (Manager.instance is GameManager gm)
             {
                 gm.OnCheckpoint += ForceDrop;
+                gm.OnEndCheckpoint += DisableControls;
+                Map.OnFinishAnimateChunk += EnableControls;
+
                 gm.OnGameEnd += DisableControls;
                 gm.OnGameEnd += ForceDrop;
             }
@@ -46,8 +51,6 @@ namespace Overrailed.Player
                 tm.OnCloseInfo += EnableControls;
             }
             else if (!Manager.Exists) Debug.LogError("No Manager Found");
-
-            base.Start();
 
             if (Map.HighlightEnabled) TileHighlighting();
         }

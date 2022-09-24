@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Overrailed.Terrain.Generation;
-using Overrailed.Terrain.Tiles;
+using Overrailed.Managers;
 
 namespace Overrailed.Terrain.Tiles
 {
@@ -11,17 +10,20 @@ namespace Overrailed.Terrain.Tiles
     {
         [SerializeField] private StackTile replacementTile;
 
-        protected override void Start() => base.Start();
+        protected override void Start()
+        {
+            if (Manager.instance is GameManager gm) gm.OnEndCheckpoint += EndCheckpoint;
+            else Destroy(gameObject);
+        }
 
         protected override void EndCheckpoint()
         {
-            foreach (MapManager map in FindObjectsOfType<MapManager>())
+            var map = MapManager.FindMap(transform.position);
+            if (map)
             {
-                if (map.PointIsInPlayBounds(transform.position))
-                {
-                    map.PlacePickup(Instantiate(replacementTile), Coords);
-                    Destroy(gameObject);
-                }
+                gameObject.SetActive(false);
+                map.PlacePickup(Instantiate(replacementTile), Coords);
+                Destroy(gameObject);
             }
         }
 

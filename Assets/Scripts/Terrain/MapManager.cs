@@ -13,7 +13,7 @@ namespace Overrailed.Terrain
     [SelectionBase]
     public class MapManager : MonoBehaviour
     {
-        public event System.Action OnFinishAnimateFirstChunk;
+        public event System.Action OnFinishAnimateFirstChunk, OnFinishAnimateChunk;
 
         #region Inspector Variables
         [SerializeField] private MonoBehaviour defaultPlayerPrefab;
@@ -55,6 +55,7 @@ namespace Overrailed.Terrain
                 gm.OnGameEnd += ShowAllChunks;
                 OnFinishAnimateFirstChunk += SpawnPlayer;
                 OnFinishAnimateFirstChunk += StartTrain;
+                OnFinishAnimateChunk += () => GetComponentInChildren<Locomotive>().ResumeTrain();
             }
             else if (Manager.instance is MainMenuManager mm)
             {
@@ -415,10 +416,12 @@ namespace Overrailed.Terrain
 
             OnFinishAnimateFirstChunk?.Invoke();
         }
-        public void AnimateNewChunk()
+        public async void AnimateNewChunk()
         {
             RestoreCollisions();
-            _ = AnimateChunk(transform.childCount - 2);
+            await AnimateChunk(transform.childCount - 2);
+
+            OnFinishAnimateChunk?.Invoke();
         }
 
         public async Task AnimateChunk(int chunkIndex)

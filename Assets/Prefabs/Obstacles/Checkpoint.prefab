@@ -1149,7 +1149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15425150221e0f044918d5d6c38825a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meshParent: {fileID: 2112259598006567757}
+  meshParent: {fileID: 1664843579641658645}
   breakParticlePrefab: {fileID: 0}
   rotateOnSpawn: 0
   replacementTile: {fileID: 5106245144070438126, guid: 89342437821057141b5c9095fe3d9a05, type: 3}

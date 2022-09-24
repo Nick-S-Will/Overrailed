@@ -1,16 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 using Overrailed.Managers;
-using System;
 
 namespace Overrailed.Train
 {
     public class Locomotive : TrainCar
     {
-        public event System.Action<string> OnSpeedChange;
-        public event System.Action OnStartTrain;
+        public event Action<string> OnSpeedChange;
+        public event Action OnStartTrain;
         public override event Action OnPickUp;
         public override event Action OnDrop;
 
@@ -46,17 +46,16 @@ namespace Overrailed.Train
 
         protected override void Start()
         {
+            base.Start();
+            
             OnStartTrain += StartEmittingSmoke;
             OnDeath += SpeedUp;
             if (Manager.instance is GameManager gm)
             {
-                gm.OnEndCheckpoint += SetToBaseSpeed;
                 gm.OnCheckpoint += StopEmittingSmoke;
-                gm.OnEndCheckpoint += StartEmittingSmoke;
+                gm.OnEndCheckpoint += SetToBaseSpeed;
                 OnDeath += gm.EndGame;
             }
-            
-            base.Start();
 
             smokeParticles = Instantiate(smokeParticlePrefab, smokePoint);
             if (Manager.instance is GameManager) SetToBaseSpeed();
@@ -68,6 +67,8 @@ namespace Overrailed.Train
         }
 
         public void StartTrain() => OnStartTrain?.Invoke();
+
+        public void ResumeTrain() => StartEmittingSmoke();
 
         #region Smoke Particles
         protected void StartEmittingSmoke() => SetEmitSmoke(true);
