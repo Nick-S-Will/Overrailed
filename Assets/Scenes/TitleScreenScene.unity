@@ -4050,7 +4050,7 @@ MonoBehaviour:
   highlightEnabled: 0
   visualizeBounds: 0
   spawnOffset: {x: 0, y: -2.5, z: 0}
-  groundSpawnInterval: 0.1
+  groundSpawnInterval: 0
   obstacleSpawnInterval: 0.1
   bounceHeight: 0.25
   slideSpeed: 50
@@ -10068,7 +10068,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 1.02e-43, y: 0, z: 0, w: 1.6114932e-38}
+  m_BoundingSphereOverride: {x: 0, y: 1e-45, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0

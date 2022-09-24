@@ -26377,7 +26377,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 1e-45, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: -0.000000006058791, z: 8.74e-43, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -80068,8 +80068,8 @@ MonoBehaviour:
   highlightEnabled: 1
   visualizeBounds: 0
   spawnOffset: {x: 0, y: -10, z: 0}
-  groundSpawnInterval: 0.15
-  obstacleSpawnInterval: 0.06
+  groundSpawnInterval: 0.06
+  obstacleSpawnInterval: 0.03
   bounceHeight: 0.5
   slideSpeed: 80
   numbersPrefabs:
@@ -80119,7 +80119,7 @@ MonoBehaviour:
   seed: 69
   noiseScale: 10
   noiseOffset: {x: 0, y: 0}
-  chunkLength: 10
+  chunkLength: 25
   mapWidth: 19
   stationPrefab: {fileID: 7779122044187992337, guid: a402d09a7bba5e2469788096bbd61a1f, type: 3}
   stationBridge: {fileID: 8000788900880814408, guid: 38de585089c892f4d93cb9f74028c9a4, type: 3}

@@ -31,7 +31,7 @@ namespace Overrailed.UI.Shop
         {
             float panelWidth = GetComponent<SpriteRenderer>().size.x;
             float panelInterval = panelWidth / (carTypes.Length + 1);
-            Coins = 3;
+            Coins = 0;
 
             // Spawns in holders
             for (int i = 0; i < carTypes.Length; i++)
