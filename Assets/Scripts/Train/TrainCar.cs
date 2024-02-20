@@ -126,7 +126,7 @@ namespace Overrailed.Train
             transform.localPosition = Vector3.up;
             transform.localRotation = Quaternion.identity;
 
-            AudioManager.PlaySound(PickupAudio, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(PickupAudio, transform.position));
 
             return this;
         }
@@ -155,31 +155,31 @@ namespace Overrailed.Train
                 newCar.leaderLocomotive = leaderLocomotive;
                 newCar.StartDriving();
 
-                AudioManager.PlaySound(DropAudio, transform.position);
+                _ = StartCoroutine(AudioManager.PlaySound(DropAudio, transform.position));
             }
 
             Die();
             return true;
         }
 
-        public virtual async void Ignite()
+        public virtual IEnumerator Ignite()
         {
             burningParticles = Instantiate(burningParticlePrefab, burnPoint);
-            AudioManager.PlaySound(igniteSound, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(igniteSound, transform.position));
             Manager.OnPause += burningParticles.Pause;
             Manager.OnResume += burningParticles.Play;
 
             while (burningParticles)
             {
-                await Manager.Delay(5);
+                yield return Manager.Delay(5);
 
-                if (!burningParticles) return;
+                if (!burningParticles) yield break;
 
                 var carF = TryGetAdjacentCar(transform.position, transform.forward);
                 var carB = TryGetAdjacentCar(transform.position, -transform.forward);
 
-                if (carF && !carF.burningParticles && carF.currentRail) carF.Ignite();
-                if (carB && !carB.burningParticles && carB.currentRail) carB.Ignite();
+                if (carF && !carF.burningParticles && carF.currentRail) _ = StartCoroutine(carF.Ignite());
+                if (carB && !carB.burningParticles && carB.currentRail) _ = StartCoroutine(carB.Ignite());
             }
 
             Manager.OnPause -= burningParticles.Pause;
@@ -274,7 +274,7 @@ namespace Overrailed.Train
         protected virtual void Die()
         {
             BreakIntoParticles(transform.position);
-            AudioManager.PlaySound(explosionSound, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(explosionSound, transform.position));
 
             var waterColliders = Physics.OverlapBox(transform.position, 0.1f * Vector3.one, Quaternion.identity, LayerMask.GetMask("Water"));
             if (waterColliders.Length > 0) Destroy(Instantiate(splashParticlePrefab, waterColliders[0].transform.position, Quaternion.identity), splashParticlePrefab.main.startLifetime.constant);

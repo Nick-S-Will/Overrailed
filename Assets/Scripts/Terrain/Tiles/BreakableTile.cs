@@ -39,9 +39,8 @@ namespace Overrailed.Terrain.Tiles
                 if (toSpawn is BreakableTile t)
                 {
                     BreakIntoParticles(transform.position);
-                    AudioManager.PlaySound(tool.InteractSound, transform.position);
-                    AudioManager.PlaySound(breakAudio, transform.position);
-                    
+                    _ = StartCoroutine(AudioManager.PlaySound(tool.InteractSound, transform.position));
+                    _ = StartCoroutine(AudioManager.PlaySound(breakAudio, transform.position));
                     toSpawn = t.lowerTier;
                 }
                 else break;

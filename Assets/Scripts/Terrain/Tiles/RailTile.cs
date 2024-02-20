@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
@@ -51,7 +49,7 @@ namespace Overrailed.Terrain.Tiles
                 InDirection = Vector3Int.RoundToInt(straightMesh.transform.forward);
                 OutDirection = InDirection;
 
-                UpdateConnections();
+                _ = StartCoroutine(UpdateConnections());
 
                 if (startsPowered) straightPower.SetActive(true);
                 else if (Manager.instance is GameManager gm) gm.OnCheckpoint += ConvertToNonCheckpoint;
@@ -78,14 +76,14 @@ namespace Overrailed.Terrain.Tiles
             if (Passenger)
             {
                 isCheckpoint = false;
-                UpdateConnections();
+                _ = StartCoroutine(UpdateConnections());
                 if (Manager.instance is GameManager gm) gm.OnCheckpoint -= ConvertToNonCheckpoint;
             }
         }
 
-        private async void UpdateConnections()
+        private IEnumerator UpdateConnections()
         {
-            if (isCheckpoint && FindObjectOfType<MapManager>().transform.childCount > 2) await Task.Delay(200);
+            if (isCheckpoint && FindObjectOfType<MapManager>().transform.childCount > 2) yield return new WaitForSeconds(0.2f);
 
             RaycastHit info;
             if (Physics.Raycast(transform.position, OutDirection, out info, 1, LayerMask.GetMask("Default", "Rail"))) NextRail = info.collider.GetComponent<RailTile>();
@@ -155,13 +153,13 @@ namespace Overrailed.Terrain.Tiles
             // Doesn't connect to tracks if in a stack
             if (NextInStack)
             {
-                AudioManager.PlaySound(DropAudio, coords);
+                _ = StartCoroutine(AudioManager.PlaySound(DropAudio, coords));
                 return;
             }
 
             var connectableRail = TryGetConnectableRail();
             if (connectableRail) ConnectToRail(connectableRail);
-            else AudioManager.PlaySound(DropAudio, transform.position);
+            else _ = StartCoroutine(AudioManager.PlaySound(DropAudio, transform.position));
         }
         #endregion
 
@@ -175,7 +173,7 @@ namespace Overrailed.Terrain.Tiles
             PrevRail = connectableRail;
             SetState(dirToThis, dirToThis, null);
 
-            AudioManager.PlaySound(connectSound, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(connectSound, transform.position));
         }
 
         #region Find Rails
@@ -235,9 +233,9 @@ namespace Overrailed.Terrain.Tiles
         /// </summary>
         /// <param name="inDir">Direction to this rail from the previous one</param>
         /// <param name="outDir">Direction from this rail to the next one</param>
-        private async void DelaySetState(Vector3Int inDir, Vector3Int outDir, RailTile newConnection)
+        private IEnumerator DelaySetState(Vector3Int inDir, Vector3Int outDir, RailTile newConnection)
         {
-            await Task.Yield();
+            yield return null;
 
             SetState(inDir, outDir, newConnection);
         }
@@ -265,7 +263,7 @@ namespace Overrailed.Terrain.Tiles
                     if (NextRail)
                     {
                         NextRail.PrevRail = null;
-                        NextRail.DelaySetState(Vector3Int.zero, Vector3Int.zero, null);
+                        _ = StartCoroutine(NextRail.DelaySetState(Vector3Int.zero, Vector3Int.zero, null));
                         NextRail = null;
                     }
                     if (PrevRail)
@@ -303,7 +301,7 @@ namespace Overrailed.Terrain.Tiles
 
                         if (nextRail.isCheckpoint)
                         {
-                            nextRail.DelaySetState(dir, nextRail.OutDirection, null);
+                            _ = StartCoroutine(nextRail.DelaySetState(dir, nextRail.OutDirection, null));
 
                             if (!isCheckpoint)
                             {
@@ -322,7 +320,7 @@ namespace Overrailed.Terrain.Tiles
                                 } while (prev);
                             }
                         }
-                        else nextRail.DelaySetState(dir, dir, null);
+                        else _ = StartCoroutine(nextRail.DelaySetState(dir, dir, null));
 
                         return;
                     }

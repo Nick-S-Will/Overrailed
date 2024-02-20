@@ -99,7 +99,7 @@ namespace Overrailed.Terrain.Tiles
             toPickUp.transform.localPosition = Vector3.up;
             toPickUp.transform.localRotation = Quaternion.identity;
 
-            AudioManager.PlaySound(PickupAudio, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(PickupAudio, transform.position));
             OnPickUp?.Invoke();
 
             return toPickUp;
@@ -109,7 +109,7 @@ namespace Overrailed.Terrain.Tiles
 
         public override void Drop(Vector3Int position)
         {
-            AudioManager.PlaySound(DropAudio, position);
+            _ = StartCoroutine(AudioManager.PlaySound(DropAudio, position));
             OnDrop?.Invoke();
 
             boxCollider.enabled = true;
@@ -138,7 +138,7 @@ namespace Overrailed.Terrain.Tiles
             transform.localPosition = top.tileHeight * Vector3.up;
             transform.localRotation = Quaternion.Euler(0, Random.Range(-5, 5f), 0);
 
-            AudioManager.PlaySound(DropAudio, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(DropAudio, transform.position));
 
             return true;
         }
@@ -164,7 +164,7 @@ namespace Overrailed.Terrain.Tiles
             _ = Instantiate(bridge, liquid.transform.position, liquid.transform.rotation, liquid.transform);
             Destroy(GetStackTop().gameObject);
 
-            AudioManager.PlaySound(bridgeBuildAudio, liquid.transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(bridgeBuildAudio, liquid.transform.position));
 
             Destroy(liquid.GetComponent<BoxCollider>());
         }

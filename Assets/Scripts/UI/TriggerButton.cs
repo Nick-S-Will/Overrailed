@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine.Events;
 using UnityEngine;
 
@@ -27,32 +25,32 @@ namespace Overrailed.UI
 
         private void Start() => boxCollider = GetComponent<BoxCollider>();
 
-        private async void LoadAction()
+        private IEnumerator LoadAction()
         {
-            if (barIsLoading) return;
+            if (barIsLoading) yield break;
 
             float percent = 0;
             barIsLoading = true;
 
             while (percent < 1 && barIsLoading)
             {
-                await Manager.Pause;
-                await Task.Yield();
+                yield return Manager.PauseRoutine;
+                yield return null;
 
                 percent += Time.deltaTime / loadTime;
                 loadingBar.localScale = new Vector3(Mathf.Lerp(0, buttonSize.x, percent), loadingBar.localScale.y, loadingBar.localScale.z);
             }
 
             loadingBar.localScale = new Vector3(0, loadingBar.localScale.y, loadingBar.localScale.z);
-            if (!barIsLoading) return;
+            if (!barIsLoading) yield break;
 
             barIsLoading = false;
             OnPress?.Invoke();
         }
 
-        private async void UpdateSize()
+        private IEnumerator UpdateSize()
         {
-            await Task.Yield();
+            yield return null;
 
             GetComponent<BoxCollider>().size = new Vector3(buttonSize.x, buttonSize.y, 0.25f);
             GetComponent<SpriteRenderer>().size = buttonSize;
@@ -64,7 +62,7 @@ namespace Overrailed.UI
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.tag.Equals(collisionTag) && (!other.GetComponent<PlayerController>().IsHoldingItem )) LoadAction();
+            if (other.tag.Equals(collisionTag) && (!other.GetComponent<PlayerController>().IsHoldingItem )) _ = StartCoroutine(LoadAction());
         }
 
         private void OnTriggerExit(Collider other)
@@ -77,7 +75,7 @@ namespace Overrailed.UI
 
         private void OnValidate()
         {
-            if ((Vector2)buttonFill.localScale != buttonSize) UpdateSize();
+            if ((Vector2)buttonFill.localScale != buttonSize) _ = StartCoroutine(UpdateSize());
         }
     }
 }

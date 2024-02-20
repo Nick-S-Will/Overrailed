@@ -27,7 +27,7 @@ namespace Overrailed.Terrain.Tools
 
         public void Refill()
         {
-            AudioManager.PlaySound(InteractSound, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(InteractSound, transform.position));
             IsFull = true;
         }
     }

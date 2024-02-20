@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -78,7 +77,7 @@ namespace Overrailed.Managers.Audio
 
                 musicSource.transform.parent = transform;
             }
-            if (startingMusic) PlayMusic(startingMusic, true);
+            if (startingMusic) _ = StartCoroutine(PlayMusic(startingMusic, true));
         }
 
         private static void AddSoundSource()
@@ -96,9 +95,9 @@ namespace Overrailed.Managers.Audio
             foreach (var source in musicSources) source.volume = masterVolume * musicVolume;
         }
 
-        public static async void PlaySound(AudioClip clip, Vector3 position)
+        public static IEnumerator PlaySound(AudioClip clip, Vector3 position)
         {
-            if (instance == null) return;
+            if (instance == null) yield break;
 
             if (clip)
             {
@@ -114,7 +113,7 @@ namespace Overrailed.Managers.Audio
                 source.clip = clip;
                 source.Play();
 
-                await Task.Delay(Mathf.CeilToInt(1000 * clip.length));
+                yield return new WaitForSeconds(clip.length);
 
                 if (source)
                 {
@@ -129,13 +128,12 @@ namespace Overrailed.Managers.Audio
         {
             if (instance == null) return;
 
-            if (instance.audioDictionary.TryGetValue(title, out AudioClip[] clips)) PlaySound(clips[Random.Range(0, clips.Length)], position);
-            else Debug.LogError("No audio group titled \"" + title + "\".");
+            if (instance.audioDictionary.TryGetValue(title, out AudioClip[] clips)) _ = instance.StartCoroutine(PlaySound(clips[Random.Range(0, clips.Length)], position)); else Debug.LogError("No audio group titled \"" + title + "\".");
         }
 
-        public static async void PlayMusic(AudioClip clip, bool loop, float fadeDuration = 0f)
+        public static IEnumerator PlayMusic(AudioClip clip, bool loop, float fadeDuration = 0f)
         {
-            if (instance == null) return;
+            if (instance == null) yield break;
 
             instance.activeMusicSourceIndex = 1 - instance.activeMusicSourceIndex;
 
@@ -147,7 +145,7 @@ namespace Overrailed.Managers.Audio
             {
                 instance.musicSources[instance.activeMusicSourceIndex].volume = instance.masterVolume * instance.musicVolume;
                 instance.musicSources[1 - instance.activeMusicSourceIndex].Stop();
-                return;
+                yield break;
             }
 
             float percent = 0;
@@ -157,7 +155,7 @@ namespace Overrailed.Managers.Audio
                 instance.musicSources[1 - instance.activeMusicSourceIndex].volume = Mathf.Lerp(instance.masterVolume * instance.musicVolume, 0, percent);
 
                 percent += Time.deltaTime / fadeDuration;
-                await Task.Yield();
+                yield return null;
             }
 
             instance.musicSources[1 - instance.activeMusicSourceIndex].Stop();

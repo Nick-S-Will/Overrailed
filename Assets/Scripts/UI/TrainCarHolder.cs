@@ -36,7 +36,7 @@ namespace Overrailed.UI.Shop
                 shopManager.Coins -= heldCar.Tier;
                 priceText.text = string.Empty;
 
-                AudioManager.PlaySound(PickupAudio, transform.position);
+                _ = StartCoroutine(AudioManager.PlaySound(PickupAudio, transform.position));
 
                 return heldCar;
             }
@@ -70,7 +70,7 @@ namespace Overrailed.UI.Shop
             {
                 if (car == heldCar && TryPlaceCar(car))
                 {
-                    AudioManager.PlaySound(DropAudio, transform.position);
+                    _ = StartCoroutine(AudioManager.PlaySound(DropAudio, transform.position));
                     shopManager.Coins += car.Tier;
                     return Interaction.Used;
                 }

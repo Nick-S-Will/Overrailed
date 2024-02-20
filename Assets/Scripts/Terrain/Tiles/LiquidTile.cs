@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
@@ -20,15 +18,16 @@ namespace Overrailed.Terrain.Tiles
 
         override protected void Start()
         {
-            if (liquid) AnimateLiquid();
+            if (liquid) _ = StartCoroutine(AnimateLiquid());
         }
 
         /// <summary>
         /// Animates waves in liquid by scaling its local y in [1 - waveHeight, 1]
         /// </summary>
-        protected async void AnimateLiquid()
+        protected IEnumerator AnimateLiquid()
         {
-            await Manager.Delay(0.2f * transform.position.x + 0.3f * transform.position.z);
+            var seconds = 0.2f * transform.position.x + 0.3f * transform.position.z;
+            yield return Manager.Delay(seconds);
             float time = 0;
 
             while (this && liquid)
@@ -38,8 +37,8 @@ namespace Overrailed.Terrain.Tiles
                     liquid.localScale = new Vector3(1, Mathf.Lerp(1, 1 - waveHeight, Mathf.PingPong(time, 1)), 1);
                     time += Time.deltaTime;
                 }
-                await Task.Yield();
-                await Manager.Pause;
+                yield return null;
+                yield return Manager.PauseRoutine;
             }
         }
 

@@ -67,7 +67,7 @@ namespace Overrailed.Train
 
                 if (LiquidPercent == 0)
                 {
-                    Ignite();
+                    _ = StartCoroutine(Ignite());
                     yield return new WaitWhile(() => LiquidPercent == 0);
                     liquid.gameObject.SetActive(true);
                 }
@@ -93,7 +93,7 @@ namespace Overrailed.Train
                 {
                     bucket.IsFull = false;
 
-                    AudioManager.PlaySound(refillSound, transform.position);
+                    _ = StartCoroutine(AudioManager.PlaySound(refillSound, transform.position));
                 }
 
                 InvokeOnInteract();

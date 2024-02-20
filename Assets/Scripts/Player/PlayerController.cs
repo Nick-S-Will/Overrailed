@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
@@ -23,7 +22,7 @@ namespace Overrailed.Player
 
             playerInput.Movement.Walk.performed += ctx => InputDir = ctx.ReadValue<Vector2>();
             playerInput.Movement.Walk.canceled += _ => InputDir = Vector2.zero;
-            playerInput.Movement.Dash.started += _ => AudioManager.PlaySound(dashSound, transform.position);
+            playerInput.Movement.Dash.started += _ => StartCoroutine(AudioManager.PlaySound(dashSound, transform.position));
             playerInput.Movement.Dash.started += _ => LastDashDownTime = Time.time;
 
             playerInput.Interaction.InteractMain.performed += _ => InteractAll();
@@ -52,10 +51,10 @@ namespace Overrailed.Player
             }
             else if (!Manager.Exists) Debug.LogError("No Manager Found");
 
-            if (Map.HighlightEnabled) TileHighlighting();
+            if (Map.HighlightEnabled) _ = StartCoroutine(TileHighlighting());
         }
 
-        private async void TileHighlighting()
+        private IEnumerator TileHighlighting()
         {
             while (this && Map)
             {
@@ -64,7 +63,7 @@ namespace Overrailed.Player
                 if (tile == null) tile = Map.GetTileAt(LookPoint + Vector3Int.down);
                 Map.TryHighlightTile(tile);
 
-                await Task.Yield();
+                yield return null;
             }
         }
 

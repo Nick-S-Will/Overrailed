@@ -1,19 +1,13 @@
-using System.Threading.Tasks;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem;
 using UnityEngine;
+using Overrailed.Managers;
 
 public static class Utils
 {
-    private static TaskCompletionSource<bool> pauseSource;
-    private static Task Pause => pauseSource == null ? Task.CompletedTask : pauseSource.Task;
-
-    public static void PauseTasks() => pauseSource = new TaskCompletionSource<bool>();
-    public static void ResumeTasks() => pauseSource.SetResult(true);
-    
     public static float GetAverageX(MonoBehaviour[] objects) => GetAverageCoord(objects, 0);
     public static float GetAverageY(MonoBehaviour[] objects) => GetAverageCoord(objects, 1);
     public static float GetAverageZ(MonoBehaviour[] objects) => GetAverageCoord(objects, 2);
@@ -26,22 +20,22 @@ public static class Utils
         return averageCoord;
     }
 
-    public static async Task MoveTransformTo(Transform transform, Transform destination, float moveSpeed, float angularSpeed)
+    public static IEnumerator MoveTransformTo(Transform transform, Transform destination, float moveSpeed, float angularSpeed)
     {
         while (Application.isPlaying && (transform.position != destination.position || transform.rotation != destination.rotation))
         {
             transform.position = Vector3.MoveTowards(transform.position, destination.position, moveSpeed * Time.deltaTime);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, destination.rotation, angularSpeed * Time.deltaTime);
 
-            await Pause;
-            await Task.Yield();
+            yield return Manager.PauseRoutine;
+            yield return null;
         }
     }
 
     /// <summary>
     /// Spawns in an object at <paramref name="position"/>, and fades it out over <paramref name="duration"/> seconds
     /// </summary>
-    public static async void FadeObject(GameObject objectPrefab, Vector3 position, float moveSpeed, float duration)
+    public static IEnumerator FadeObject(GameObject objectPrefab, Vector3 position, float moveSpeed, float duration)
     {
         var numTransform = Object.Instantiate(objectPrefab, position, Quaternion.identity, null).transform;
         var meshes = numTransform.GetComponentsInChildren<MeshRenderer>();
@@ -52,8 +46,8 @@ public static class Utils
         var time = 0f;
         while (time < duration)
         {
-            await Pause;
-            await Task.Yield();
+            yield return Manager.PauseRoutine;
+            yield return null;
             if (numTransform == null) break;
 
             numTransform.position += deltaPos;

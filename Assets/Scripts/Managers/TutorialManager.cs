@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -69,23 +68,24 @@ namespace Overrailed.Managers
         }
 
         #region Tutorial Routines
-        private async void GamepadSouthCloseInfo()
+        private IEnumerator GamepadSouthCloseInfoRoutine()
         {
-            if (Gamepad.current == null) return;
+            if (Gamepad.current == null) yield break;
 
             while (infoPanel.activeSelf)
             {
-                await Task.Yield();
+                yield return null;
 
                 if (Gamepad.current.buttonSouth.wasPressedThisFrame) CloseInfo();
             }
         }
+        private void GamepadSouthCloseInfo() => _ = StartCoroutine(GamepadSouthCloseInfoRoutine());
 
         private void StartTutorial() => _ = StartCoroutine(TutorialRoutine());
         private IEnumerator TutorialRoutine()
         {
             pointerTarget = axe.transform;
-            BobPointer();
+            _ = StartCoroutine(BobPointer());
 
             // Pick up axe and break tree
             yield return StartCoroutine(ToolAndTile(axe, treePrefab, treePoint, true));
@@ -313,7 +313,7 @@ namespace Overrailed.Managers
         /// <summary>
         /// Moves <see cref="pointer"/> up and down over <see cref="pointerTarget"/> and spins it every <see cref="spinCycleInterval"/> cycle
         /// </summary>
-        private async void BobPointer()
+        private IEnumerator BobPointer()
         {
             float time = 0;
 
@@ -329,8 +329,8 @@ namespace Overrailed.Managers
                 pointer.position = pointerTarget.position + pointerOffset + bobOffset;
                 pointer.localRotation = nthCycle ? Quaternion.Euler(0, Mathf.Lerp(0, 360, cycleProgress - cycleCount), 0) : Quaternion.identity;
 
-                await Pause;
-                await Task.Yield();
+                yield return Manager.PauseRoutine;
+                yield return null;
                 time += Time.deltaTime;
             }
 

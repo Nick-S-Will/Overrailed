@@ -85,10 +85,10 @@ namespace Overrailed.Train
         protected void ResumeSmokeParticles() => smokeParticles.Play();
         #endregion
 
-        public override async void Ignite()
+        public override IEnumerator Ignite()
         {
-            base.Ignite();
-            await Manager.Delay(5);
+            _ = StartCoroutine(base.Ignite());
+            yield return Manager.Delay(5);
 
             if (burningParticles) Die();
         }

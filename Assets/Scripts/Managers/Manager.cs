@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
@@ -17,8 +16,6 @@ namespace Overrailed.Managers
         [SerializeField] protected string titleSceneName = "TitleScreenScene", tutorialSceneName = "TutorialScene", gameSceneName = "GameScene";
         [SerializeField] private GameObject pauseMenuObject;
 
-        private static TaskCompletionSource<bool> pauseCompletionSource;
-
         public static Manager instance;
         protected static MonoBehaviour skinPrefab;
         /// <summary>
@@ -28,16 +25,14 @@ namespace Overrailed.Managers
 
         public static MonoBehaviour GetSkin() => skinPrefab;
         /// <summary>
-        /// Halts async functions while the game is paused
-        /// </summary>
-        public static Task Pause => pauseCompletionSource.Task;
-        /// <summary>
         /// Halts coroutines while the game is paused
         /// </summary>
-        public static WaitUntil PauseRoutine => new WaitUntil(() => Pause.IsCompleted);
+        public static WaitWhile PauseRoutine => new WaitWhile(() => paused);
         /// <summary>
         /// <see cref="Task.Delay(int)"/> but awaits <see cref="Pause"/>
         /// </summary>
+        /// 
+        private static bool paused;
         
         protected virtual void Awake()
         {
@@ -49,23 +44,21 @@ namespace Overrailed.Managers
 
             instance = this;
             CurrentState = GameState.Play;
-            pauseCompletionSource = new TaskCompletionSource<bool>();
-            pauseCompletionSource.SetResult(true);
 
             SetCursor(false);
-            Pausing.HandlePausing(Keyboard.current, Keyboard.current.escapeKey);
-            if (Gamepad.current != null) Pausing.HandlePausing(Gamepad.current, Gamepad.current.startButton);
+            _ = StartCoroutine(Pausing.HandlePausing(Keyboard.current, Keyboard.current.escapeKey));
+            if (Gamepad.current != null) _ = StartCoroutine(Pausing.HandlePausing(Gamepad.current, Gamepad.current.startButton));
         }
 
-        public static async Task Delay(float seconds)
+        public static IEnumerator Delay(float seconds)
         {
-            float elapsedTime = 0f;
-            while (elapsedTime < seconds)
+            float elapsedSeconds = 0f;
+            while (elapsedSeconds < seconds)
             {
                 float startTime = Time.time;
-                await Pause;
-                await Task.Yield();
-                elapsedTime += Time.time - startTime;
+                yield return PauseRoutine;
+                yield return null;
+                elapsedSeconds += Time.time - startTime;
             }
         }
         public static IEnumerator DelayRoutine(float seconds)
@@ -133,19 +126,17 @@ namespace Overrailed.Managers
 
                 if (paused)
                 {
-                    pauseCompletionSource = new TaskCompletionSource<bool>();
+                    Manager.paused = true;
                     if (CurrentState != GameState.Paused) prevState = CurrentState;
                     CurrentState = GameState.Paused;
 
-                    Utils.PauseTasks();
                     OnPause?.Invoke();
                 }
                 else
                 {
-                    pauseCompletionSource.SetResult(true);
+                    Manager.paused = false;
                     CurrentState = prevState;
 
-                    Utils.ResumeTasks();
                     OnResume?.Invoke();
                 }
 
@@ -153,14 +144,14 @@ namespace Overrailed.Managers
                 SetCursor(paused);
             }
 
-            public static async void HandlePausing(InputDevice device, ButtonControl pauseButton)
+            public static IEnumerator HandlePausing(InputDevice device, ButtonControl pauseButton)
             {
                 var startScene = SceneManager.GetActiveScene();
 
                 while (Application.isPlaying && device != null && startScene == SceneManager.GetActiveScene())
                 {
                     if (pauseButton.wasPressedThisFrame) TogglePause();
-                    await Task.Yield();
+                    yield return null;
                 }
             }
         }

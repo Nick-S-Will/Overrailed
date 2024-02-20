@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
@@ -67,8 +66,7 @@ namespace Overrailed.Terrain
                 OnFinishAnimateFirstChunk += SpawnPlayer;
             }
 
-            if (GetComponent<MapGenerator>() == null) AnimateFirstChunk();
-
+            if (GetComponent<MapGenerator>() == null) _ = StartCoroutine(AnimateFirstChunk());
             if (highlightEnabled) _ = StartCoroutine(UpdateHighlighting());
         }
 
@@ -86,21 +84,21 @@ namespace Overrailed.Terrain
         }
 
         #region Train Starting
-        public void StartTrain() => StartTrain(initialTrainDelay);
-        private async void StartTrain(float delay)
+        public void StartTrain() => _ = StartCoroutine(StartTrain(initialTrainDelay));
+        private IEnumerator StartTrain(float delay)
         {
-            await Manager.Delay(delay - 5f);
-            if (!Application.isPlaying) return;
+            yield return Manager.Delay(delay - 5f);
+            if (!Application.isPlaying) yield break;
 
             var locomotive = GetComponentInChildren<Locomotive>();
             if (locomotive == null) Debug.LogError("Map has no Locomotive");
 
             for (int countDown = 5; countDown > 0; countDown--)
             {
-                if (locomotive == null) return;
+                if (locomotive == null) yield break;
                 Utils.FadeObject(numbersPrefabs[countDown], locomotive.transform.position + Vector3.up, numberFadeSpeed, numberFadeDuration);
 
-                await Manager.Delay(1);
+                yield return Manager.Delay(1);
             }
 
             locomotive.StartTrain();
@@ -409,28 +407,30 @@ namespace Overrailed.Terrain
         /// <summary>
         /// Slides in the first chunk of the map, and invokes <see cref="OnFinishAnimateFirstChunk"/>. Only meant for the start of the game.
         /// </summary>
-        public async void AnimateFirstChunk()
+        public IEnumerator AnimateFirstChunk()
         {
-            await Task.Yield();
-            await AnimateChunk(0);
+            yield return null;
+            yield return AnimateChunk(0);
 
             OnFinishAnimateFirstChunk?.Invoke();
         }
-        public async void AnimateNewChunk()
+
+        public void AnimateNewChunk() => _ = StartCoroutine(AnimateNewChunkRoutine());
+        public IEnumerator AnimateNewChunkRoutine()
         {
             RestoreCollisions();
-            await AnimateChunk(transform.childCount - 2);
+            yield return AnimateChunk(transform.childCount - 2);
 
             OnFinishAnimateChunk?.Invoke();
         }
 
-        public async Task AnimateChunk(int chunkIndex)
+        public IEnumerator AnimateChunk(int chunkIndex)
         {
-            if (spawnOffset == Vector3.zero || !Application.isPlaying) return;
+            if (spawnOffset == Vector3.zero || !Application.isPlaying) yield break;
 
             var chunk = transform.GetChild(chunkIndex + 1);
             Transform ground = chunk.GetChild(0), obstacles = chunk.GetChild(1);
-            List<Task> slideTasks = new List<Task>();
+            var slideRoutines = new List<Coroutine>();
 
             // Hiding and moving station and checkpoint
             var extras = new List<Transform>();
@@ -460,16 +460,14 @@ namespace Overrailed.Terrain
             }
 
             // Turning on and sliding each ground row into place
-            System.Func<float, Task> Delay = time => Task.Delay(Mathf.RoundToInt(1000f * time));
-            if (Application.isPlaying) Delay = time => Manager.Delay(time);
             foreach (Transform groundRow in ground)
             {
                 groundRow.gameObject.SetActive(true);
 
-                slideTasks.Add(AnimateSlideAndBounce(groundRow, Vector3.zero));
+                slideRoutines.Add(StartCoroutine(AnimateSlideAndBounce(groundRow, Vector3.zero)));
 
-                await Manager.Pause;
-                await Delay(groundSpawnInterval);
+                yield return Manager.PauseRoutine;
+                yield return Manager.Delay(groundSpawnInterval);
             }
 
             // Turning on and sliding each obstacle row into place
@@ -478,12 +476,12 @@ namespace Overrailed.Terrain
                 var obstacleRow = obstacles.GetChild(i);
                 foreach (var tile in obstacleRow.GetComponentsInChildren<Tile>()) tile.SetVisible(true);
 
-                slideTasks.Add(AnimateSlideAndBounce(obstacleRow, Vector3.zero));
+                slideRoutines.Add(StartCoroutine(AnimateSlideAndBounce(obstacleRow, Vector3.zero)));
 
                 if (obstacleRow.childCount == 0) continue;
 
-                await Manager.Pause;
-                await Delay(obstacleSpawnInterval);
+                yield return Manager.PauseRoutine;
+                yield return Manager.Delay(obstacleSpawnInterval);
             }
 
             // Turning on and sliding station and checkpoint into place
@@ -494,35 +492,33 @@ namespace Overrailed.Terrain
             }
             if (extras.Count > 0)
             {
-                await AnimateSlide(extras[0], extraStartPos[0]);
-                if (extras.Count > 1) await AnimateSlide(extras[1], extraStartPos[1]);
+                yield return AnimateSlide(extras[0], extraStartPos[0]);
+                if (extras.Count > 1) yield return AnimateSlide(extras[1], extraStartPos[1]);
             }
-
-            await Task.WhenAll(slideTasks.ToArray());
         }
 
-        private async Task AnimateSlide(Transform t, Vector3 destination)
+        private IEnumerator AnimateSlide(Transform t, Vector3 destination)
         {
             while (t.localPosition != destination)
             {
                 t.localPosition = Vector3.MoveTowards(t.localPosition, destination, slideSpeed * Time.deltaTime);
 
-                await Manager.Pause;
-                await Task.Yield();
+                yield return Manager.PauseRoutine;
+                yield return null;
             }
         }
 
-        private async Task AnimateSlideAndBounce(Transform t, Vector3 destination)
+        private IEnumerator AnimateSlideAndBounce(Transform t, Vector3 destination)
         {
-            await AnimateSlide(t, destination);
+            yield return AnimateSlide(t, destination);
 
             var time = 0f;
             while (time <= 1f)
             {
                 t.localPosition = destination + bounceHeight * new Vector3(0, Mathf.Sin(2 * Mathf.PI * (time)), 0);
 
-                await Manager.Pause;
-                await Task.Yield();
+                yield return Manager.PauseRoutine;
+                yield return null;
                 time += Time.deltaTime;
             }
 

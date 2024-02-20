@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -191,7 +190,7 @@ namespace Overrailed.UI
         #endregion
 
         #region Train Warning HUDs
-        private async void MakeWarningHUD(TrainCar car)
+        private IEnumerator MakeWarningHUDRoutine(TrainCar car)
         {
             var warningHUD = Instantiate(warningHUDPrefab, warningHUDParent).GetComponent<RectTransform>();
             warningHUD.SetAsFirstSibling();
@@ -202,12 +201,13 @@ namespace Overrailed.UI
                 MoveRectToWorldPosition(warningHUD, car.transform.position);
                 image.color = Color.Lerp(Color.white, Color.red, Mathf.PingPong(warningBlinkSpeed * Time.time, 1));
 
-                await Task.Yield();
-                await Manager.Pause;
+                yield return null;
+                yield return Manager.PauseRoutine;
             }
 
             Destroy(warningHUD.gameObject);
         }
+        private void MakeWarningHUD(TrainCar car) => _ = StartCoroutine(MakeWarningHUDRoutine(car));
         #endregion
 
         #region UI Buttons

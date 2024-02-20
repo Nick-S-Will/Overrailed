@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -33,18 +31,19 @@ namespace Overrailed.Managers
             OnEndCheckpoint?.Invoke();
         }
 
-        public async void EndGame()
+        private IEnumerator EndGameRoutine()
         {
             OnGameEnd?.Invoke();
-            await Task.Delay(1000);
+            yield return new WaitForSeconds(1f);
 
-            if (!Application.isPlaying) return;
+            if (!Application.isPlaying) yield break;
 
-            await CameraManager.SlideToStart();
-            await Task.Delay(1500);
+            yield return CameraManager.SlideToStart();
+            yield return new WaitForSeconds(1.5f);
 
             if (instance) SceneManager.LoadScene(titleSceneName);
         }
+        public void EndGame() => _ = StartCoroutine(EndGameRoutine());
 
         protected override void OnDestroy() => base.OnDestroy();
     }

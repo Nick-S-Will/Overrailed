@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
@@ -22,7 +20,7 @@ namespace Overrailed.Terrain.Tiles
             base.Start();
 
             startLocalPosition = MeshParent.localPosition;
-            AnimateCoin();
+            _ = StartCoroutine(AnimateCoin());
         }
 
         private void Collect()
@@ -38,7 +36,7 @@ namespace Overrailed.Terrain.Tiles
         /// <summary>
         /// Moves <see cref="pointer"/> up and down over <see cref="pointerTarget"/> and spins it every <see cref="spinCycleInterval"/> cycle
         /// </summary>
-        private async void AnimateCoin()
+        private IEnumerator AnimateCoin()
         {
             float time = 0;
 
@@ -54,8 +52,8 @@ namespace Overrailed.Terrain.Tiles
                 MeshParent.localPosition = startLocalPosition + bobOffset;
                 MeshParent.localRotation = nthCycle ? Quaternion.Euler(0, Mathf.Lerp(0, 360, cycleProgress - cycleCount), 0) : Quaternion.identity;
 
-                await Manager.Pause;
-                await Task.Yield();
+                yield return Manager.PauseRoutine;
+                yield return null;
                 time += Time.deltaTime;
             }
 

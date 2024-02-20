@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using System.Collections;
 using System.Text;
 using UnityEngine;
@@ -83,18 +82,18 @@ namespace Overrailed.Managers
         }
 
         #region Slide UI
-        public void SlideInMainElements() => _ = SlideElements(-mainSlideOffset, mainElements);
-        private async Task SlideElements(Vector3 slideDelta, params Transform[] elements)
+        public void SlideInMainElements() => _ = StartCoroutine(SlideElementsRoutine(-mainSlideOffset, mainElements));
+        private IEnumerator SlideElementsRoutine(Vector3 slideDelta, params Transform[] elements)
         {
-            if (elements.Length == 0) return;
+            if (elements.Length == 0) yield break;
 
             foreach (var element in elements)
             {
-                SlideElementRoutine(slideDelta, element);
-                await Task.Delay(Mathf.RoundToInt(1000 * elementSlideInterval));
+                _ = StartCoroutine(SlideElementRoutine(slideDelta, element));
+                yield return new WaitForSeconds(elementSlideInterval);
             }
         }
-        private async void SlideElementRoutine(Vector3 slideDelta, Transform element)
+        private IEnumerator SlideElementRoutine(Vector3 slideDelta, Transform element)
         {
             var endPos = element.transform.position + slideDelta;
 
@@ -102,25 +101,34 @@ namespace Overrailed.Managers
             {
                 element.position = Vector3.MoveTowards(element.position, endPos, slideSpeed * Time.deltaTime);
 
-                await Task.Yield();
+                yield return null;
             }
         }
         #endregion
 
         #region Options Menu
-        private async void SlideToOptions() // Used by trigger button
+        private IEnumerator SlideToOptionsRoutine()
         {
-            await SlideElements(-optionsSlideOffset, mainElements);
-            await SlideElements(-optionsSlideOffset, optionsElements);
+            yield return StartCoroutine(SlideElementsRoutine(-optionsSlideOffset, mainElements));
+            yield return StartCoroutine(SlideElementsRoutine(-optionsSlideOffset, optionsElements));
         }
-        private async void SlideFromOptions() // Used by trigger button
+        public void SlideToOptions() // Used by trigger button
         {
-            await SlideElements(optionsSlideOffset, optionsElements);
-            await SlideElements(optionsSlideOffset, mainElements);
+            _ = StartCoroutine(SlideToOptionsRoutine());
+        }
+
+        private IEnumerator SlideFromOptionsRoutine()
+        {
+            yield return StartCoroutine(SlideElementsRoutine(optionsSlideOffset, optionsElements));
+            yield return StartCoroutine(SlideElementsRoutine(optionsSlideOffset, mainElements));
+        }
+        public void SlideFromOptions() // Used by trigger button
+        {
+            _ = StartCoroutine(SlideFromOptionsRoutine());
         }
 
         #region Volume
-        private async void UpdateVolumes()
+        private IEnumerator UpdateVolumes()
         {
             var audioManager = FindObjectOfType<AudioManager>();
             volumeSliders[0].WriteValue(PlayerPrefs.GetFloat(MasterVolumeKey, 0.5f));
@@ -133,19 +141,18 @@ namespace Overrailed.Managers
                 audioManager.SoundVolume = volumeSliders[1].ReadValue();
                 audioManager.MusicVolume = volumeSliders[2].ReadValue();
 
-                await Task.Yield();
+                yield return null;
             }
         }
         public void SlideInVolumeSliders() // Used by trigger button
         {
             player.DisableControls();
-            _ = SlideElements(-optionsSlideOffset, volumeElements);
+            _ = StartCoroutine(SlideElementsRoutine(-optionsSlideOffset, volumeElements));
             Slider.StartClickCheck(this, cam, Mouse.current);
             ClickButton.StartClickCheck(this, cam, Mouse.current);
 
             Pausing.ForcePause();
-
-            UpdateVolumes();
+            StartCoroutine(UpdateVolumes());
         }
         public void SlideOutVolumeSliders() // Used by button
         {
@@ -155,7 +162,7 @@ namespace Overrailed.Managers
 
             ClickButton.StopClickCheck(this);
             Slider.StopClickCheck(this);
-            _ = SlideElements(optionsSlideOffset, volumeElements);
+            _ = StartCoroutine(SlideElementsRoutine(optionsSlideOffset, volumeElements));
             player.EnableControls();
 
             Pausing.ForceResume();
@@ -181,7 +188,7 @@ namespace Overrailed.Managers
         public void SlideInSeedMenu() // Used by trigger button
         {
             player.DisableControls();
-            _ = SlideElements(-optionsSlideOffset, seedElements);
+            _ = StartCoroutine(SlideElementsRoutine(-optionsSlideOffset, seedElements));
             ClickButton.StartClickCheck(this, cam, Mouse.current);
 
             Pausing.ForcePause();
@@ -193,7 +200,7 @@ namespace Overrailed.Managers
             PlayerPrefs.SetString(SeedKey, seedText.text);
 
             ClickButton.StopClickCheck(this);
-            _ = SlideElements(optionsSlideOffset, seedElements);
+            _ = StartCoroutine(SlideElementsRoutine(optionsSlideOffset, seedElements));
             player.EnableControls();
 
             Pausing.ForceResume();
@@ -210,12 +217,12 @@ namespace Overrailed.Managers
             player.EnableControls();
         }
 
-        public async void SwapToSkinsMenu() // Used by trigger button
+        private IEnumerator SwapToSkinsMenuRoutine()
         {
             player.DisableControls();
 
-            _ = SlideElements(-optionsSlideOffset, optionsElements);
-            await Utils.MoveTransformTo(cam.transform, skinCamTransform, camMoveSpeed, camAngularSpeed);
+            _ = StartCoroutine(SlideElementsRoutine(-optionsSlideOffset, optionsElements));
+            yield return StartCoroutine(Utils.MoveTransformTo(cam.transform, skinCamTransform, camMoveSpeed, camAngularSpeed));
 
             playerLastPosition = player.transform.position;
             player.transform.parent = skinsParent.GetChild(currentSkinIndex);
@@ -229,7 +236,12 @@ namespace Overrailed.Managers
 
             Pausing.ForcePause();
         }
-        private async void SwapFromSkinsMenu() // Used by canvas button
+        public void SwapToSkinsMenu() // Used by trigger button
+        {
+            _ = StartCoroutine(SwapToSkinsMenuRoutine());
+        }
+
+        private IEnumerator SwapFromSkinsMenuRoutine()
         {
             StopCoroutine(rotateSkins);
             skinCanvasParent.SetActive(false);
@@ -240,13 +252,17 @@ namespace Overrailed.Managers
             skinPrefab = skinPrefabs[currentSkinIndex];
 
             Pausing.ForceResume();
-            _ = SlideElements(optionsSlideOffset, optionsElements);
-            await Utils.MoveTransformTo(cam.transform, mainCamTransform, camMoveSpeed, camAngularSpeed);
+            _ = StartCoroutine(SlideElementsRoutine(optionsSlideOffset, optionsElements));
+            yield return _ = StartCoroutine(Utils.MoveTransformTo(cam.transform, mainCamTransform, camMoveSpeed, camAngularSpeed));
 
             player.transform.parent = null;
             player.transform.position = playerLastPosition;
             player.transform.localRotation = Quaternion.identity;
             player.EnableControls();
+        }
+        public void SwapFromSkinsMenu() // Used by canvas button
+        {
+            _ = StartCoroutine(SwapFromSkinsMenuRoutine());
         }
 
         private IEnumerator RotateSkins()
@@ -267,14 +283,14 @@ namespace Overrailed.Managers
         {
             if (currentSkinIndex == 0) return;
 
-            SlideElementRoutine(spaceBetweenSkins, skinsParent);
+            _ = StartCoroutine(SlideElementRoutine(spaceBetweenSkins, skinsParent));
             currentSkinIndex--;
         }
         public void ScrollSkinMenuRight() // Used by canvas button
         {
             if (currentSkinIndex == skinsParent.childCount - 1) return;
 
-            SlideElementRoutine(-spaceBetweenSkins, skinsParent);
+            _ = StartCoroutine(SlideElementRoutine(-spaceBetweenSkins, skinsParent));
             currentSkinIndex++;
         }
         #endregion

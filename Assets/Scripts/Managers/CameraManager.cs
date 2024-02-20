@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -56,7 +55,7 @@ namespace Overrailed.Managers.Cameras
             followingTrains = null;
         }
 
-        public static async Task SlideToStart()
+        public static IEnumerator SlideToStart()
         {
             var camTransform = Camera.main.transform;
             var finalPos = new Vector3(4, camTransform.position.y, camTransform.position.z);
@@ -65,14 +64,14 @@ namespace Overrailed.Managers.Cameras
             {
                 camTransform.position = Vector3.MoveTowards(camTransform.position, finalPos, 5 * Time.deltaTime);
 
-                await Task.Yield();
+                yield return null;
             }
         }
 
         public void TransitionEditMode() => TransitionWipe(camera1, camera2);
         public void TransitionGameMode() => TransitionWipe(camera2, camera1);
-        private void TransitionWipe(Camera startCam, Camera endCam) => TransitionWipe(startCam, endCam, fadeRenderTexture, fadeMask, endSize, fadeSpeed);
-        private static async void TransitionWipe(Camera startCam, Camera endCam, RenderTexture fadeTexture, RawImage fadeShape, Vector2 shapeEndSize, float speed)
+        private void TransitionWipe(Camera startCam, Camera endCam) => _ = StartCoroutine(TransitionWipe(startCam, endCam, fadeRenderTexture, fadeMask, endSize, fadeSpeed));
+        private static IEnumerator TransitionWipe(Camera startCam, Camera endCam, RenderTexture fadeTexture, RawImage fadeShape, Vector2 shapeEndSize, float speed)
         {
             if (!startCam.enabled) throw new System.Exception("Start camera not enabled");
 
@@ -89,7 +88,7 @@ namespace Overrailed.Managers.Cameras
             {
                 fadeShape.rectTransform.sizeDelta = Vector2.Lerp(Vector2.zero, shapeEndSize, percentage);
                 percentage += speed * percentage * Time.deltaTime;
-                await Task.Yield();
+                yield return null;
             }
 
             // Transfer active cam to end cam

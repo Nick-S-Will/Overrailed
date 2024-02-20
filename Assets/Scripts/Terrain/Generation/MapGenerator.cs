@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 using Overrailed.Managers;
@@ -47,7 +46,7 @@ namespace Overrailed.Terrain.Generation
                 gm.OnCheckpoint += AddChunk;
                 // Done in this class to lift new chunk *after* it's added
                 gm.OnCheckpoint += GetComponent<MapManager>().PreventCollisions;
-
+                
                 GenerateMap();
             }
         }
@@ -56,7 +55,7 @@ namespace Overrailed.Terrain.Generation
         /// <summary>
         /// Clears current map and generates the first chunk of a new one
         /// </summary>
-        public async void GenerateMap()
+        public IEnumerator GenerateMapRoutine()
         {
             transform.position = IntPos;
 
@@ -66,7 +65,7 @@ namespace Overrailed.Terrain.Generation
             if (Application.isPlaying) DestroyType = Destroy;
             foreach (Transform t in transform.Cast<Transform>().ToList()) DestroyType(t.gameObject);
 
-            await Task.Yield(); // For destroy cleanup
+            yield return null; // For destroy cleanup
 
             if (Application.isPlaying) seed = int.Parse(PlayerPrefs.GetString(Manager.SeedKey, "0"));
             rng = new System.Random(seed);
@@ -82,8 +81,9 @@ namespace Overrailed.Terrain.Generation
 
             var locomotive = GetComponentInChildren<Locomotive>();
             if (locomotive) MapManager.AddLocomotive(GetComponentInChildren<Locomotive>());
-            GetComponent<MapManager>().AnimateFirstChunk();
+            _ = StartCoroutine(GetComponent<MapManager>().AnimateFirstChunk());
         }
+        public void GenerateMap() => _ = StartCoroutine(GenerateMapRoutine());
 
         /// <summary>
         /// Generates map floor and obstacles based on based on Generation variables

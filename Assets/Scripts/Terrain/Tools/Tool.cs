@@ -38,7 +38,7 @@ namespace Overrailed.Terrain.Tools
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
 
-            AudioManager.PlaySound(PickupAudio, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(PickupAudio, transform.position));
 
             OnPickup?.Invoke(this);
             return this;
@@ -48,7 +48,7 @@ namespace Overrailed.Terrain.Tools
 
         public override void Drop(Vector3Int position)
         {
-            AudioManager.PlaySound(DropAudio, transform.position);
+            _ = StartCoroutine(AudioManager.PlaySound(DropAudio, transform.position));
 
             OnDropTool?.Invoke(this);
         }
