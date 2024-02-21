@@ -270,8 +270,12 @@ namespace Overrailed.Managers
         #endregion
 
         #region Change Step
-        private void CompleteStep(Tool unused) => NextStep();
-        private void CompleteStep(Tile unused) => NextStep();
+        private void CompleteStep(Tool _) => NextStep();
+        private void CompleteStep(Tile spawnedTile)
+        {
+            pointerTarget = spawnedTile.transform;
+            NextStep();
+        }
         private void NextStep()
         {
             stepIndex++;
@@ -329,7 +333,7 @@ namespace Overrailed.Managers
                 pointer.position = pointerTarget.position + pointerOffset + bobOffset;
                 pointer.localRotation = nthCycle ? Quaternion.Euler(0, Mathf.Lerp(0, 360, cycleProgress - cycleCount), 0) : Quaternion.identity;
 
-                yield return Manager.PauseRoutine;
+                yield return PauseRoutine;
                 yield return null;
                 time += Time.deltaTime;
             }

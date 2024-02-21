@@ -48,9 +48,15 @@ namespace Overrailed.UI.Shop
 
             if (Manager.instance is GameManager gm)
             {
+                gm.OnCheckpoint += AddCoin;
                 gm.OnCheckpoint += UpdateHoldersCars;
                 gm.OnEndCheckpoint += UpdateHolderVisibility;
             }
+        }
+
+        private void AddCoin()
+        {
+            Coins++;
         }
 
         private void UpdateHoldersCars()
@@ -69,6 +75,7 @@ namespace Overrailed.UI.Shop
         {
             if (Manager.instance is GameManager gm)
             {
+                gm.OnCheckpoint -= AddCoin;
                 gm.OnCheckpoint -= UpdateHoldersCars;
                 gm.OnEndCheckpoint -= UpdateHolderVisibility;
             }

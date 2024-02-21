@@ -495,6 +495,8 @@ namespace Overrailed.Terrain
                 yield return AnimateSlide(extras[0], extraStartPos[0]);
                 if (extras.Count > 1) yield return AnimateSlide(extras[1], extraStartPos[1]);
             }
+
+            yield return new WaitForSeconds(1f);
         }
 
         private IEnumerator AnimateSlide(Transform t, Vector3 destination)

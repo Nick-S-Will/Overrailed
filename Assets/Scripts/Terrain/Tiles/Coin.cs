@@ -26,7 +26,7 @@ namespace Overrailed.Terrain.Tiles
         private void Collect()
         {
             var shop = FindObjectOfType<TrainStoreManager>();
-            if (shop) shop.Coins += 1;
+            if (shop) shop.Coins++;
             else Debug.LogWarning($"{name} couldn't find shop");
 
             BreakIntoParticles(transform.position);
